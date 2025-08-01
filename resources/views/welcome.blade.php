@@ -3,12 +3,17 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-
-        <title>Laravel</title>
-
+        <title>Desa Sukamaju - Website Resmi</title>
+        
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet" />
+        
+        <!-- Tailwind CSS -->
+        <script src="https://cdn.tailwindcss.com"></script>
+        
+        <!-- Additional CSS -->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
 
         <!-- Styles -->
         <style>
@@ -16,29 +21,298 @@
         </style>
     </head>
     <body class="antialiased">
-        <div class="relative sm:flex sm:justify-center sm:items-center min-h-screen bg-dots-darker bg-center bg-gray-100 dark:bg-dots-lighter dark:bg-gray-900 selection:bg-red-500 selection:text-white">
-            @if (Route::has('login'))
-                <div class="sm:fixed sm:top-0 sm:right-0 p-6 text-right z-10">
-                    @auth
-                        <a href="{{ url('/home') }}" class="font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Home</a>
-                    @else
-                        <a href="{{ route('login') }}" class="font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Log in</a>
-
-                        @if (Route::has('register'))
-                            <a href="{{ route('register') }}" class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Register</a>
-                        @endif
-                    @endauth
+        <!-- Navbar -->
+        <nav class="bg-green-800 text-white shadow-lg">
+            <div class="max-w-7xl mx-auto px-4">
+                <div class="flex justify-between items-center py-4">
+                    <div class="flex items-center space-x-8">
+                        <a href="/" class="flex items-center space-x-2">
+                            <img src="/img/logo.png" alt="Logo Desa" class="h-10 w-auto">
+                            <span class="font-bold text-xl">Desa Sukamaju</span>
+                        </a>
+                        <div class="hidden md:flex space-x-4">
+                            <a href="/" class="hover:text-green-200">Beranda</a>
+                            <a href="/profil" class="hover:text-green-200">Profil Desa</a>
+                            <div class="relative group">
+                                <button class="hover:text-green-200">Statistik Penduduk ▼</button>
+                                <div class="absolute hidden group-hover:block w-48 bg-white text-gray-700 shadow-lg mt-2 py-2 rounded-lg">
+                                    <a href="/statistik/wilayah" class="block px-4 py-2 hover:bg-green-100">Wilayah</a>
+                                    <a href="/statistik/usia" class="block px-4 py-2 hover:bg-green-100">Usia</a>
+                                    <a href="/statistik/pendidikan" class="block px-4 py-2 hover:bg-green-100">Pendidikan</a>
+                                    <a href="/statistik/pekerjaan" class="block px-4 py-2 hover:bg-green-100">Pekerjaan</a>
+                                </div>
+                            </div>
+                            <div class="relative group">
+                                <button class="hover:text-green-200">Pelayanan Surat ▼</button>
+                                <div class="absolute hidden group-hover:block w-48 bg-white text-gray-700 shadow-lg mt-2 py-2 rounded-lg">
+                                    <a href="/surat/status" class="block px-4 py-2 hover:bg-green-100">Status Layanan</a>
+                                    <a href="/surat/jadwal" class="block px-4 py-2 hover:bg-green-100">Jadwal Pengambilan</a>
+                                    <a href="/surat/form" class="block px-4 py-2 hover:bg-green-100">Pengisian Surat</a>
+                                </div>
+                            </div>
+                            <a href="/kontak" class="hover:text-green-200">Kontak</a>
+                        </div>
+                    </div>
+                    <div class="hidden md:flex items-center space-x-4">
+                        @auth
+                            <a href="/dashboard" class="bg-white text-green-800 px-4 py-2 rounded-lg hover:bg-green-100">Dashboard</a>
+                        @else
+                            <a href="/login" class="text-white hover:text-green-200">Masuk</a>
+                            <a href="/register" class="bg-white text-green-800 px-4 py-2 rounded-lg hover:bg-green-100">Daftar</a>
+                        @endauth
+                    </div>
                 </div>
-            @endif
+            </div>
+        </nav>
 
-            <div class="max-w-7xl mx-auto p-6 lg:p-8">
-                <div class="flex justify-center">
-                    <svg viewBox="0 0 62 65" fill="none" xmlns="http://www.w3.org/2000/svg" class="h-16 w-auto bg-gray-100 dark:bg-gray-900">
-                        <path d="M61.8548 14.6253C61.8778 14.7102 61.8895 14.7978 61.8897 14.8858V28.5615C61.8898 28.737 61.8434 28.9095 61.7554 29.0614C61.6675 29.2132 61.5409 29.3392 61.3887 29.4265L49.9104 36.0351V49.1337C49.9104 49.4902 49.7209 49.8192 49.4118 49.9987L25.4519 63.7916C25.3971 63.8227 25.3372 63.8427 25.2774 63.8639C25.255 63.8714 25.2338 63.8851 25.2101 63.8913C25.0426 63.9354 24.8666 63.9354 24.6991 63.8913C24.6716 63.8838 24.6467 63.8689 24.6205 63.8589C24.5657 63.8389 24.5084 63.8215 24.456 63.7916L0.501061 49.9987C0.348882 49.9113 0.222437 49.7853 0.134469 49.6334C0.0465019 49.4816 0.000120578 49.3092 0 49.1337L0 8.10652C0 8.01678 0.0124642 7.92953 0.0348998 7.84477C0.0423783 7.8161 0.0598282 7.78993 0.0697995 7.76126C0.0884958 7.70891 0.105946 7.65531 0.133367 7.6067C0.152063 7.5743 0.179485 7.54812 0.20192 7.51821C0.230588 7.47832 0.256763 7.43719 0.290416 7.40229C0.319084 7.37362 0.356476 7.35243 0.388883 7.32751C0.425029 7.29759 0.457436 7.26518 0.498568 7.2415L12.4779 0.345059C12.6296 0.257786 12.8015 0.211853 12.9765 0.211853C13.1515 0.211853 13.3234 0.257786 13.475 0.345059L25.4531 7.2415H25.4556C25.4955 7.26643 25.5292 7.29759 25.5653 7.32626C25.5977 7.35119 25.6339 7.37362 25.6625 7.40104C25.6974 7.43719 25.7224 7.47832 25.7523 7.51821C25.7735 7.54812 25.8021 7.5743 25.8196 7.6067C25.8483 7.65656 25.8645 7.70891 25.8844 7.76126C25.8944 7.78993 25.9118 7.8161 25.9193 7.84602C25.9423 7.93096 25.954 8.01853 25.9542 8.10652V33.7317L35.9355 27.9844V14.8846C35.9355 14.7973 35.948 14.7088 35.9704 14.6253C35.9792 14.5954 35.9954 14.5692 36.0053 14.5405C36.0253 14.4882 36.0427 14.4346 36.0702 14.386C36.0888 14.3536 36.1163 14.3274 36.1375 14.2975C36.1674 14.2576 36.1923 14.2165 36.2272 14.1816C36.2559 14.1529 36.292 14.1317 36.3244 14.1068C36.3618 14.0769 36.3942 14.0445 36.4341 14.0208L48.4147 7.12434C48.5663 7.03694 48.7383 6.99094 48.9133 6.99094C49.0883 6.99094 49.2602 7.03694 49.4118 7.12434L61.3899 14.0208C61.4323 14.0457 61.4647 14.0769 61.5021 14.1055C61.5333 14.1305 61.5694 14.1529 61.5981 14.1803C61.633 14.2165 61.6579 14.2576 61.6878 14.2975C61.7103 14.3274 61.7377 14.3536 61.7551 14.386C61.7838 14.4346 61.8 14.4882 61.8199 14.5405C61.8312 14.5692 61.8474 14.5954 61.8548 14.6253ZM59.893 27.9844V16.6121L55.7013 19.0252L49.9104 22.3593V33.7317L59.8942 27.9844H59.893ZM47.9149 48.5566V37.1768L42.2187 40.4299L25.953 49.7133V61.2003L47.9149 48.5566ZM1.99677 9.83281V48.5566L23.9562 61.199V49.7145L12.4841 43.2219L12.4804 43.2194L12.4754 43.2169C12.4368 43.1945 12.4044 43.1621 12.3682 43.1347C12.3371 43.1097 12.3009 43.0898 12.2735 43.0624L12.271 43.0586C12.2386 43.0275 12.2162 42.9888 12.1887 42.9539C12.1638 42.9203 12.1339 42.8916 12.114 42.8567L12.1127 42.853C12.0903 42.8156 12.0766 42.7707 12.0604 42.7283C12.0442 42.6909 12.023 42.656 12.013 42.6161C12.0005 42.5688 11.998 42.5177 11.9931 42.4691C11.9881 42.4317 11.9781 42.3943 11.9781 42.3569V15.5801L6.18848 12.2446L1.99677 9.83281ZM12.9777 2.36177L2.99764 8.10652L12.9752 13.8513L22.9541 8.10527L12.9752 2.36177H12.9777ZM18.1678 38.2138L23.9574 34.8809V9.83281L19.7657 12.2459L13.9749 15.5801V40.6281L18.1678 38.2138ZM48.9133 9.14105L38.9344 14.8858L48.9133 20.6305L58.8909 14.8846L48.9133 9.14105ZM47.9149 22.3593L42.124 19.0252L37.9323 16.6121V27.9844L43.7219 31.3174L47.9149 33.7317V22.3593ZM24.9533 47.987L39.59 39.631L46.9065 35.4555L36.9352 29.7145L25.4544 36.3242L14.9907 42.3482L24.9533 47.987Z" fill="#FF2D20"/>
-                    </svg>
+        <!-- Hero Section -->
+        <section id="hero" class="relative h-screen">
+            <div class="absolute inset-0">
+                <img src="{{ asset('img/hero-bg.jpg') }}" alt="Desa Sukamaju" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-black opacity-50"></div>
+            </div>
+            <div class="relative max-w-7xl mx-auto px-4 h-full flex flex-col justify-center items-center text-white text-center">
+                <h1 class="text-5xl md:text-6xl font-bold mb-4">Desa Sukamaju</h1>
+                <p class="text-xl md:text-2xl mb-8">"Maju, Mandiri, dan Sejahtera"</p>
+                <div class="flex flex-wrap justify-center gap-4">
+                    <a href="#statistik" class="bg-green-600 hover:bg-green-700 px-6 py-3 rounded-lg font-semibold transition duration-300">
+                        <i class="fas fa-chart-bar mr-2"></i>Statistik Penduduk
+                    </a>
+                    <a href="#layanan" class="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg font-semibold transition duration-300">
+                        <i class="fas fa-file-alt mr-2"></i>Ajukan Surat
+                    </a>
+                    <a href="#kontak" class="bg-yellow-600 hover:bg-yellow-700 px-6 py-3 rounded-lg font-semibold transition duration-300">
+                        <i class="fas fa-phone mr-2"></i>Hubungi Kami
+                    </a>
                 </div>
+            </div>
+        </section>
 
-                <div class="mt-16">
+        <!-- Main Content -->
+        <div class="bg-white">
+            <!-- Profil Singkat -->
+            <section id="profil" class="py-16 bg-gray-100">
+                <div class="max-w-7xl mx-auto px-4">
+                    <h2 class="text-3xl font-bold text-center mb-12">Profil Desa Sukamaju</h2>
+                    <div class="grid md:grid-cols-3 gap-8 mb-12">
+                        <div class="bg-white p-6 rounded-lg shadow-lg text-center transform hover:scale-105 transition duration-300">
+                            <div class="text-4xl font-bold text-green-800 mb-2">1945</div>
+                            <div class="text-gray-600">Tahun Berdiri</div>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow-lg text-center transform hover:scale-105 transition duration-300">
+                            <div class="text-4xl font-bold text-green-800 mb-2">5.280</div>
+                            <div class="text-gray-600">Jumlah Penduduk</div>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow-lg text-center transform hover:scale-105 transition duration-300">
+                            <div class="text-4xl font-bold text-green-800 mb-2">450 Ha</div>
+                            <div class="text-gray-600">Luas Wilayah</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Perangkat Desa -->
+                    <h3 class="text-2xl font-bold text-center mb-8">Perangkat Desa</h3>
+                    <div class="grid md:grid-cols-4 gap-6">
+                        <div class="text-center transform hover:scale-105 transition duration-300">
+                            <img src="{{ asset('img/kades.jpg') }}" alt="Kepala Desa" class="w-48 h-48 rounded-full mx-auto mb-4 object-cover shadow-lg">
+                            <h3 class="font-semibold">Bapak Suharto</h3>
+                            <p class="text-gray-600">Kepala Desa</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Fitur Utama -->
+            <section id="layanan" class="py-16">
+                <div class="max-w-7xl mx-auto px-4">
+                    <h2 class="text-3xl font-bold text-center mb-12">Layanan Utama</h2>
+                    <div class="grid md:grid-cols-3 gap-8">
+                        <div class="bg-white p-8 rounded-lg shadow-lg text-center transform hover:scale-105 transition duration-300">
+                            <div class="text-5xl mb-4">📊</div>
+                            <h3 class="text-xl font-semibold mb-4">Statistik Penduduk</h3>
+                            <p class="text-gray-600 mb-4">Data lengkap kependudukan Desa Sukamaju</p>
+                            <a href="#statistik" class="inline-block bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition duration-300">
+                                Lihat Data
+                            </a>
+                        </div>
+                        <div class="bg-white p-8 rounded-lg shadow-lg text-center transform hover:scale-105 transition duration-300">
+                            <div class="text-5xl mb-4">📝</div>
+                            <h3 class="text-xl font-semibold mb-4">Pelayanan Surat</h3>
+                            <p class="text-gray-600 mb-4">Ajukan surat keterangan secara online</p>
+                            <a href="/surat" class="inline-block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-300">
+                                Buat Surat
+                            </a>
+                        </div>
+                        <div class="bg-white p-8 rounded-lg shadow-lg text-center transform hover:scale-105 transition duration-300">
+                            <div class="text-5xl mb-4">📂</div>
+                            <h3 class="text-xl font-semibold mb-4">Laporan Bulanan</h3>
+                            <p class="text-gray-600 mb-4">Laporan kegiatan dan keuangan desa</p>
+                            <a href="/laporan" class="inline-block bg-yellow-600 text-white px-6 py-2 rounded-lg hover:bg-yellow-700 transition duration-300">
+                                Lihat Laporan
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Berita & Informasi -->
+            <section id="berita" class="py-16 bg-gray-100">
+                <div class="max-w-7xl mx-auto px-4">
+                    <h2 class="text-3xl font-bold text-center mb-12">Berita & Informasi Terbaru</h2>
+                    <div class="grid md:grid-cols-3 gap-8">
+                        <!-- Berita 1 -->
+                        <div class="bg-white rounded-lg overflow-hidden shadow-lg transform hover:scale-105 transition duration-300">
+                            <img src="{{ asset('img/berita1.jpg') }}" alt="Berita 1" class="w-full h-48 object-cover">
+                            <div class="p-6">
+                                <div class="text-sm text-gray-500 mb-2">1 Agustus 2025</div>
+                                <h3 class="font-semibold text-xl mb-2">Jadwal Posyandu Bulan Agustus</h3>
+                                <p class="text-gray-600 mb-4">Kegiatan Posyandu akan dilaksanakan pada tanggal 10 Agustus 2025...</p>
+                                <a href="#" class="inline-block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition duration-300">
+                                    Baca selengkapnya
+                                </a>
+                            </div>
+                        </div>
+                        <!-- Berita 2 -->
+                        <div class="bg-white rounded-lg overflow-hidden shadow-lg transform hover:scale-105 transition duration-300">
+                            <img src="{{ asset('img/berita2.jpg') }}" alt="Berita 2" class="w-full h-48 object-cover">
+                            <div class="p-6">
+                                <div class="text-sm text-gray-500 mb-2">28 Juli 2025</div>
+                                <h3 class="font-semibold text-xl mb-2">Gotong Royong Pembangunan Jalan Desa</h3>
+                                <p class="text-gray-600 mb-4">Warga desa bersama-sama bergotong royong dalam pembangunan...</p>
+                                <a href="#" class="inline-block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition duration-300">
+                                    Baca selengkapnya
+                                </a>
+                            </div>
+                        </div>
+                        <!-- Berita 3 -->
+                        <div class="bg-white rounded-lg overflow-hidden shadow-lg transform hover:scale-105 transition duration-300">
+                            <img src="{{ asset('img/berita3.jpg') }}" alt="Berita 3" class="w-full h-48 object-cover">
+                            <div class="p-6">
+                                <div class="text-sm text-gray-500 mb-2">25 Juli 2025</div>
+                                <h3 class="font-semibold text-xl mb-2">Program Vaksinasi COVID-19</h3>
+                                <p class="text-gray-600 mb-4">Program vaksinasi COVID-19 tahap kedua akan dilaksanakan...</p>
+                                <a href="#" class="inline-block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition duration-300">
+                                    Baca selengkapnya
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Galeri -->
+            <section id="galeri" class="py-16">
+                <div class="max-w-7xl mx-auto px-4">
+                    <h2 class="text-3xl font-bold text-center mb-12">Galeri Desa</h2>
+                    <div class="grid md:grid-cols-4 gap-4">
+                        <!-- Galeri 1 -->
+                        <div class="rounded-lg overflow-hidden shadow-lg">
+                            <img src="{{ asset('img/galeri1.jpg') }}" alt="Galeri 1" 
+                                 class="w-full h-48 object-cover transform hover:scale-110 transition duration-300">
+                        </div>
+                        <!-- Galeri 2 -->
+                        <div class="rounded-lg overflow-hidden shadow-lg">
+                            <img src="{{ asset('img/galeri2.jpg') }}" alt="Galeri 2" 
+                                 class="w-full h-48 object-cover transform hover:scale-110 transition duration-300">
+                        </div>
+                        <!-- Galeri 3 -->
+                        <div class="rounded-lg overflow-hidden shadow-lg">
+                            <img src="{{ asset('img/galeri3.jpg') }}" alt="Galeri 3" 
+                                 class="w-full h-48 object-cover transform hover:scale-110 transition duration-300">
+                        </div>
+                        <!-- Galeri 4 -->
+                        <div class="rounded-lg overflow-hidden shadow-lg">
+                            <img src="{{ asset('img/galeri4.jpg') }}" alt="Galeri 4" 
+                                 class="w-full h-48 object-cover transform hover:scale-110 transition duration-300">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Kontak dan Lokasi -->
+            <section id="kontak" class="py-16 bg-gray-100">
+                <div class="max-w-7xl mx-auto px-4">
+                    <h2 class="text-3xl font-bold text-center mb-12">Kontak & Lokasi</h2>
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div>
+                            <div class="bg-white p-6 rounded-lg shadow-lg">
+                                <h3 class="text-xl font-semibold mb-4">Informasi Kontak</h3>
+                                <div class="space-y-4">
+                                    <p class="flex items-center">
+                                        <i class="fas fa-map-marker-alt w-6 text-green-600"></i>
+                                        Jl. Raya Sukamaju No. 123, Kec. Sukamaju
+                                    </p>
+                                    <p class="flex items-center">
+                                        <i class="fas fa-phone w-6 text-green-600"></i>
+                                        (021) 1234-5678
+                                    </p>
+                                    <p class="flex items-center">
+                                        <i class="fas fa-envelope w-6 text-green-600"></i>
+                                        info@desasukamaju.desa.id
+                                    </p>
+                                </div>
+                                <div class="mt-6 flex space-x-4">
+                                    <a href="#" class="text-blue-600 hover:text-blue-800 transition duration-300">
+                                        <i class="fab fa-facebook fa-2x"></i>
+                                    </a>
+                                    <a href="#" class="text-green-600 hover:text-green-800 transition duration-300">
+                                        <i class="fab fa-whatsapp fa-2x"></i>
+                                    </a>
+                                    <a href="#" class="text-pink-600 hover:text-pink-800 transition duration-300">
+                                        <i class="fab fa-instagram fa-2x"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="h-96 rounded-lg overflow-hidden shadow-lg">
+                            <iframe 
+                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3963.952912260219!2d3.375295414770757!3d6.5276316952457235!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNsKwMzEnMzkuNSJOIDPCsDIyJzMxLjEiRQ!5e0!3m2!1sen!2sid!4v1627981258190!5m2!1sen!2sid" 
+                                width="100%" 
+                                height="100%" 
+                                style="border:0;" 
+                                allowfullscreen="" 
+                                loading="lazy">
+                            </iframe>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Footer -->
+            <footer class="bg-green-800 text-white py-8">
+                <div class="max-w-7xl mx-auto px-4">
+                    <div class="grid md:grid-cols-3 gap-8">
+                        <div>
+                            <h4 class="text-xl font-semibold mb-4">Desa Sukamaju</h4>
+                            <p class="text-green-200">Website resmi Pemerintah Desa Sukamaju</p>
+                        </div>
+                        <div>
+                            <h4 class="text-xl font-semibold mb-4">Link Cepat</h4>
+                            <ul class="space-y-2">
+                                <li><a href="#hero" class="text-green-200 hover:text-white transition duration-300">Beranda</a></li>
+                                <li><a href="#profil" class="text-green-200 hover:text-white transition duration-300">Profil Desa</a></li>
+                                <li><a href="#layanan" class="text-green-200 hover:text-white transition duration-300">Layanan</a></li>
+                                <li><a href="#kontak" class="text-green-200 hover:text-white transition duration-300">Kontak</a></li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="text-xl font-semibold mb-4">Jam Operasional</h4>
+                            <p class="text-green-200">Senin - Jumat: 08.00 - 16.00</p>
+                            <p class="text-green-200">Sabtu: 08.00 - 12.00</p>
+                            <p class="text-green-200">Minggu: Tutup</p>
+                        </div>
+                    </div>
+                    <div class="border-t border-green-700 mt-8 pt-8 text-center">
+                        <p class="text-green-200">&copy; {{ date('Y') }} Desa Sukamaju. All rights reserved.</p>
+                    </div>
+                </div>
+            </footer>
+
+            <!-- Back to top button -->
+            <button id="backToTop" class="fixed bottom-4 right-4 bg-green-600 text-white p-3 rounded-full shadow-lg hover:bg-green-700 transition duration-300 hidden">
+                <i class="fas fa-arrow-up"></i>
+            </button>
+
+            <div class="mt-16">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
                         <a href="https://laravel.com/docs" class="scale-100 p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
                             <div>
