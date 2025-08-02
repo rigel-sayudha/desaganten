@@ -12,7 +12,6 @@
         <!-- Tailwind CSS -->
         <script src="https://cdn.tailwindcss.com"></script>
         
-        <!-- Additional CSS -->
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
 
         <!-- Styles -->
@@ -21,27 +20,7 @@
         </style>
     </head>
     <body class="antialiased">
-        <!-- Navbar -->
-        <nav class="bg-green-800 text-white shadow-lg">
-            <div class="max-w-7xl mx-auto px-4">
-                <div class="flex justify-between items-center py-4">
-                    <div class="flex items-center space-x-8">
-                        <a href="/" class="flex items-center space-x-2">
-                            <img src="/img/logo.png" alt="Logo Desa" class="h-10 w-auto">
-                            <span class="font-bold text-xl">Desa Sukamaju</span>
-                        </a>
-                        <div class="hidden md:flex space-x-4">
-                            <a href="/" class="hover:text-green-200">Beranda</a>
-                            <a href="/profil" class="hover:text-green-200">Profil Desa</a>
-                            <div class="relative group">
-                                <button class="hover:text-green-200">Statistik Penduduk ▼</button>
-                                <div class="absolute hidden group-hover:block w-48 bg-white text-gray-700 shadow-lg mt-2 py-2 rounded-lg">
-                                    <a href="/statistik/wilayah" class="block px-4 py-2 hover:bg-green-100">Wilayah</a>
-                                    <a href="/statistik/usia" class="block px-4 py-2 hover:bg-green-100">Usia</a>
-                                    <a href="/statistik/pendidikan" class="block px-4 py-2 hover:bg-green-100">Pendidikan</a>
-                                    <a href="/statistik/pekerjaan" class="block px-4 py-2 hover:bg-green-100">Pekerjaan</a>
-                                </div>
-                            </div>
+        @include('partials.navbar')
                             <div class="relative group">
                                 <button class="hover:text-green-200">Pelayanan Surat ▼</button>
                                 <div class="absolute hidden group-hover:block w-48 bg-white text-gray-700 shadow-lg mt-2 py-2 rounded-lg">
@@ -57,8 +36,8 @@
                         @auth
                             <a href="/dashboard" class="bg-white text-green-800 px-4 py-2 rounded-lg hover:bg-green-100">Dashboard</a>
                         @else
-                            <a href="/login" class="text-white hover:text-green-200">Masuk</a>
-                            <a href="/register" class="bg-white text-green-800 px-4 py-2 rounded-lg hover:bg-green-100">Daftar</a>
+                            {{-- <a href="/login" class="text-white hover:text-green-200">Masuk</a>
+                            <a href="/register" class="bg-white text-green-800 px-4 py-2 rounded-lg hover:bg-green-100">Daftar</a> --}}
                         @endauth
                     </div>
                 </div>
@@ -88,7 +67,6 @@
             </div>
         </section>
 
-        <!-- Main Content -->
         <div class="bg-white">
             <!-- Profil Singkat -->
             <section id="profil" class="py-16 bg-gray-100">
@@ -108,8 +86,7 @@
                             <div class="text-gray-600">Luas Wilayah</div>
                         </div>
                     </div>
-                    
-                    <!-- Perangkat Desa -->
+
                     <h3 class="text-2xl font-bold text-center mb-8">Perangkat Desa</h3>
                     <div class="grid md:grid-cols-4 gap-6">
                         <div class="text-center transform hover:scale-105 transition duration-300">
@@ -278,36 +255,9 @@
             </section>
 
             <!-- Footer -->
-            <footer class="bg-green-800 text-white py-8">
-                <div class="max-w-7xl mx-auto px-4">
-                    <div class="grid md:grid-cols-3 gap-8">
-                        <div>
-                            <h4 class="text-xl font-semibold mb-4">Desa Sukamaju</h4>
-                            <p class="text-green-200">Website resmi Pemerintah Desa Sukamaju</p>
-                        </div>
-                        <div>
-                            <h4 class="text-xl font-semibold mb-4">Link Cepat</h4>
-                            <ul class="space-y-2">
-                                <li><a href="#hero" class="text-green-200 hover:text-white transition duration-300">Beranda</a></li>
-                                <li><a href="#profil" class="text-green-200 hover:text-white transition duration-300">Profil Desa</a></li>
-                                <li><a href="#layanan" class="text-green-200 hover:text-white transition duration-300">Layanan</a></li>
-                                <li><a href="#kontak" class="text-green-200 hover:text-white transition duration-300">Kontak</a></li>
-                            </ul>
-                        </div>
-                        <div>
-                            <h4 class="text-xl font-semibold mb-4">Jam Operasional</h4>
-                            <p class="text-green-200">Senin - Jumat: 08.00 - 16.00</p>
-                            <p class="text-green-200">Sabtu: 08.00 - 12.00</p>
-                            <p class="text-green-200">Minggu: Tutup</p>
-                        </div>
-                    </div>
-                    <div class="border-t border-green-700 mt-8 pt-8 text-center">
-                        <p class="text-green-200">&copy; {{ date('Y') }} Desa Sukamaju. All rights reserved.</p>
-                    </div>
-                </div>
-            </footer>
+        @include('partials.footer')
 
-            <!-- Back to top button -->
+        <!-- Back to top button -->            <!-- Back to top button -->
             <button id="backToTop" class="fixed bottom-4 right-4 bg-green-600 text-white p-3 rounded-full shadow-lg hover:bg-green-700 transition duration-300 hidden">
                 <i class="fas fa-arrow-up"></i>
             </button>

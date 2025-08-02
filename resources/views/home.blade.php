@@ -32,10 +32,10 @@
                             <a href="#kontak" class="hover:text-green-200">Kontak</a>
                         </div>
                     </div>
-                    <div class="hidden md:flex items-center space-x-4">
+                    {{-- <div class="hidden md:flex items-center space-x-4">
                         <a href="/login" class="hover:text-green-200">Masuk</a>
                         <a href="/register" class="bg-white text-green-800 px-4 py-2 rounded-lg hover:bg-green-100">Daftar</a>
-                    </div>
+                    </div> --}}
                     <!-- Mobile menu button -->
                     <div class="md:hidden">
                         <button class="mobile-menu-button">
@@ -54,7 +54,9 @@
             </div>
             <div class="relative max-w-7xl mx-auto px-4 h-full flex flex-col justify-center items-center text-white text-center">
                 <h1 class="text-5xl md:text-6xl font-bold mb-4">Desa Sukamaju</h1>
-                <p class="text-xl md:text-2xl mb-8">"Maju, Mandiri, dan Sejahtera"</p>
+                <p class="text-xl md:text-2xl mb-8">"Maju, Mandiri, dan Sejahtera
+                    
+                    "</p>
                 <div class="flex flex-wrap justify-center gap-4">
                     <a href="#statistik" class="bg-green-600 hover:bg-green-700 px-6 py-3 rounded-lg font-semibold transition duration-300">
                         <i class="fas fa-chart-bar mr-2"></i>Statistik Penduduk
@@ -96,7 +98,6 @@
                         <h3 class="font-semibold">Bapak Suharto</h3>
                         <p class="text-gray-600">Kepala Desa</p>
                     </div>
-                    <!-- Add more village officials here -->
                 </div>
             </div>
         </section>
