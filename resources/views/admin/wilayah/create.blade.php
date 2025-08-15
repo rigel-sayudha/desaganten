@@ -1,6 +1,14 @@
 @extends('layouts.app')
 
 @section('content')
+@php
+$breadcrumbs = [
+    ['label' => 'Admin', 'url' => url('/admin/dashboard')],
+    ['label' => 'Wilayah', 'url' => url('/admin/wilayah')],
+    ['label' => 'Tambah', 'url' => '#'],
+];
+@endphp
+@include('partials.breadcrumbs', ['items' => $breadcrumbs])
 @include('admin.partials.navbar')
 <div class="flex">
     @include('admin.partials.sidebar')

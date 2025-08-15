@@ -19,7 +19,17 @@
                 <h4 class="text-xl font-semibold mb-4">Jam Operasional</h4>
                 <p class="text-blue-100">Senin - Jumat: 08.00 - 16.00</p>
                 <p class="text-blue-100">Sabtu: 08.00 - 12.00</p>
-                <p class="text-blue-100">Minggu: Tutup</p>
+                <p class="text-blue-100 mb-4">Minggu: Tutup</p>
+                <div class="flex flex-col space-y-3">
+                    <div class="bg-white bg-opacity-10 border border-blue-200 rounded-lg px-6 py-4 inline-block text-left shadow">
+                        <div class="text-xs text-blue-100 mb-1">Visitor Hari Ini</div>
+                        <div class="text-2xl font-bold text-white">{{ $visitorToday ?? 0 }}</div>
+                    </div>
+                    <div class="bg-white bg-opacity-10 border border-blue-200 rounded-lg px-6 py-4 inline-block text-left shadow">
+                        <div class="text-xs text-blue-100 mb-1">Total Visitor</div>
+                        <div class="text-2xl font-bold text-white">{{ $visitorAllTime ?? 0 }}</div>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="border-t border-blue-300 mt-8 pt-8 text-center">

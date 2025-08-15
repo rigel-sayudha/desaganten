@@ -1,12 +1,11 @@
 @extends('layouts.app')
 
-{{-- Tidak ada topbar di halaman login user --}}
 @section('content')
 <div class="flex items-center justify-center min-h-screen bg-gradient-to-br from-[#e0f7fa] via-[#f5faff] to-[#e3f2fd]">
     <div class="w-full max-w-md p-0 sm:p-8 bg-white rounded-2xl shadow-2xl flex flex-col items-center relative overflow-hidden">
         <div class="w-full flex flex-col items-center justify-center py-8 px-6">
             <img src="/img/logo.png" alt="Logo Desa Ganten" class="w-16 h-16 rounded-full mb-4 shadow-lg border-2 border-[#0088cc] bg-white">
-            <h2 class="text-3xl font-extrabold text-[#0088cc] mb-2 text-center drop-shadow">Login Penduduk</h2>
+            <h2 class="text-3xl font-extrabold text-[#0088cc] mb-2 text-center drop-shadow">Login Admin</h2>
             @if(session('error'))
                 <div class="mb-4 text-red-600 text-center">{{ session('error') }}</div>
             @endif
@@ -16,14 +15,14 @@
                     document.addEventListener('DOMContentLoaded', function() {
                         Swal.fire({
                             icon: 'success',
-                            title: 'Berhasil!',
+                            title: 'Berhasil Logout',
                             text: '{{ session('success') }}',
                             confirmButtonColor: '#0088cc',
                         });
                     });
                 </script>
             @endif
-            <form method="POST" action="{{ route('login') }}" class="space-y-4 w-full">
+            <form method="POST" action="{{ route('admin.login') }}" class="space-y-4 w-full">
                 @csrf
                 <div>
                     <label for="email" class="block mb-1 font-semibold text-[#0088cc]">Email</label>
@@ -35,11 +34,6 @@
                 </div>
                 <button type="submit" class="w-full py-2 font-bold text-white bg-gradient-to-r from-[#0088cc] to-[#006fa1] rounded-lg shadow hover:scale-105 transition">Login</button>
             </form>
-            <div class="mt-12 text-center text-sm text-gray-600 flex flex-col items-center">
-                <hr class="w-2/3 mb-4 border-[#b3e5fc]">
-                <span>Belum punya akun?</span>
-                <a href="{{ route('register') }}" class="text-[#0088cc] font-bold hover:underline mt-2">Daftar Sekarang</a>
-            </div>
         </div>
     </div>
 </div>
