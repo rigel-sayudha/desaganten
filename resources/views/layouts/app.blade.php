@@ -18,11 +18,6 @@
         </style>
     </head>
     <body class="antialiased">
-        @hasSection('topbar')
-            @yield('topbar')
-        @else
-            @include('partials.topbar')
-        @endif
         <div id="loadingOverlay" class="fixed inset-0 z-50 flex items-center justify-center bg-white bg-opacity-80 hidden">
             <div class="flex flex-col items-center">
                 <svg class="animate-spin h-12 w-12 text-[#0088cc] mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -32,6 +27,13 @@
                 <span class="text-[#0088cc] font-semibold text-lg">Memuat...</span>
             </div>
         </div>
+        @if (!Str::startsWith(request()->path(), 'admin'))
+            @hasSection('topbar')
+                @yield('topbar')
+            @else
+                @include('partials.topbar')
+            @endif
+        @endif
         @yield('content')
         @include('admin.partials.alpinejs')
         <script>

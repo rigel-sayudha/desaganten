@@ -62,4 +62,112 @@ class SuratController extends Controller
         $surat->save();
         return back()->with('success','Status surat diperbarui.');
     }
+
+    public function kehilanganSubmit(Request $request)
+    {
+        $request->validate([
+            'nama' => 'required',
+            'nik' => 'required',
+            'tempat_lahir' => 'required',
+            'tanggal_lahir' => 'required',
+            'alamat' => 'required',
+            'jenis_barang' => 'required',
+            'waktu_tempat' => 'required',
+        ]);
+        return redirect()->back()->with('success', 'Permohonan surat keterangan kehilangan berhasil dikirim.');
+    }
+
+    public function ktpSubmit(Request $request)
+    {
+        $request->validate([
+            'nama_lengkap' => 'required',
+            'jenis_kelamin' => 'required',
+            'agama' => 'required',
+            'status_perkawinan' => 'required',
+            'nik' => 'required|digits:16',
+            'tempat_lahir' => 'required',
+            'tanggal_lahir' => 'required',
+            'pekerjaan' => 'required',
+            'alamat' => 'required',
+            'keperluan' => 'required',
+        ]);
+        return redirect()->back()->with('success', 'Permohonan surat keterangan KTP berhasil dikirim.');
+    }
+
+    public function kematianSubmit(Request $request)
+    {
+        $request->validate([
+            'nama' => 'required',
+            'tempat_lahir' => 'required',
+            'tanggal_lahir' => 'required',
+            'jenis_kelamin' => 'required',
+            'kewarganegaraan' => 'required',
+            'agama' => 'required',
+            'status_perkawinan' => 'required',
+            'pekerjaan' => 'required',
+            'alamat' => 'required',
+            'rt_rw' => 'required',
+            'hari' => 'required',
+            'tanggal_meninggal' => 'required',
+            'tempat_kematian' => 'required',
+            'kecamatan' => 'required',
+            'kabupaten' => 'required',
+            'provinsi' => 'required',
+            'sebab_kematian' => 'required',
+        ]);
+        return redirect()->back()->with('success', 'Permohonan surat keterangan kematian berhasil dikirim.');
+    }
+
+    public function kkSubmit(Request $request)
+    {
+        $request->validate([
+            'nama_lengkap' => 'required',
+            'jenis_kelamin' => 'required',
+            'agama' => 'required',
+            'status_perkawinan' => 'required',
+            'nik' => 'required|digits:16',
+            'tempat_lahir' => 'required',
+            'tanggal_lahir' => 'required',
+            'pekerjaan' => 'required',
+            'alamat' => 'required',
+            'keperluan' => 'required',
+        ]);
+        return redirect()->back()->with('success', 'Permohonan surat keterangan KK berhasil dikirim.');
+    }
+
+    public function kelahiranSubmit(Request $request)
+    {
+        $request->validate([
+            'nama_anak' => 'required',
+            'anak_ke' => 'required',
+            'jenis_kelamin' => 'required',
+            'tempat_lahir_anak' => 'required',
+            'alamat_anak' => 'required',
+            'penolong_kelahiran' => 'required',
+            'alamat_bidan' => 'required',
+            'ibu_nik' => 'required',
+            'ibu_nama' => 'required',
+            'ibu_tempat_lahir' => 'required',
+            'ibu_tanggal_lahir' => 'required',
+            'ibu_alamat' => 'required',
+        ]);
+        return redirect()->back()->with('success', 'Permohonan surat keterangan kelahiran berhasil dikirim.');
+    }
+
+    public function skckSubmit(Request $request)
+    {
+        $request->validate([
+            'nama_lengkap' => 'required',
+            'jenis_kelamin' => 'required',
+            'agama' => 'required',
+            'status_perkawinan' => 'required',
+            'nik' => 'required|digits:16',
+            'tempat_lahir' => 'required',
+            'tanggal_lahir' => 'required',
+            'pekerjaan' => 'required',
+            'alamat' => 'required',
+            'keperluan' => 'required',
+        ]);
+        return redirect()->back()->with('success', 'Permohonan surat keterangan SKCK berhasil dikirim.');
+    }
 }

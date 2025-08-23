@@ -3,19 +3,6 @@
 
 @section('content')
     @include('partials.navbar')
-    @if(session('success'))
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Berhasil Logout',
-                    text: '{{ session('success') }}',
-                    confirmButtonColor: '#0088cc',
-                });
-            });
-        </script>
-    @endif
 
 
     <!-- HERO SECTION: CAROUSEL -->
@@ -53,12 +40,15 @@
         <button @click="next" class="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-80 text-white rounded-full p-2 sm:p-4 z-30 focus:outline-none shadow-lg">
             <i class="fas fa-chevron-right text-lg sm:text-2xl"></i>
         </button>
+        <!-- Indicators -->
         <div class="absolute bottom-4 sm:bottom-8 left-1/2 -translate-x-1/2 flex space-x-2 sm:space-x-3 z-30">
             <template x-for="(slide, idx) in slides" :key="idx">
                 <button @click="active = idx" :class="{'ring-2 ring-white scale-125': active === idx, 'opacity-60': active !== idx}" class="w-3 h-3 sm:w-4 sm:h-4 rounded-full transition-all duration-300 bg-white border-2 border-[#0088cc]"></button>
             </template>
         </div>
     </section>
+
+    <!-- PROFIL SINGKAT & VISI MISI -->
     <section id="profil" class="py-10 sm:py-16 bg-gray-50">
         <div class="max-w-7xl mx-auto px-2 sm:px-4 grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-12 items-center">
             <div>
@@ -79,6 +69,8 @@
             </div>
         </div>
     </section>
+
+    <!-- PERANGKAT DESA -->
     <section id="perangkat" class="py-10 sm:py-16 bg-white">
         <div class="max-w-7xl mx-auto px-2 sm:px-4">
             <h2 class="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-12 text-[#0088cc]">Perangkat Desa</h2>
@@ -106,6 +98,8 @@
             </div>
         </div>
     </section>
+
+    <!-- STATISTIK SINGKAT -->
     <section id="statistik" class="py-10 sm:py-16 bg-gray-50">
         <div class="max-w-7xl mx-auto px-2 sm:px-4">
             <h2 class="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-12 text-[#0088cc]">Statistik Desa</h2>
@@ -129,6 +123,8 @@
             </div>
         </div>
     </section>
+
+    <!-- LAYANAN UTAMA -->
     <section id="layanan" class="py-10 sm:py-16 bg-white">
         <div class="max-w-7xl mx-auto px-2 sm:px-4">
           <h2 class="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-12 text-[#0088cc]">Layanan Desa</h2>

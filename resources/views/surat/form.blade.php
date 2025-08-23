@@ -29,10 +29,10 @@ $breadcrumbs = [
             <div class="font-bold mb-1">Surat Pengantar SKCK</div>
             <div class="text-sm text-gray-600">Permohonan pengantar pembuatan SKCK di kepolisian</div>
         </a>
-        <a href="{{ route('surat.pindah') }}" class="block bg-pink-50 hover:bg-pink-100 border border-pink-200 rounded-lg p-6 shadow text-center transition">
-            <div class="text-4xl mb-2"><i class="fas fa-exchange-alt"></i></div>
-            <div class="font-bold mb-1">Surat Pengantar Pindah Penduduk</div>
-            <div class="text-sm text-gray-600">Permohonan pindah domisili antar RT/RW/Desa/Kecamatan</div>
+        <a href="{{ route('surat.kehilangan') }}" class="block bg-pink-50 hover:bg-pink-100 border border-pink-200 rounded-lg p-6 shadow text-center transition">
+            <div class="text-4xl mb-2"><i class="fas fa-search-minus"></i></div>
+            <div class="font-bold mb-1">Surat Keterangan Kehilangan</div>
+            <div class="text-sm text-gray-600">Permohonan surat keterangan kehilangan barang atau dokumen</div>
         </a>
         <a href="{{ route('surat.domisili') }}" class="block bg-green-50 hover:bg-green-100 border border-green-200 rounded-lg p-6 shadow text-center transition">
             <div class="text-4xl mb-2"><i class="fas fa-home"></i></div>
@@ -54,21 +54,16 @@ $breadcrumbs = [
             <div class="font-bold mb-1">Surat Keterangan Usaha</div>
             <div class="text-sm text-gray-600">Keterangan usaha untuk keperluan perizinan atau administrasi</div>
         </a>
-        <a href="{{ route('surat.janda') }}" class="block bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg p-6 shadow text-center transition">
+        {{-- <a href="{{ route('surat.janda') }}" class="block bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg p-6 shadow text-center transition">
             <div class="text-4xl mb-2"><i class="fas fa-heart-broken"></i></div>
             <div class="font-bold mb-1">Surat Keterangan Janda / Duda</div>
             <div class="text-sm text-gray-600">Keterangan status janda/duda untuk keperluan administrasi</div>
-        </a>
-        <a href="{{ route('surat.akta') }}" class="block bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-lg p-6 shadow text-center transition">
+        </a> --}}
+        {{-- <a href="{{ route('surat.akta') }}" class="block bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-lg p-6 shadow text-center transition">
             <div class="text-4xl mb-2"><i class="fas fa-file-alt"></i></div>
             <div class="font-bold mb-1">Surat Pengantar Pembuatan Akta</div>
             <div class="text-sm text-gray-600">Pengantar untuk pembuatan akta kelahiran/kematian/dll</div>
-        </a>
-        <a href="{{ route('surat.nikah') }}" class="block bg-teal-50 hover:bg-teal-100 border border-teal-200 rounded-lg p-6 shadow text-center transition">
-            <div class="text-4xl mb-2"><i class="fas fa-ring"></i></div>
-            <div class="font-bold mb-1">Surat Pengantar Nikah</div>
-            <div class="text-sm text-gray-600">Pengantar untuk keperluan pernikahan di KUA</div>
-        </a>
+        </a> --}}
     </div>
 </div>
 @endsection

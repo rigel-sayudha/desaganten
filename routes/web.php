@@ -8,42 +8,39 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Admin\SuratController;
+use App\Http\Controllers\Admin\SuratPrintController;
 use App\Http\Controllers\Admin\WilayahController;
-Route::get('/surat/form', function () {
-    if (!Auth::check()) {
-        return response()->view('auth.force_login');
-    }
-    return view('surat.form');
+
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider and all of them will
+| be assigned to the "web" middleware group. Make something great!
+|
+*/
+
+Route::get('/surat/ktp', function () {
+    return view('surat.templates.ktp');
 });
-Route::post('/surat/store', function (\Illuminate\Http\Request $request) {
-    return redirect('/surat/form')->with('success', 'Surat berhasil diajukan.');
-})->name('surat.store');
-Route::middleware('auth')->prefix('admin')->group(function () {
-
-
-
+Route::get('/surat/kk', function () {
+    return view('surat.templates.kk');
 });
-
+Route::get('/surat/skck', function () {
+    return view('surat.templates.skck');
+});
+Route::get('/surat/kehilangan', function () {
+    return view('surat.kehilangan');
+})->name('surat.kehilangan');
+Route::get('/surat/usaha', function () {
+    return view('surat.templates.usaha');
+})->name('surat.usaha');
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
-Route::post('/login', function (\Illuminate\Http\Request $request) {
-    $credentials = $request->only('email', 'password');
-    if (\Auth::attempt($credentials)) {
-        // Cek jika user adalah admin, redirect ke admin dan logout
-        if (\Auth::user()->role === 'admin') {
-            \Auth::logout();
-            return redirect('/login')->with('error', 'Akun admin tidak dapat login sebagai user.');
-        }
-        $request->session()->regenerate();
-        return redirect()->intended('/');
-    }
-    return back()->with('error', 'Email atau password salah.');
-});
-Route::post('/logout', function (\Illuminate\Http\Request $request) {
-    \Auth::logout();
-    $request->session()->invalidate();
-    $request->session()->regenerateToken();
-    return redirect('/')->with('success', 'Anda telah berhasil logout.');
-})->name('logout');
+Route::post('/login', [LoginController::class, 'login']);
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::post('/register', [RegisterController::class, 'register']);
 
@@ -52,11 +49,38 @@ Route::middleware('auth')->group(function () {
         return view('auth.profile');
     })->name('profile');
 });
+Route::middleware('auth')->prefix('admin')->group(function () {
+    Route::get('/surat/data', [\App\Http\Controllers\Admin\SuratController::class, 'dataSurat'])->name('admin.surat.data');
+    Route::resource('surat', \App\Http\Controllers\Admin\SuratController::class)->names([
+        'index' => 'admin.surat.index',
+        'create' => 'admin.surat.create',
+        'store' => 'admin.surat.store',
+        'show' => 'admin.surat.show',
+        'edit' => 'admin.surat.edit',
+        'update' => 'admin.surat.update',
+        'destroy' => 'admin.surat.destroy'
+    ]);
+});
+
+Route::post('/surat/kehilangan/submit', [SuratController::class, 'kehilanganSubmit'])->name('surat.kehilangan.submit');
+
+Route::post('/surat/ktp/submit', [SuratController::class, 'ktpSubmit'])->name('surat.ktp.submit');
+
+Route::post('/surat/kematian/submit', [SuratController::class, 'kematianSubmit'])->name('surat.kematian.submit');
+
+Route::post('/surat/kk/submit', [SuratController::class, 'kkSubmit'])->name('surat.kk.submit');
 
 Route::middleware('auth')->prefix('admin')->group(function () {
     Route::resource('user', UserController::class, ['as' => 'admin']);
+    Route::get('/surat/print-pdf/domisili/{id}', [SuratPrintController::class, 'printDomisili'])->name('admin.surat.print.domisili');
+    Route::get('/surat/print-pdf/ktp/{id}', [SuratPrintController::class, 'printKtp'])->name('admin.surat.print.ktp');
+    Route::get('/surat/print-pdf/kk/{id}', [SuratPrintController::class, 'printKk'])->name('admin.surat.print.kk');
+    Route::get('/surat/print-pdf/skck/{id}', [SuratPrintController::class, 'printSkck'])->name('admin.surat.print.skck');
+    Route::get('/surat/print-pdf/kematian/{id}', [SuratPrintController::class, 'printKematian'])->name('admin.surat.print.kematian');
+    Route::get('/surat/print-pdf/kelahiran/{id}', [SuratPrintController::class, 'printKelahiran'])->name('admin.surat.print.kelahiran');
 });
-
+Route::post('/surat/kelahiran/submit', [SuratController::class, 'kelahiranSubmit'])->name('surat.kelahiran.submit');
+Route::post('/surat/skck/submit', [SuratController::class, 'skckSubmit'])->name('surat.skck.submit');
 Route::post('/surat/domisili/submit', function (\Illuminate\Http\Request $request) {
     if (!Auth::check()) {
         return response()->view('auth.force_login');
@@ -114,9 +138,6 @@ Route::get('/surat/skck', function () {
     return view('surat.templates.skck');
 })->name('surat.skck');
 
-Route::get('/surat/pindah', function () {
-    return view('surat.templates.pindah');
-})->name('surat.pindah');
 
 Route::get('/surat/domisili', function () {
     return view('surat.templates.domisili');
@@ -130,9 +151,6 @@ Route::get('/surat/kelahiran', function () {
     return view('surat.templates.kelahiran');
 })->name('surat.kelahiran');
 
-Route::get('/surat/usaha', function () {
-    return view('surat.templates.usaha');
-})->name('surat.usaha');
 
 Route::get('/surat/janda', function () {
     return view('surat.templates.janda');
@@ -146,10 +164,13 @@ Route::get('/surat/nikah', function () {
     return view('surat.templates.nikah');
 })->name('surat.nikah');
 
+Route::get('/surat/kehilangan', function () {
+    return view('surat.templates.kehilangan');
+})->name('surat.kehilangan');
+
 Route::post('/surat/store', [SuratController::class, 'store'])->name('surat.store');
 
 Route::middleware('auth')->prefix('admin')->group(function () {
-    Route::get('/surat', [SuratController::class, 'index']);
     Route::delete('/surat/{id}/delete', [SuratController::class, 'destroy']);
     Route::post('/surat/{id}/status', [SuratController::class, 'updateStatus']);
     Route::resource('wilayah', WilayahController::class, [
@@ -160,20 +181,11 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     });
 });
 
-
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
-*/
-
 Route::get('/', function () {
-    return view('home');    
+    if (Auth::check() && Auth::user()->role === 'admin') {
+        return redirect('/admin/dashboard');
+    }
+    return view('home');
 });
 
 Route::get('/statistik/wilayah', function () {
@@ -198,7 +210,7 @@ Route::post('/admin/login', function (Request $request) {
         return redirect()->intended('/admin/dashboard');
     }
     return back()->with('error', 'Email atau password salah.');
-})->name('admin.login')->middleware('guest');
+})->middleware('guest');
 
 Route::post('/admin/logout', function (Request $request) {
     Auth::logout();
@@ -219,6 +231,10 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::resource('wilayah', WilayahController::class, [
         'as' => 'admin'
     ])->except(['show']);
+    
+    Route::get('/settings', [App\Http\Controllers\Admin\SettingsController::class, 'index'])->name('admin.settings');
+    Route::put('/settings', [App\Http\Controllers\Admin\SettingsController::class, 'update'])->name('admin.settings.update');
+    
     Route::get('/dashboard', function () {
         return view('admin.dashboard');
     });
