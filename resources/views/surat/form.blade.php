@@ -54,16 +54,16 @@ $breadcrumbs = [
             <div class="font-bold mb-1">Surat Keterangan Usaha</div>
             <div class="text-sm text-gray-600">Keterangan usaha untuk keperluan perizinan atau administrasi</div>
         </a>
-        {{-- <a href="{{ route('surat.janda') }}" class="block bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg p-6 shadow text-center transition">
-            <div class="text-4xl mb-2"><i class="fas fa-heart-broken"></i></div>
-            <div class="font-bold mb-1">Surat Keterangan Janda / Duda</div>
-            <div class="text-sm text-gray-600">Keterangan status janda/duda untuk keperluan administrasi</div>
-        </a> --}}
-        {{-- <a href="{{ route('surat.akta') }}" class="block bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-lg p-6 shadow text-center transition">
-            <div class="text-4xl mb-2"><i class="fas fa-file-alt"></i></div>
-            <div class="font-bold mb-1">Surat Pengantar Pembuatan Akta</div>
-            <div class="text-sm text-gray-600">Pengantar untuk pembuatan akta kelahiran/kematian/dll</div>
-        </a> --}}
+        <a href="{{ route('surat.belum-menikah') }}" class="block bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg p-6 shadow text-center transition">
+            <div class="text-4xl mb-2"><i class="fas fa-heart"></i></div>
+            <div class="font-bold mb-1">Surat Keterangan Belum Menikah</div>
+            <div class="text-sm text-gray-600">Keterangan status belum menikah untuk keperluan administrasi</div>
+        </a>
+        <a href="{{ route('surat.tidak-mampu') }}" class="block bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-lg p-6 shadow text-center transition">
+            <div class="text-4xl mb-2"><i class="fas fa-hand-holding-heart"></i></div>
+            <div class="font-bold mb-1">Surat Keterangan Tidak Mampu</div>
+            <div class="text-sm text-gray-600">Keterangan ekonomi tidak mampu untuk keperluan bantuan sosial</div>
+        </a>
     </div>
 </div>
 @endsection

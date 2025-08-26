@@ -36,12 +36,22 @@
         <!-- Login Form Container -->
         <div class="bg-white backdrop-blur-lg bg-opacity-80 rounded-2xl shadow-xl border border-white border-opacity-50 p-8 space-y-6">
             
-            <!-- Error Message -->
-            @if(session('error'))
+            <!-- Error Messages -->
+            @if(session('error') || $errors->any())
                 <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
                     <div class="flex items-center space-x-2">
                         <i class="fas fa-exclamation-circle text-red-500"></i>
-                        <span class="text-red-700 text-sm">{{ session('error') }}</span>
+                        <div>
+                            @if(session('error'))
+                                <span class="text-red-700 text-sm">{{ session('error') }}</span>
+                            @endif
+                            @if($errors->has('email'))
+                                <span class="text-red-700 text-sm">{{ $errors->first('email') }}</span>
+                            @endif
+                            @if($errors->has('password'))
+                                <span class="text-red-700 text-sm block">{{ $errors->first('password') }}</span>
+                            @endif
+                        </div>
                     </div>
                 </div>
             @endif
@@ -49,10 +59,29 @@
             <!-- Login Form -->
             <form method="POST" action="{{ route('login') }}" class="space-y-6" x-data="{ 
                 showPassword: false,
-                email: '',
+                email: '{{ old('email') }}',
                 password: '',
-                isLoading: false 
-            }">
+                isLoading: false,
+                submitForm() {
+                    if (!this.email || !this.password) {
+                        return false;
+                    }
+                    this.isLoading = true;
+                    // Reset loading state after a timeout to prevent permanent loading
+                    setTimeout(() => {
+                        this.isLoading = false;
+                    }, 8000);
+                    // Let the form submit naturally
+                    return true;
+                }
+            }" 
+            @submit="if (!isLoading) { return submitForm(); } else { $event.preventDefault(); }"
+            x-init="
+                // Reset loading state if there are errors (page reload)
+                @if($errors->any() || session('error'))
+                    isLoading = false;
+                @endif
+            ">
                 @csrf
                 
                 <!-- Email Field -->
@@ -67,9 +96,10 @@
                             type="email" 
                             name="email" 
                             x-model="email"
+                            value="{{ old('email') }}"
                             required 
                             autofocus
-                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0088cc] focus:border-transparent transition duration-200 placeholder-gray-400 bg-white"
+                            class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#0088cc] focus:border-transparent transition duration-200 placeholder-gray-400 bg-white @error('email') border-red-500 @else border-gray-300 @enderror"
                             placeholder="Masukkan email Anda"
                         >
                         <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
@@ -92,7 +122,7 @@
                             name="password" 
                             x-model="password"
                             required
-                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0088cc] focus:border-transparent transition duration-200 placeholder-gray-400 bg-white pr-12"
+                            class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#0088cc] focus:border-transparent transition duration-200 placeholder-gray-400 bg-white pr-12 @error('password') border-red-500 @else border-gray-300 @enderror"
                             placeholder="Masukkan kata sandi"
                         >
                         <button 
@@ -120,7 +150,6 @@
                 <!-- Login Button -->
                 <button 
                     type="submit"
-                    @click="isLoading = true"
                     :disabled="isLoading || !email || !password"
                     :class="{
                         'opacity-50 cursor-not-allowed': isLoading || !email || !password,

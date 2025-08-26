@@ -78,7 +78,9 @@ $breadcrumbs = [
                     </div>
                 @endif
 
-                <form action="{{ url('/surat/domisili/submit') }}" method="POST" class="space-y-8">
+                <form action="{{ route('surat.domisili.submit') }}" method="POST" class="space-y-8" 
+                      @submit="isSubmitting = true" 
+                      x-bind:class="{ 'pointer-events-none opacity-75': isSubmitting }">
                     @csrf
                     
                     <!-- Personal Information Section -->
@@ -93,7 +95,7 @@ $breadcrumbs = [
 
                         <!-- NIK -->
                         <div class="space-y-2">
-                            <label for="nik" class="block text-sm font-medium text-gray-700 flex items-center space-x-2">
+                            <label for="nik" class="block text-sm font-medium text-black flex items-center space-x-2">
                                 <i class="fas fa-id-card text-blue-500 w-4"></i>
                                 <span>NIK (Nomor Induk Kependudukan)</span>
                                 <span class="text-red-500">*</span>
@@ -113,7 +115,7 @@ $breadcrumbs = [
 
                         <!-- Nama Lengkap -->
                         <div class="space-y-2">
-                            <label for="nama" class="block text-sm font-medium text-gray-700 flex items-center space-x-2">
+                            <label for="nama" class="block text-sm font-medium text-black flex items-center space-x-2">
                                 <i class="fas fa-user text-purple-500 w-4"></i>
                                 <span>Nama Lengkap</span>
                                 <span class="text-red-500">*</span>
@@ -133,7 +135,7 @@ $breadcrumbs = [
                         <!-- Tempat & Tanggal Lahir -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="space-y-2">
-                                <label for="tempat_lahir" class="block text-sm font-medium text-gray-700 flex items-center space-x-2">
+                                <label for="tempat_lahir" class="block text-sm font-medium text-black flex items-center space-x-2">
                                     <i class="fas fa-map-marker-alt text-orange-500 w-4"></i>
                                     <span>Tempat Lahir</span>
                                     <span class="text-red-500">*</span>
@@ -150,7 +152,7 @@ $breadcrumbs = [
                                 >
                             </div>
                             <div class="space-y-2">
-                                <label for="tanggal_lahir" class="block text-sm font-medium text-gray-700 flex items-center space-x-2">
+                                <label for="tanggal_lahir" class="block text-sm font-medium text-black flex items-center space-x-2">
                                     <i class="fas fa-calendar text-blue-500 w-4"></i>
                                     <span>Tanggal Lahir</span>
                                     <span class="text-red-500">*</span>
@@ -330,8 +332,7 @@ $breadcrumbs = [
                                 
                                 <button 
                                     type="submit"
-                                    @click="isSubmitting = true"
-                                    :disabled="isSubmitting"
+                                    x-bind:disabled="isSubmitting"
                                     :class="{
                                         'opacity-50 cursor-not-allowed': isSubmitting,
                                         'hover:bg-green-600 hover:shadow-lg transform hover:-translate-y-0.5': !isSubmitting

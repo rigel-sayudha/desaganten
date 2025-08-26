@@ -70,10 +70,22 @@ $breadcrumbs = [
                     alamat: '',
                     keperluan: ''
                 },
-                isSubmitting: false
-            }">
+                isSubmitting: false,
+                submitForm() {
+                    this.isSubmitting = true;
+                    this.$refs.form.submit();
+                },
+                resetSubmission() {
+                    this.isSubmitting = false;
+                }
+            }" x-init="
+                // Reset submission state if form errors exist
+                if({{ $errors->any() ? 'true' : 'false' }}) {
+                    resetSubmission();
+                }
+            ">
 
-                <form method="POST" action="{{ route('surat.ktp.submit') }}" class="space-y-8">
+                <form x-ref="form" method="POST" action="{{ route('surat.ktp.submit') }}" class="space-y-8">
                     @csrf
                     
                     <!-- Personal Information Section -->
@@ -88,7 +100,7 @@ $breadcrumbs = [
 
                         <!-- NIK -->
                         <div class="space-y-2">
-                            <label for="nik" class="block text-sm font-medium text-gray-700 flex items-center space-x-2">
+                            <label for="nik" class="block text-sm font-medium text-black flex items-center space-x-2">
                                 <i class="fas fa-id-card text-blue-500 w-4"></i>
                                 <span>NIK (Nomor Induk Kependudukan)</span>
                                 <span class="text-red-500">*</span>
@@ -110,7 +122,7 @@ $breadcrumbs = [
 
                         <!-- Nama Lengkap -->
                         <div class="space-y-2">
-                            <label for="nama_lengkap" class="block text-sm font-medium text-gray-700 flex items-center space-x-2">
+                            <label for="nama_lengkap" class="block text-sm font-medium text-black flex items-center space-x-2">
                                 <i class="fas fa-user text-purple-500 w-4"></i>
                                 <span>Nama Lengkap</span>
                                 <span class="text-red-500">*</span>
@@ -131,7 +143,7 @@ $breadcrumbs = [
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <!-- Jenis Kelamin -->
                             <div class="space-y-2">
-                                <label for="jenis_kelamin" class="block text-sm font-medium text-gray-700 flex items-center space-x-2">
+                                <label for="jenis_kelamin" class="block text-sm font-medium text-black flex items-center space-x-2">
                                     <i class="fas fa-venus-mars text-pink-500 w-4"></i>
                                     <span>Jenis Kelamin</span>
                                     <span class="text-red-500">*</span>
@@ -151,7 +163,7 @@ $breadcrumbs = [
 
                             <!-- Agama -->
                             <div class="space-y-2">
-                                <label for="agama" class="block text-sm font-medium text-gray-700 flex items-center space-x-2">
+                                <label for="agama" class="block text-sm font-medium text-black flex items-center space-x-2">
                                     <i class="fas fa-pray text-green-500 w-4"></i>
                                     <span>Agama</span>
                                     <span class="text-red-500">*</span>
@@ -176,7 +188,7 @@ $breadcrumbs = [
 
                         <!-- Status Perkawinan -->
                         <div class="space-y-2">
-                            <label for="status_perkawinan" class="block text-sm font-medium text-gray-700 flex items-center space-x-2">
+                            <label for="status_perkawinan" class="block text-sm font-medium text-black flex items-center space-x-2">
                                 <i class="fas fa-heart text-red-500 w-4"></i>
                                 <span>Status Perkawinan</span>
                                 <span class="text-red-500">*</span>
@@ -199,7 +211,7 @@ $breadcrumbs = [
                         <!-- Tempat & Tanggal Lahir -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="space-y-2">
-                                <label for="tempat_lahir" class="block text-sm font-medium text-gray-700 flex items-center space-x-2">
+                                <label for="tempat_lahir" class="block text-sm font-medium text-black flex items-center space-x-2">
                                     <i class="fas fa-map-marker-alt text-orange-500 w-4"></i>
                                     <span>Tempat Lahir</span>
                                     <span class="text-red-500">*</span>
@@ -216,7 +228,7 @@ $breadcrumbs = [
                                 >
                             </div>
                             <div class="space-y-2">
-                                <label for="tanggal_lahir" class="block text-sm font-medium text-gray-700 flex items-center space-x-2">
+                                <label for="tanggal_lahir" class="block text-sm font-medium text-black flex items-center space-x-2">
                                     <i class="fas fa-calendar text-blue-500 w-4"></i>
                                     <span>Tanggal Lahir</span>
                                     <span class="text-red-500">*</span>
@@ -235,7 +247,7 @@ $breadcrumbs = [
 
                         <!-- Pekerjaan -->
                         <div class="space-y-2">
-                            <label for="pekerjaan" class="block text-sm font-medium text-gray-700 flex items-center space-x-2">
+                            <label for="pekerjaan" class="block text-sm font-medium text-black flex items-center space-x-2">
                                 <i class="fas fa-briefcase text-indigo-500 w-4"></i>
                                 <span>Pekerjaan</span>
                                 <span class="text-red-500">*</span>
@@ -254,7 +266,7 @@ $breadcrumbs = [
 
                         <!-- Alamat -->
                         <div class="space-y-2">
-                            <label for="alamat" class="block text-sm font-medium text-gray-700 flex items-center space-x-2">
+                            <label for="alamat" class="block text-sm font-medium text-black flex items-center space-x-2">
                                 <i class="fas fa-map-marker-alt text-green-500 w-4"></i>
                                 <span>Alamat Lengkap</span>
                                 <span class="text-red-500">*</span>
@@ -272,7 +284,7 @@ $breadcrumbs = [
 
                         <!-- Keperluan -->
                         <div class="space-y-2">
-                            <label for="keperluan" class="block text-sm font-medium text-gray-700 flex items-center space-x-2">
+                            <label for="keperluan" class="block text-sm font-medium text-black flex items-center space-x-2">
                                 <i class="fas fa-clipboard-list text-yellow-500 w-4"></i>
                                 <span>Keperluan</span>
                                 <span class="text-red-500">*</span>
@@ -309,8 +321,8 @@ $breadcrumbs = [
                                 </button>
                                 
                                 <button 
-                                    type="submit"
-                                    @click="isSubmitting = true"
+                                    type="button"
+                                    @click="submitForm()"
                                     :disabled="isSubmitting"
                                     :class="{
                                         'opacity-50 cursor-not-allowed': isSubmitting,
@@ -337,27 +349,6 @@ $breadcrumbs = [
             </div>
         </div>
 
-        <!-- Information Card -->
-        <div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
-            <h4 class="font-semibold text-blue-900 mb-3 flex items-center space-x-2">
-                <i class="fas fa-lightbulb text-blue-600"></i>
-                <span>Informasi Penting</span>
-            </h4>
-            <ul class="text-blue-800 text-sm space-y-2">
-                <li class="flex items-start space-x-2">
-                    <i class="fas fa-check text-blue-600 mt-0.5"></i>
-                    <span>NIK harus sesuai dengan Kartu Keluarga atau KTP yang lama</span>
-                </li>
-                <li class="flex items-start space-x-2">
-                    <i class="fas fa-check text-blue-600 mt-0.5"></i>
-                    <span>Surat keterangan KTP akan diproses dalam 1-3 hari kerja</span>
-                </li>
-                <li class="flex items-start space-x-2">
-                    <i class="fas fa-check text-blue-600 mt-0.5"></i>
-                    <span>Anda akan dihubungi untuk pengambilan surat</span>
-                </li>
-            </ul>
-        </div>
     </div>
 </div>
 

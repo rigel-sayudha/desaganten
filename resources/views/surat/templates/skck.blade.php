@@ -8,74 +8,366 @@ $breadcrumbs = [
 ];
 @endphp
 @include('partials.breadcrumbs', ['items' => $breadcrumbs])
-<div class="max-w-3xl mx-auto mt-12 bg-gradient-to-br from-yellow-50 to-white p-0 rounded-2xl shadow-2xl">
-    <div class="flex flex-col items-center justify-center py-8">
-        <div class="bg-yellow-500 rounded-full p-4 mb-4 shadow-lg">
-            <i class="fas fa-id-card fa-3x text-white"></i>
+
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-yellow-50 py-8 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-yellow-50 to-orange-100 rounded-t-2xl p-8 text-center relative overflow-hidden">
+            <div class="absolute inset-0 bg-white/20 backdrop-blur-sm"></div>
+            <div class="relative z-10">
+                <div class="inline-flex items-center justify-center w-20 h-20 bg-yellow-500 rounded-full shadow-lg mb-4">
+                    <i class="fas fa-shield-alt text-3xl text-white"></i>
+                </div>
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">Surat Pengantar SKCK</h1>
+                <p class="text-lg text-gray-600">Silakan isi formulir berikut dengan data yang valid dan lengkap</p>
+            </div>
         </div>
-        <h2 class="text-3xl font-extrabold mb-2 text-yellow-700 text-center tracking-tight">Form Surat Pengantar SKCK</h2>
-        <p class="text-gray-600 mb-6 text-center">Silakan isi data permohonan SKCK dengan lengkap dan benar.</p>
+
+        <!-- Form Container -->
+        <div class="bg-white rounded-b-2xl shadow-xl border-t-4 border-yellow-500">
+            <div class="p-8">
+                <form 
+                    id="skck-form"
+                    method="POST" 
+                    action="{{ route('surat.skck.submit') }}" 
+                    x-data="submitForm()"
+                    @submit.prevent="submitForm()"
+                    class="space-y-8"
+                >
+                    @csrf
+
+                    <!-- Personal Information Section -->
+                    <div class="space-y-6">
+                        <div class="border-b border-gray-200 pb-4">
+                            <h3 class="text-lg font-semibold text-gray-900 flex items-center space-x-2">
+                                <i class="fas fa-user text-purple-500"></i>
+                                <span>Data Pemohon</span>
+                            </h3>
+                            <p class="text-sm text-gray-600 mt-1">Informasi pribadi pemohon surat pengantar SKCK</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Nama Lengkap -->
+                            <div class="space-y-2">
+                                <label for="nama_lengkap" class="block text-sm font-medium text-black flex items-center space-x-2">
+                                    <i class="fas fa-user text-purple-500 w-4"></i>
+                                    <span>Nama Lengkap</span>
+                                    <span class="text-red-500">*</span>
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="nama_lengkap"
+                                    name="nama_lengkap" 
+                                    value="{{ old('nama_lengkap') }}"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition duration-200 placeholder-gray-400"
+                                    placeholder="Masukkan nama lengkap sesuai KTP"
+                                    required
+                                >
+                                @error('nama_lengkap')
+                                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <!-- NIK -->
+                            <div class="space-y-2">
+                                <label for="nik" class="block text-sm font-medium text-black flex items-center space-x-2">
+                                    <i class="fas fa-id-card text-blue-500 w-4"></i>
+                                    <span>NIK (Nomor Induk Kependudukan)</span>
+                                    <span class="text-red-500">*</span>
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="nik"
+                                    name="nik" 
+                                    value="{{ old('nik') }}"
+                                    maxlength="16"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition duration-200 placeholder-gray-400"
+                                    placeholder="Contoh: 3310010112850001"
+                                    required
+                                >
+                                @error('nik')
+                                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <!-- Jenis Kelamin -->
+                            <div class="space-y-2">
+                                <label for="jenis_kelamin" class="block text-sm font-medium text-black flex items-center space-x-2">
+                                    <i class="fas fa-venus-mars text-pink-500 w-4"></i>
+                                    <span>Jenis Kelamin</span>
+                                    <span class="text-red-500">*</span>
+                                </label>
+                                <select 
+                                    id="jenis_kelamin"
+                                    name="jenis_kelamin" 
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition duration-200"
+                                    required
+                                >
+                                    <option value="">Pilih Jenis Kelamin</option>
+                                    <option value="Laki-laki" {{ old('jenis_kelamin') == 'Laki-laki' ? 'selected' : '' }}>Laki-laki</option>
+                                    <option value="Perempuan" {{ old('jenis_kelamin') == 'Perempuan' ? 'selected' : '' }}>Perempuan</option>
+                                </select>
+                                @error('jenis_kelamin')
+                                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <!-- Tempat Lahir -->
+                            <div class="space-y-2">
+                                <label for="tempat_lahir" class="block text-sm font-medium text-black flex items-center space-x-2">
+                                    <i class="fas fa-map-marker-alt text-orange-500 w-4"></i>
+                                    <span>Tempat Lahir</span>
+                                    <span class="text-red-500">*</span>
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="tempat_lahir"
+                                    name="tempat_lahir" 
+                                    value="{{ old('tempat_lahir') }}"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition duration-200 placeholder-gray-400"
+                                    placeholder="Contoh: Karanganyar"
+                                    required
+                                >
+                                @error('tempat_lahir')
+                                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <!-- Tanggal Lahir -->
+                            <div class="space-y-2">
+                                <label for="tanggal_lahir" class="block text-sm font-medium text-black flex items-center space-x-2">
+                                    <i class="fas fa-calendar text-green-500 w-4"></i>
+                                    <span>Tanggal Lahir</span>
+                                    <span class="text-red-500">*</span>
+                                </label>
+                                <input 
+                                    type="date" 
+                                    id="tanggal_lahir"
+                                    name="tanggal_lahir" 
+                                    value="{{ old('tanggal_lahir') }}"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition duration-200"
+                                    required
+                                >
+                                @error('tanggal_lahir')
+                                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <!-- Status Perkawinan -->
+                            <div class="space-y-2">
+                                <label for="status_perkawinan" class="block text-sm font-medium text-black flex items-center space-x-2">
+                                    <i class="fas fa-heart text-pink-500 w-4"></i>
+                                    <span>Status Perkawinan</span>
+                                    <span class="text-red-500">*</span>
+                                </label>
+                                <select 
+                                    id="status_perkawinan"
+                                    name="status_perkawinan" 
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition duration-200"
+                                    required
+                                >
+                                    <option value="">Pilih Status</option>
+                                    <option value="Kawin" {{ old('status_perkawinan') == 'Kawin' ? 'selected' : '' }}>Kawin</option>
+                                    <option value="Belum Kawin" {{ old('status_perkawinan') == 'Belum Kawin' ? 'selected' : '' }}>Belum Kawin</option>
+                                    <option value="Cerai" {{ old('status_perkawinan') == 'Cerai' ? 'selected' : '' }}>Cerai</option>
+                                    <option value="Mati" {{ old('status_perkawinan') == 'Mati' ? 'selected' : '' }}>Mati</option>
+                                </select>
+                                @error('status_perkawinan')
+                                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <!-- Kewarganegaraan -->
+                            <div class="space-y-2">
+                                <label for="kewarganegaraan" class="block text-sm font-medium text-black flex items-center space-x-2">
+                                    <i class="fas fa-flag text-red-500 w-4"></i>
+                                    <span>Kewarganegaraan</span>
+                                    <span class="text-red-500">*</span>
+                                </label>
+                                <select 
+                                    id="kewarganegaraan"
+                                    name="kewarganegaraan" 
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition duration-200"
+                                    required
+                                >
+                                    <option value="">Pilih Kewarganegaraan</option>
+                                    <option value="WNI" {{ old('kewarganegaraan') == 'WNI' ? 'selected' : '' }}>WNI (Warga Negara Indonesia)</option>
+                                    <option value="WNA" {{ old('kewarganegaraan') == 'WNA' ? 'selected' : '' }}>WNA (Warga Negara Asing)</option>
+                                </select>
+                                @error('kewarganegaraan')
+                                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <!-- Agama -->
+                            <div class="space-y-2">
+                                <label for="agama" class="block text-sm font-medium text-black flex items-center space-x-2">
+                                    <i class="fas fa-pray text-green-500 w-4"></i>
+                                    <span>Agama</span>
+                                    <span class="text-red-500">*</span>
+                                </label>
+                                <select 
+                                    id="agama"
+                                    name="agama" 
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition duration-200"
+                                    required
+                                >
+                                    <option value="">Pilih Agama</option>
+                                    <option value="Islam" {{ old('agama') == 'Islam' ? 'selected' : '' }}>Islam</option>
+                                    <option value="Kristen" {{ old('agama') == 'Kristen' ? 'selected' : '' }}>Kristen</option>
+                                    <option value="Katolik" {{ old('agama') == 'Katolik' ? 'selected' : '' }}>Katolik</option>
+                                    <option value="Hindu" {{ old('agama') == 'Hindu' ? 'selected' : '' }}>Hindu</option>
+                                    <option value="Buddha" {{ old('agama') == 'Buddha' ? 'selected' : '' }}>Buddha</option>
+                                    <option value="Konghucu" {{ old('agama') == 'Konghucu' ? 'selected' : '' }}>Konghucu</option>
+                                </select>
+                                @error('agama')
+                                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <!-- Pekerjaan -->
+                            <div class="space-y-2">
+                                <label for="pekerjaan" class="block text-sm font-medium text-black flex items-center space-x-2">
+                                    <i class="fas fa-briefcase text-indigo-500 w-4"></i>
+                                    <span>Pekerjaan</span>
+                                    <span class="text-red-500">*</span>
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="pekerjaan"
+                                    name="pekerjaan" 
+                                    value="{{ old('pekerjaan') }}"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition duration-200 placeholder-gray-400"
+                                    placeholder="Contoh: Pegawai Swasta / Wiraswasta"
+                                    required
+                                >
+                                @error('pekerjaan')
+                                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <!-- Alamat -->
+                        <div class="space-y-2">
+                            <label for="alamat" class="block text-sm font-medium text-black flex items-center space-x-2">
+                                <i class="fas fa-home text-orange-500 w-4"></i>
+                                <span>Alamat Lengkap</span>
+                                <span class="text-red-500">*</span>
+                            </label>
+                            <textarea 
+                                id="alamat"
+                                name="alamat" 
+                                rows="3"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition duration-200 placeholder-gray-400 resize-none"
+                                placeholder="Contoh: Jl. Raya No. 123, RT 01/RW 02, Kelurahan..."
+                                required
+                            >{{ old('alamat') }}</textarea>
+                            @error('alamat')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Keperluan -->
+                        <div class="space-y-2">
+                            <label for="keperluan" class="block text-sm font-medium text-black flex items-center space-x-2">
+                                <i class="fas fa-clipboard-list text-yellow-500 w-4"></i>
+                                <span>Keperluan</span>
+                                <span class="text-red-500">*</span>
+                            </label>
+                            <input 
+                                type="text" 
+                                id="keperluan"
+                                name="keperluan" 
+                                value="{{ old('keperluan') }}"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition duration-200 placeholder-gray-400"
+                                placeholder="Contoh: Melamar pekerjaan / Pendaftaran kuliah"
+                                required
+                            >
+                            @error('keperluan')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="pt-6 border-t border-gray-200">
+                        <div class="flex flex-col sm:flex-row gap-4 justify-between">
+                            <a 
+                                href="{{ url('/surat/form') }}" 
+                                class="flex items-center justify-center px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition duration-200 font-medium"
+                            >
+                                <i class="fas fa-arrow-left mr-2"></i>
+                                Kembali
+                            </a>
+                            <button 
+                                type="submit" 
+                                :disabled="isSubmitting"
+                                class="flex-1 sm:flex-initial bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-semibold py-3 px-8 rounded-lg transition duration-300 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg hover:shadow-xl"
+                            >
+                                <span x-show="!isSubmitting" class="flex items-center justify-center space-x-2">
+                                    <i class="fas fa-paper-plane"></i>
+                                    <span>Ajukan Surat Pengantar SKCK</span>
+                                </span>
+                                <span x-show="isSubmitting" class="flex items-center justify-center space-x-2">
+                                    <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    <span>Sedang memproses...</span>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
-    <form method="POST" action="{{ route('surat.skck.submit') }}" class="px-6 pb-8">
-        @csrf
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <div>
-                <label class="block font-semibold mb-2 text-yellow-700">Nama Lengkap</label>
-                <input type="text" name="nama_lengkap" class="border border-yellow-300 rounded-lg px-3 py-2 w-full focus:ring focus:ring-yellow-200" required>
-            </div>
-            <div>
-                <label class="block font-semibold mb-2 text-yellow-700">Jenis Kelamin</label>
-                <select name="jenis_kelamin" class="border border-yellow-300 rounded-lg px-3 py-2 w-full focus:ring focus:ring-yellow-200" required>
-                    <option value="">-- Pilih Jenis Kelamin --</option>
-                    <option value="Laki-laki">Laki-laki</option>
-                    <option value="Perempuan">Perempuan</option>
-                </select>
-            </div>
-            <div>
-                <label class="block font-semibold mb-2 text-yellow-700">Tempat/Tanggal Lahir</label>
-                <input type="text" name="tempat_lahir" class="border border-yellow-300 rounded-lg px-3 py-2 w-full focus:ring focus:ring-yellow-200" required>
-                <input type="date" name="tanggal_lahir" class="border border-yellow-300 rounded-lg px-3 py-2 w-full mt-2 focus:ring focus:ring-yellow-200" required>
-            </div>
-            <div>
-                <label class="block font-semibold mb-2 text-yellow-700">Status Perkawinan</label>
-                <input type="text" name="status_perkawinan" class="border border-yellow-300 rounded-lg px-3 py-2 w-full focus:ring focus:ring-yellow-200" required>
-            </div>
-            <div>
-                <label class="block font-semibold mb-2 text-yellow-700">Kewarganegaraan</label>
-                <select name="kewarganegaraan" class="border border-yellow-300 rounded-lg px-3 py-2 w-full focus:ring focus:ring-yellow-200" required>
-                    <option value="">-- Pilih Kewarganegaraan --</option>
-                    <option value="WNI">WNI</option>
-                    <option value="WNA">WNA</option>
-                </select>
-            </div>
-            <div>
-                <label class="block font-semibold mb-2 text-yellow-700">Agama</label>
-                <select name="agama" class="border border-yellow-300 rounded-lg px-3 py-2 w-full focus:ring focus:ring-yellow-200" required>
-                    <option value="">-- Pilih Agama --</option>
-                    <option value="Islam">Islam</option>
-                    <option value="Kristen">Kristen</option>
-                    <option value="Katolik">Katolik</option>
-                    <option value="Hindu">Hindu</option>
-                    <option value="Buddha">Buddha</option>
-                    <option value="Konghucu">Konghucu</option>
-                </select>
-            </div>
-            <div>
-                <label class="block font-semibold mb-2 text-yellow-700">Pekerjaan</label>
-                <input type="text" name="pekerjaan" class="border border-yellow-300 rounded-lg px-3 py-2 w-full focus:ring focus:ring-yellow-200" required>
-            </div>
-            <div>
-                <label class="block font-semibold mb-2 text-yellow-700">Nomor Induk Kependudukan</label>
-                <input type="text" name="nik" class="border border-yellow-300 rounded-lg px-3 py-2 w-full focus:ring focus:ring-yellow-200" required>
-            </div>
-            <div class="md:col-span-2">
-                <label class="block font-semibold mb-2 text-yellow-700">Alamat</label>
-                <textarea name="alamat" class="border border-yellow-300 rounded-lg px-3 py-2 w-full focus:ring focus:ring-yellow-200" required></textarea>
-            </div>
-        </div>
-        <div class="flex justify-center">
-            <button type="submit" class="bg-yellow-600 text-white px-8 py-3 rounded-xl font-bold text-lg shadow hover:bg-yellow-700 transition">Kirim Permohonan</button>
-        </div>
-    </form>
-</div>
+
+    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Alpine.js Script -->
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
+    <script>
+        function submitForm() {
+            return {
+                isSubmitting: false,
+                
+                submitForm() {
+                    if (this.isSubmitting) return;
+                    
+                    // Validate required fields
+                    const form = document.getElementById('skck-form');
+                    if (!form.checkValidity()) {
+                        form.reportValidity();
+                        return;
+                    }
+                    
+                    this.isSubmitting = true;
+                    form.submit();
+                }
+            }
+        }
+
+        @if(session('success'))
+            Swal.fire({
+                title: 'Berhasil!',
+                text: '{{ session('success') }}',
+                icon: 'success',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#eab308'
+            });
+        @endif
+
+        @if(session('error'))
+            Swal.fire({
+                title: 'Gagal!',
+                text: '{{ session('error') }}',
+                icon: 'error',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#eab308'
+            });
+        @endif
+    </script>
 @endsection

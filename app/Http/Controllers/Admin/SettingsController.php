@@ -15,7 +15,7 @@ class SettingsController extends Controller
             'kepala_desa_jabatan' => Setting::get('kepala_desa_jabatan', 'Kepala Desa Ganten'),
         ];
 
-        return view('admin.settings.index', compact('settings'));
+        return view('admin.settings', compact('settings'));
     }
 
     public function update(Request $request)
@@ -28,6 +28,6 @@ class SettingsController extends Controller
         Setting::set('kepala_desa_nama', $request->kepala_desa_nama, 'Nama Kepala Desa untuk ditampilkan di surat keterangan');
         Setting::set('kepala_desa_jabatan', $request->kepala_desa_jabatan, 'Jabatan Kepala Desa untuk ditampilkan di surat keterangan');
 
-        return redirect()->route('admin.settings.index')->with('success', 'Pengaturan berhasil diperbarui!');
+        return redirect()->route('admin.settings')->with('success', 'Pengaturan berhasil diperbarui!');
     }
 }

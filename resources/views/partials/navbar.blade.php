@@ -42,18 +42,18 @@
             <div class="hidden lg:flex items-center space-x-1">
                 <!-- Main Navigation Links -->
                 <a href="{{ url('/') }}" 
-                   class="px-4 py-2 rounded-lg text-[#0088cc] hover:bg-blue-50 transition-colors font-medium">
+                   class="px-4 py-2 rounded-lg text-black hover:bg-blue-50 transition-colors font-medium">
                     Beranda
                 </a>
                 
                 <a href="{{ url('/') }}#profil" 
-                   class="px-4 py-2 rounded-lg text-[#0088cc] hover:bg-blue-50 transition-colors font-medium">
+                   class="px-4 py-2 rounded-lg text-black hover:bg-blue-50 transition-colors font-medium">
                     Profil Desa
                 </a>
 
                 <!-- Statistik Penduduk Dropdown -->
                 <div class="relative" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
-                    <button class="flex items-center px-4 py-2 rounded-lg text-[#0088cc] hover:bg-blue-50 transition-colors font-medium">
+                    <button class="flex items-center px-4 py-2 rounded-lg text-black hover:bg-blue-50 transition-colors font-medium">
                         Statistik Penduduk
                         <i class="fas fa-chevron-down ml-2 text-xs transition-transform duration-200" :class="{'rotate-180': open}"></i>
                     </button>
@@ -68,16 +68,16 @@
                         class="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-100 py-2 z-50"
                         style="display: none;"
                     >
-                        <a href="/statistik/wilayah" class="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-[#0088cc] transition-colors">Wilayah</a>
-                        <a href="/statistik/usia" class="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-[#0088cc] transition-colors">Usia</a>
-                        <a href="/statistik/pendidikan" class="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-[#0088cc] transition-colors">Pendidikan</a>
-                        <a href="/statistik/pekerjaan" class="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-[#0088cc] transition-colors">Pekerjaan</a>
+                        <a href="/statistik/wilayah" class="block px-4 py-2 text-black hover:bg-blue-50 hover:text-black transition-colors">Wilayah</a>
+                        <a href="/statistik/usia" class="block px-4 py-2 text-black hover:bg-blue-50 hover:text-black transition-colors">Usia</a>
+                        <a href="/statistik/pendidikan" class="block px-4 py-2 text-black hover:bg-blue-50 hover:text-black transition-colors">Pendidikan</a>
+                        <a href="/statistik/pekerjaan" class="block px-4 py-2 text-black hover:bg-blue-50 hover:text-black transition-colors">Pekerjaan</a>
                     </div>
                 </div>
 
                 <!-- Pelayanan Surat Dropdown -->
                 <div class="relative" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
-                    <button class="flex items-center px-4 py-2 rounded-lg text-[#0088cc] hover:bg-blue-50 transition-colors font-medium">
+                    <button class="flex items-center px-4 py-2 rounded-lg text-black hover:bg-blue-50 transition-colors font-medium">
                         Pelayanan Surat
                         <i class="fas fa-chevron-down ml-2 text-xs transition-transform duration-200" :class="{'rotate-180': open}"></i>
                     </button>
@@ -92,15 +92,21 @@
                         class="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-100 py-2 z-50"
                         style="display: none;"
                     >
-                        <a href="/surat/status" class="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-[#0088cc] transition-colors">Status Layanan</a>
-                        <a href="/surat/jadwal" class="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-[#0088cc] transition-colors">Jadwal Pengambilan</a>
-                        <a href="/surat/form" class="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-[#0088cc] transition-colors">Pelayanan Surat</a>
+                        @auth
+                        <a href="{{ route('user.surat.index') }}" class="block px-4 py-2 text-black hover:bg-blue-50 hover:text-black transition-colors">
+                            <i class="fas fa-list-check mr-2"></i>Status Surat Saya
+                        </a>
+                        <div class="border-t border-gray-100 my-1"></div>
+                        @endauth
+                        <a href="/surat/status" class="block px-4 py-2 text-black hover:bg-blue-50 hover:text-black transition-colors">Status Layanan</a>
+                        <a href="/surat/jadwal" class="block px-4 py-2 text-black hover:bg-blue-50 hover:text-black transition-colors">Jadwal Pengambilan</a>
+                        <a href="/surat/form" class="block px-4 py-2 text-black hover:bg-blue-50 hover:text-black transition-colors">Pelayanan Surat</a>
                     </div>
                 </div>
 
                 <!-- Laporan Dropdown -->
                 <div class="relative" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
-                    <button class="flex items-center px-4 py-2 rounded-lg text-[#0088cc] hover:bg-blue-50 transition-colors font-medium">
+                    <button class="flex items-center px-4 py-2 rounded-lg text-black hover:bg-blue-50 transition-colors font-medium">
                         Laporan
                         <i class="fas fa-chevron-down ml-2 text-xs transition-transform duration-200" :class="{'rotate-180': open}"></i>
                     </button>
@@ -115,13 +121,13 @@
                         class="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-100 py-2 z-50"
                         style="display: none;"
                     >
-                        <a href="/laporan/bulanan" class="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-[#0088cc] transition-colors">Laporan Bulanan</a>
-                        <a href="/laporan/rekap" class="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-[#0088cc] transition-colors">Rekap Bulanan</a>
+                        <a href="/laporan/bulanan" class="block px-4 py-2 text-black hover:bg-blue-50 hover:text-black transition-colors">Laporan Bulanan</a>
+                        <a href="/laporan/rekap" class="block px-4 py-2 text-black hover:bg-blue-50 hover:text-black transition-colors">Rekap Bulanan</a>
                     </div>
                 </div>
 
                 <a href="{{ url('/') }}#kontak" 
-                   class="px-4 py-2 rounded-lg text-[#0088cc] hover:bg-blue-50 transition-colors font-medium">
+                   class="px-4 py-2 rounded-lg text-black hover:bg-blue-50 transition-colors font-medium">
                     Kontak
                 </a>
             </div>
@@ -132,7 +138,7 @@
                 <div class="relative" x-data="{ open: false }" x-ref="notifDropdown">
                     <button 
                         @click="open = !open"
-                        class="p-2 rounded-lg text-[#0088cc] hover:bg-blue-50 transition-colors relative"
+                        class="p-2 rounded-lg text-black hover:bg-blue-50 transition-colors relative"
                     >
                         <i class="fas fa-bell text-xl"></i>
                         @php
@@ -191,7 +197,7 @@
                     <div class="relative" x-data="{ open: false }" x-ref="userDropdown">
                         <button 
                             @click="open = !open"
-                            class="flex items-center space-x-2 bg-white text-[#0088cc] px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 border border-blue-100"
+                            class="flex items-center space-x-2 bg-white text-black px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 border border-blue-100"
                         >
                             <div class="w-8 h-8 bg-gradient-to-br from-[#0088cc] to-blue-600 rounded-full flex items-center justify-center">
                                 <i class="fas fa-user text-white text-sm"></i>
@@ -212,10 +218,10 @@
                             style="display: none;"
                         >
                             <div class="px-4 py-2 border-b border-gray-100">
-                                <p class="font-medium text-gray-900 text-sm">{{ Auth::user()->name }}</p>
-                                <p class="text-xs text-gray-500">{{ Auth::user()->email }}</p>
+                                <p class="font-medium text-black text-sm">{{ Auth::user()->name }}</p>
+                                <p class="text-xs text-black">{{ Auth::user()->email }}</p>
                             </div>
-                            <a href="{{ route('profile') }}" class="flex items-center px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-[#0088cc] transition-colors">
+                            <a href="{{ route('profile') }}" class="flex items-center px-4 py-2 text-black hover:bg-blue-50 hover:text-black transition-colors">
                                 <i class="fas fa-user w-4 h-4 mr-3"></i>
                                 Profil Saya
                             </a>
@@ -235,7 +241,7 @@
                 @else
                     <div class="hidden lg:flex items-center space-x-3">
                         <a href="{{ route('login') }}" 
-                           class="px-4 py-2 text-[#0088cc] hover:bg-blue-50 rounded-lg transition-colors font-medium">
+                           class="px-4 py-2 text-black hover:bg-blue-50 rounded-lg transition-colors font-medium">
                             Login
                         </a>
                         <a href="{{ route('register') }}" 
@@ -248,7 +254,7 @@
                 <!-- Mobile Menu Button -->
                 <button 
                     @click="mobileMenuOpen = !mobileMenuOpen"
-                    class="lg:hidden p-2 rounded-lg text-[#0088cc] hover:bg-blue-50 transition-colors"
+                    class="lg:hidden p-2 rounded-lg text-black hover:bg-blue-50 transition-colors"
                 >
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
@@ -270,55 +276,55 @@
             style="display: none;"
         >
             <div class="px-4 py-3 space-y-1">
-                <a href="{{ url('/') }}" class="block px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-[#0088cc] transition-colors">Beranda</a>
-                <a href="{{ url('/') }}#profil" class="block px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-[#0088cc] transition-colors">Profil Desa</a>
+                <a href="{{ url('/') }}" class="block px-3 py-2 rounded-lg text-black hover:bg-blue-50 hover:text-black transition-colors">Beranda</a>
+                <a href="{{ url('/') }}#profil" class="block px-3 py-2 rounded-lg text-black hover:bg-blue-50 hover:text-black transition-colors">Profil Desa</a>
                 
                 <!-- Mobile Dropdowns -->
                 <div x-data="{ open: false }">
-                    <button @click="open = !open" class="flex items-center justify-between w-full px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-[#0088cc] transition-colors">
+                    <button @click="open = !open" class="flex items-center justify-between w-full px-3 py-2 rounded-lg text-black hover:bg-blue-50 hover:text-black transition-colors">
                         Statistik Penduduk
                         <i class="fas fa-chevron-down text-xs transition-transform duration-200" :class="{'rotate-180': open}"></i>
                     </button>
                     <div x-show="open" class="pl-6 mt-1 space-y-1" style="display: none;">
-                        <a href="/statistik/wilayah" class="block px-3 py-2 rounded-lg text-gray-600 hover:bg-blue-50 hover:text-[#0088cc] transition-colors">Wilayah</a>
-                        <a href="/statistik/usia" class="block px-3 py-2 rounded-lg text-gray-600 hover:bg-blue-50 hover:text-[#0088cc] transition-colors">Usia</a>
-                        <a href="/statistik/pendidikan" class="block px-3 py-2 rounded-lg text-gray-600 hover:bg-blue-50 hover:text-[#0088cc] transition-colors">Pendidikan</a>
-                        <a href="/statistik/pekerjaan" class="block px-3 py-2 rounded-lg text-gray-600 hover:bg-blue-50 hover:text-[#0088cc] transition-colors">Pekerjaan</a>
+                        <a href="/statistik/wilayah" class="block px-3 py-2 rounded-lg text-black hover:bg-blue-50 hover:text-black transition-colors">Wilayah</a>
+                        <a href="/statistik/usia" class="block px-3 py-2 rounded-lg text-black hover:bg-blue-50 hover:text-black transition-colors">Usia</a>
+                        <a href="/statistik/pendidikan" class="block px-3 py-2 rounded-lg text-black hover:bg-blue-50 hover:text-black transition-colors">Pendidikan</a>
+                        <a href="/statistik/pekerjaan" class="block px-3 py-2 rounded-lg text-black hover:bg-blue-50 hover:text-black transition-colors">Pekerjaan</a>
                     </div>
                 </div>
 
                 <div x-data="{ open: false }">
-                    <button @click="open = !open" class="flex items-center justify-between w-full px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-[#0088cc] transition-colors">
+                    <button @click="open = !open" class="flex items-center justify-between w-full px-3 py-2 rounded-lg text-black hover:bg-blue-50 hover:text-black transition-colors">
                         Pelayanan Surat
                         <i class="fas fa-chevron-down text-xs transition-transform duration-200" :class="{'rotate-180': open}"></i>
                     </button>
                     <div x-show="open" class="pl-6 mt-1 space-y-1" style="display: none;">
-                        <a href="/surat/status" class="block px-3 py-2 rounded-lg text-gray-600 hover:bg-blue-50 hover:text-[#0088cc] transition-colors">Status Layanan</a>
-                        <a href="/surat/jadwal" class="block px-3 py-2 rounded-lg text-gray-600 hover:bg-blue-50 hover:text-[#0088cc] transition-colors">Jadwal Pengambilan</a>
-                        <a href="/surat/form" class="block px-3 py-2 rounded-lg text-gray-600 hover:bg-blue-50 hover:text-[#0088cc] transition-colors">Pelayanan Surat</a>
+                        <a href="/surat/status" class="block px-3 py-2 rounded-lg text-black hover:bg-blue-50 hover:text-black transition-colors">Status Layanan</a>
+                        <a href="/surat/jadwal" class="block px-3 py-2 rounded-lg text-black hover:bg-blue-50 hover:text-black transition-colors">Jadwal Pengambilan</a>
+                        <a href="/surat/form" class="block px-3 py-2 rounded-lg text-black hover:bg-blue-50 hover:text-black transition-colors">Pelayanan Surat</a>
                     </div>
                 </div>
 
                 <div x-data="{ open: false }">
-                    <button @click="open = !open" class="flex items-center justify-between w-full px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-[#0088cc] transition-colors">
+                    <button @click="open = !open" class="flex items-center justify-between w-full px-3 py-2 rounded-lg text-black hover:bg-blue-50 hover:text-black transition-colors">
                         Laporan
                         <i class="fas fa-chevron-down text-xs transition-transform duration-200" :class="{'rotate-180': open}"></i>
                     </button>
                     <div x-show="open" class="pl-6 mt-1 space-y-1" style="display: none;">
-                        <a href="/laporan/bulanan" class="block px-3 py-2 rounded-lg text-gray-600 hover:bg-blue-50 hover:text-[#0088cc] transition-colors">Laporan Bulanan</a>
-                        <a href="/laporan/rekap" class="block px-3 py-2 rounded-lg text-gray-600 hover:bg-blue-50 hover:text-[#0088cc] transition-colors">Rekap Bulanan</a>
+                        <a href="/laporan/bulanan" class="block px-3 py-2 rounded-lg text-black hover:bg-blue-50 hover:text-black transition-colors">Laporan Bulanan</a>
+                        <a href="/laporan/rekap" class="block px-3 py-2 rounded-lg text-black hover:bg-blue-50 hover:text-black transition-colors">Rekap Bulanan</a>
                     </div>
                 </div>
 
-                <a href="{{ url('/') }}#kontak" class="block px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-[#0088cc] transition-colors">Kontak</a>
+                <a href="{{ url('/') }}#kontak" class="block px-3 py-2 rounded-lg text-black hover:bg-blue-50 hover:text-black transition-colors">Kontak</a>
                 
                 @if(Auth::check())
                     <div class="border-t border-gray-100 mt-3 pt-3">
                         <div class="px-3 py-2">
-                            <p class="font-medium text-gray-900 text-sm">{{ Auth::user()->name }}</p>
-                            <p class="text-xs text-gray-500">{{ Auth::user()->email }}</p>
+                            <p class="font-medium text-black text-sm">{{ Auth::user()->name }}</p>
+                            <p class="text-xs text-black">{{ Auth::user()->email }}</p>
                         </div>
-                        <a href="{{ route('profile') }}" class="block px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-[#0088cc] transition-colors">Profil Saya</a>
+                        <a href="{{ route('profile') }}" class="block px-3 py-2 rounded-lg text-black hover:bg-blue-50 hover:text-black transition-colors">Profil Saya</a>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <button type="button" @click="logout()" class="w-full text-left px-3 py-2 rounded-lg text-red-600 hover:bg-red-50 transition-colors">Logout</button>
@@ -326,7 +332,7 @@
                     </div>
                 @else
                     <div class="border-t border-gray-100 mt-3 pt-3 space-y-2">
-                        <a href="{{ route('login') }}" class="block px-3 py-2 rounded-lg text-[#0088cc] hover:bg-blue-50 transition-colors font-medium">Login</a>
+                        <a href="{{ route('login') }}" class="block px-3 py-2 rounded-lg text-black hover:bg-blue-50 transition-colors font-medium">Login</a>
                         <a href="{{ route('register') }}" class="block px-3 py-2 bg-[#0088cc] text-white rounded-lg hover:bg-blue-600 transition-colors font-medium text-center">Register</a>
                     </div>
                 @endif

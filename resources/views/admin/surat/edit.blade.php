@@ -4,16 +4,32 @@
 @php
 $breadcrumbs = [
     ['label' => 'Admin', 'url' => url('/admin/dashboard')],
-    ['label' => 'Pengelolaan Surat', 'url' => route('admin.surat.index')],
+    ['label' => 'Pengelolaan Surat', 'url' => url('/admin/surat')],
     ['label' => 'Edit Surat', 'url' => '#'],
 ];
 @endphp
 
     @include('admin.partials.alpinejs')
     @include('admin.partials.navbar')
-    <div id="adminLayout" x-data class="flex min-h-screen bg-gray-50">
+    <div id="adminLayout" x-data="{ sidebarMinimized: false }" class="flex min-h-screen bg-gray-50">
         @include('admin.partials.sidebar')
-        <main id="adminMain" class="flex-1 ml-0 md:ml-64 pt-24 pb-8 px-2 sm:px-4 md:px-8 transition-all duration-300">
+        <main id="adminMain" 
+              class="flex-1 pt-24 pb-8 px-2 sm:px-4 md:px-8 transition-all duration-300"
+              :class="{
+                  'ml-16': $store.sidebar && $store.sidebar.isOpen && sidebarMinimized,
+                  'ml-64': $store.sidebar && $store.sidebar.isOpen && !sidebarMinimized,
+                  'ml-0': !$store.sidebar || !$store.sidebar.isOpen
+              }"
+              x-init="
+                  $watch('$store.sidebar.isOpen', value => {
+                      if (!value) sidebarMinimized = false;
+                  });
+                  // Listen for minimize state changes from sidebar
+                  document.addEventListener('sidebar-minimized', (e) => {
+                      sidebarMinimized = e.detail.minimized;
+                  });
+              "
+        >
             <div class="max-w-7xl mx-auto">
                 <div class="mb-8">
                     <h1 class="text-3xl font-bold text-[#0088cc] mb-2 text-center md:text-left">Edit Surat Keterangan</h1>
@@ -226,7 +242,7 @@ $breadcrumbs = [
                             <button type="submit" class="bg-[#0088cc] text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition font-semibold">
                                 <i class="fas fa-save mr-2"></i> Simpan Perubahan
                             </button>
-                            <a href="{{ route('admin.surat.index') }}" class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition font-semibold text-center">
+                            <a href="/admin/surat" class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition font-semibold text-center">
                                 <i class="fas fa-arrow-left mr-2"></i> Kembali
                             </a>
                         </div>

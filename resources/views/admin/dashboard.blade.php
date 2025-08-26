@@ -10,9 +10,40 @@ $breadcrumbs = [
 
     @include('admin.partials.alpinejs')
     @include('admin.partials.navbar')
-    <div id="adminLayout" x-data class="flex min-h-screen bg-gray-50">
+    <div id="adminLayout" x-data="{ sidebarMinimized: false }" class="flex min-h-screen bg-gray-50">
         @include('admin.partials.sidebar')
-        <main id="adminMain" class="flex-1 ml-0 md:ml-64 pt-24 pb-8 px-2 sm:px-4 md:px-8 transition-all duration-300">
+        <main id="adminMain" 
+              class="flex-1 pt-24 pb-8 px-2 sm:px-4 md:px-8 transition-all duration-300"
+              :class="{
+                  'ml-16': $store.sidebar && $store.sidebar.isOpen && sidebarMinimized,
+                  'ml-64': $store.sidebar && $store.sidebar.isOpen && !sidebarMinimized,
+                  'ml-0': !$store.sidebar || !$store.sidebar.isOpen
+              }"
+              x-init="
+                  $watch('$store.sidebar.isOpen', value => {
+                      if (!value) sidebarMinimized = false;
+                  });
+                  // Listen for minimize state changes from sidebar
+                  document.addEventListener('sidebar-minimized', (e) => {
+                      sidebarMinimized = e.detail.minimized;
+                  });
+              "
+        >
+            
+            <!-- Flash Messages -->
+            @if(session('error'))
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+                    <strong class="font-bold">Error!</strong>
+                    <span class="block sm:inline">{{ session('error') }}</span>
+                </div>
+            @endif
+
+            @if(session('success'))
+                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+                    <strong class="font-bold">Success!</strong>
+                    <span class="block sm:inline">{{ session('success') }}</span>
+                </div>
+            @endif
             <div class="max-w-7xl mx-auto">
                 <div class="mb-8">
                     <h1 class="text-3xl font-bold text-[#0088cc] mb-2 text-center md:text-left">Dashboard Admin</h1>

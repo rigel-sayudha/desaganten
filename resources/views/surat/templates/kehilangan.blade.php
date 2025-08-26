@@ -253,28 +253,6 @@ $breadcrumbs = [
                 </form>
             </div>
         </div>
-
-        <!-- Information Card -->
-        <div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
-            <h4 class="font-semibold text-blue-900 mb-3 flex items-center space-x-2">
-                <i class="fas fa-lightbulb text-blue-600"></i>
-                <span>Informasi Penting</span>
-            </h4>
-            <ul class="text-blue-800 text-sm space-y-2">
-                <li class="flex items-start space-x-2">
-                    <i class="fas fa-check text-blue-600 mt-0.5"></i>
-                    <span>Pastikan semua data yang diisi sesuai dengan dokumen resmi</span>
-                </li>
-                <li class="flex items-start space-x-2">
-                    <i class="fas fa-check text-blue-600 mt-0.5"></i>
-                    <span>Surat keterangan akan diproses dalam 1-3 hari kerja</span>
-                </li>
-                <li class="flex items-start space-x-2">
-                    <i class="fas fa-check text-blue-600 mt-0.5"></i>
-                    <span>Anda akan dihubungi untuk pengambilan surat</span>
-                </li>
-            </ul>
-        </div>
     </div>
 </div>
 

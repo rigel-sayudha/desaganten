@@ -10,6 +10,7 @@ class SuratKtp extends Model
     use HasFactory;
     protected $table = 'surat_ktp';
     protected $fillable = [
+        'user_id',
         'nama_lengkap',
         'jenis_kelamin',
         'agama',
@@ -22,4 +23,13 @@ class SuratKtp extends Model
         'keperluan',
         'status',
     ];
+
+    protected $casts = [
+        'tanggal_lahir' => 'date',
+    ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

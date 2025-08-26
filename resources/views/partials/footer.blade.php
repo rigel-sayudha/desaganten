@@ -141,9 +141,6 @@
                         <p class="text-blue-100 text-sm">
                             &copy; {{ date('Y') }} Desa Ganten. All rights reserved.
                         </p>
-                        <p class="text-blue-200 text-xs mt-1">
-                            Dibuat dengan ❤️ untuk melayani masyarakat Desa Ganten
-                        </p>
                     </div>
                     
                     <!-- Social Media Links -->

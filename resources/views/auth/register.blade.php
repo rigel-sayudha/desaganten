@@ -53,16 +53,33 @@
                 </div>
             @endif
 
+            @if(session('error'))
+                <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+                    <div class="flex items-start space-x-2">
+                        <i class="fas fa-exclamation-circle text-red-500 mt-0.5"></i>
+                        <div class="flex-1">
+                            <p class="text-red-700 text-sm">{{ session('error') }}</p>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
             <!-- Register Form -->
             <form method="POST" action="{{ route('register') }}" class="space-y-5" x-data="{ 
                 showPassword: false,
                 showPasswordConfirmation: false,
-                name: '',
-                email: '',
+                name: '{{ old('name') }}',
+                email: '{{ old('email') }}',
                 password: '',
                 passwordConfirmation: '',
-                isLoading: false 
-            }">
+                isLoading: false,
+                submitForm() {
+                    if (!this.isLoading && this.name && this.email && this.password && this.passwordConfirmation && this.password === this.passwordConfirmation) {
+                        this.isLoading = true;
+                        this.$el.submit();
+                    }
+                }
+            }" @submit.prevent="submitForm()">
                 @csrf
                 
                 <!-- Name Field -->
@@ -199,7 +216,6 @@
                 <!-- Register Button -->
                 <button 
                     type="submit"
-                    @click="isLoading = true"
                     :disabled="isLoading || !name || !email || !password || !passwordConfirmation || password !== passwordConfirmation"
                     :class="{
                         'opacity-50 cursor-not-allowed': isLoading || !name || !email || !password || !passwordConfirmation || password !== passwordConfirmation,
@@ -262,4 +278,27 @@
 
 <!-- Alpine.js Script -->
 <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
+<!-- Register Form Handler -->
+<script src="{{ asset('js/register.js') }}"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Reset loading state when page loads (in case of validation errors)
+    const form = document.querySelector('form[x-data]');
+    if (form && form._x_dataStack && form._x_dataStack[0]) {
+        form._x_dataStack[0].isLoading = false;
+    }
+    
+    // Reset loading state if there are validation errors
+    @if($errors->any() || session('error'))
+    setTimeout(() => {
+        const form = document.querySelector('form[x-data]');
+        if (form && form._x_dataStack && form._x_dataStack[0]) {
+            form._x_dataStack[0].isLoading = false;
+        }
+    }, 100);
+    @endif
+});
+</script>
 @endsection

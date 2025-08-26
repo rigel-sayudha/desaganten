@@ -9,6 +9,7 @@ class Domisili extends Model
 	use HasFactory;
 	protected $table = 'domisili';
 	protected $fillable = [
+		'user_id',
 		'nik',
 		'nama',
 		'tempat_lahir',
@@ -20,6 +21,20 @@ class Domisili extends Model
 		'pekerjaan',
 		'alamat',
 		'keperluan',
-		'status_pengajuan'
+		'status_pengajuan',
+		'tahapan_verifikasi',
+		'catatan_verifikasi',
+		'tanggal_verifikasi_terakhir'
 	];
+
+	protected $casts = [
+		'tanggal_lahir' => 'date',
+		'tahapan_verifikasi' => 'array',
+		'tanggal_verifikasi_terakhir' => 'datetime',
+	];
+
+	public function user()
+	{
+		return $this->belongsTo(User::class);
+	}
 }
