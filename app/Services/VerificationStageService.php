@@ -263,6 +263,90 @@ class VerificationStageService
                     'required_documents' => ['Surat yang sudah ditandatangani'],
                     'duration_days' => 1
                 ]
+            ],
+            
+            'kehilangan' => [
+                1 => [
+                    'name' => 'Penerimaan Berkas',
+                    'description' => 'Berkas permohonan diterima dan dicatat dalam sistem',
+                    'required_documents' => ['KTP', 'KK', 'Surat permohonan', 'Kronologi kehilangan'],
+                    'duration_days' => 1
+                ],
+                2 => [
+                    'name' => 'Verifikasi Dokumen',
+                    'description' => 'Pengecekan kelengkapan dokumen dan identitas pemohon',
+                    'required_documents' => ['Verifikasi KTP', 'Verifikasi KK', 'Cek validitas kronologi'],
+                    'duration_days' => 1
+                ],
+                3 => [
+                    'name' => 'Verifikasi Laporan Polisi',
+                    'description' => 'Konfirmasi laporan kehilangan ke pihak kepolisian',
+                    'required_documents' => ['Surat laporan polisi', 'Verifikasi nomor laporan'],
+                    'duration_days' => 2
+                ],
+                4 => [
+                    'name' => 'Verifikasi Lokasi Kehilangan',
+                    'description' => 'Konfirmasi lokasi dan waktu kehilangan',
+                    'required_documents' => ['Keterangan saksi', 'Konfirmasi RT/RW'],
+                    'duration_days' => 2
+                ],
+                5 => [
+                    'name' => 'Persetujuan Kepala Desa',
+                    'description' => 'Review dan persetujuan dari Kepala Desa',
+                    'required_documents' => ['Laporan verifikasi lengkap'],
+                    'duration_days' => 1
+                ],
+                6 => [
+                    'name' => 'Penerbitan Surat',
+                    'description' => 'Pembuatan dan penandatanganan surat keterangan kehilangan',
+                    'required_documents' => ['Surat yang sudah ditandatangani'],
+                    'duration_days' => 1
+                ]
+            ],
+            
+            'usaha' => [
+                1 => [
+                    'name' => 'Penerimaan Berkas',
+                    'description' => 'Berkas permohonan diterima dan dicatat dalam sistem',
+                    'required_documents' => ['KTP', 'KK', 'Surat permohonan', 'Foto usaha'],
+                    'duration_days' => 1
+                ],
+                2 => [
+                    'name' => 'Verifikasi Dokumen',
+                    'description' => 'Pengecekan kelengkapan dokumen dan identitas pemohon',
+                    'required_documents' => ['Verifikasi KTP', 'Verifikasi KK', 'Cek data pemohon'],
+                    'duration_days' => 1
+                ],
+                3 => [
+                    'name' => 'Survey Lokasi Usaha',
+                    'description' => 'Peninjauan langsung ke lokasi usaha',
+                    'required_documents' => ['Foto lokasi usaha', 'Dokumentasi kegiatan usaha', 'Wawancara dengan pelaku usaha'],
+                    'duration_days' => 3
+                ],
+                4 => [
+                    'name' => 'Verifikasi Aktivitas Usaha',
+                    'description' => 'Konfirmasi aktivitas usaha dari lingkungan sekitar',
+                    'required_documents' => ['Keterangan RT/RW', 'Konfirmasi tetangga', 'Bukti aktivitas usaha'],
+                    'duration_days' => 2
+                ],
+                5 => [
+                    'name' => 'Verifikasi Legalitas',
+                    'description' => 'Pengecekan aspek legalitas dan perizinan usaha',
+                    'required_documents' => ['Cek izin yang diperlukan', 'Verifikasi tidak melanggar aturan'],
+                    'duration_days' => 2
+                ],
+                6 => [
+                    'name' => 'Persetujuan Kepala Desa',
+                    'description' => 'Review dan persetujuan dari Kepala Desa',
+                    'required_documents' => ['Laporan verifikasi lengkap', 'Rekomendasi tim survey'],
+                    'duration_days' => 2
+                ],
+                7 => [
+                    'name' => 'Penerbitan Surat',
+                    'description' => 'Pembuatan dan penandatanganan surat keterangan usaha',
+                    'required_documents' => ['Surat yang sudah ditandatangani'],
+                    'duration_days' => 1
+                ]
             ]
         ];
 

@@ -14,6 +14,8 @@ $jenisSurat = [
     'kelahiran' => 'Surat Keterangan Kelahiran',
     'belum_menikah' => 'Surat Keterangan Belum Menikah',
     'tidak_mampu' => 'Surat Keterangan Tidak Mampu',
+    'usaha' => 'Surat Keterangan Usaha',
+    'kehilangan' => 'Surat Keterangan Kehilangan',
 ];
 @endphp
 @include('admin.partials.alpinejs')
@@ -375,7 +377,11 @@ document.addEventListener('DOMContentLoaded', function() {
             'kk': 'Surat Keterangan KK',
             'skck': 'Surat Pengantar SKCK',
             'kematian': 'Surat Keterangan Kematian',
-            'kelahiran': 'Surat Keterangan Kelahiran'
+            'kelahiran': 'Surat Keterangan Kelahiran',
+            'belum_menikah': 'Surat Keterangan Belum Menikah',
+            'tidak_mampu': 'Surat Keterangan Tidak Mampu',
+            'usaha': 'Surat Keterangan Usaha',
+            'kehilangan': 'Surat Keterangan Kehilangan'
         };
         return jenisSuratMap[jenis] || jenis.toUpperCase();
     }

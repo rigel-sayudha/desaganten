@@ -120,6 +120,34 @@ class SuratController extends Controller
                 ]);
             }
         }
+
+        // Surat Usaha
+        if (class_exists('App\\Models\\SuratUsaha')) {
+            $usaha = \App\Models\SuratUsaha::all();
+            foreach ($usaha as $item) {
+                $suratList->push((object)[
+                    'id' => $item->id,
+                    'nama_pemohon' => $item->nama_lengkap,
+                    'jenis_surat' => 'usaha',
+                    'created_at' => $item->created_at,
+                    'status' => $item->status,
+                ]);
+            }
+        }
+
+        // Surat Kehilangan
+        if (class_exists('App\\Models\\SuratKehilangan')) {
+            $kehilangan = \App\Models\SuratKehilangan::all();
+            foreach ($kehilangan as $item) {
+                $suratList->push((object)[
+                    'id' => $item->id,
+                    'nama_pemohon' => $item->nama_lengkap,
+                    'jenis_surat' => 'kehilangan',
+                    'created_at' => $item->created_at,
+                    'status' => $item->status,
+                ]);
+            }
+        }
         // Surat lain (jika ada model Surat dan tabel surat)
         try {
             if (class_exists('App\\Models\\Surat')) {
@@ -765,6 +793,78 @@ class SuratController extends Controller
                         'status' => $item->status ?? 'menunggu',
                         'status_pengajuan' => $item->status ?? 'menunggu',
                         'jenis_surat' => 'kelahiran',
+                        'created_at' => $item->created_at,
+                        'tanggal_pengajuan' => $item->created_at ? $item->created_at->format('Y-m-d') : '-',
+                    ];
+                });
+                return response()->json($result, 200);
+            } else {
+                // Fallback if model doesn't exist
+                return response()->json([], 200);
+            }
+        } elseif ($jenis === 'usaha') {
+            // Handle Usaha data from database
+            if (class_exists('App\\Models\\SuratUsaha')) {
+                $data = \App\Models\SuratUsaha::orderBy('created_at', 'desc')->get();
+                $result = $data->map(function($item) {
+                    return [
+                        'id' => $item->id,
+                        'nama_pemohon' => $item->nama_lengkap,
+                        'nama' => $item->nama_lengkap,
+                        'nik' => $item->nik,
+                        'tempat_lahir' => $item->tempat_lahir,
+                        'tanggal_lahir' => $item->tanggal_lahir,
+                        'jenis_kelamin' => $item->jenis_kelamin,
+                        'agama' => $item->agama,
+                        'pekerjaan' => $item->pekerjaan,
+                        'alamat' => $item->alamat,
+                        'nama_usaha' => $item->nama_usaha,
+                        'jenis_usaha' => $item->jenis_usaha,
+                        'alamat_usaha' => $item->alamat_usaha,
+                        'tanggal_mulai_usaha' => $item->tanggal_mulai_usaha,
+                        'modal_usaha' => $item->modal_usaha,
+                        'deskripsi_usaha' => $item->deskripsi_usaha,
+                        'keperluan' => $item->keperluan,
+                        'status' => $item->status ?? 'menunggu',
+                        'status_pengajuan' => $item->status ?? 'menunggu',
+                        'jenis_surat' => 'usaha',
+                        'created_at' => $item->created_at,
+                        'tanggal_pengajuan' => $item->created_at ? $item->created_at->format('Y-m-d') : '-',
+                    ];
+                });
+                return response()->json($result, 200);
+            } else {
+                // Fallback if model doesn't exist
+                return response()->json([], 200);
+            }
+        } elseif ($jenis === 'kehilangan') {
+            // Handle Kehilangan data from database
+            if (class_exists('App\\Models\\SuratKehilangan')) {
+                $data = \App\Models\SuratKehilangan::orderBy('created_at', 'desc')->get();
+                $result = $data->map(function($item) {
+                    return [
+                        'id' => $item->id,
+                        'nama_pemohon' => $item->nama_lengkap,
+                        'nama' => $item->nama_lengkap,
+                        'nik' => $item->nik,
+                        'tempat_lahir' => $item->tempat_lahir,
+                        'tanggal_lahir' => $item->tanggal_lahir,
+                        'jenis_kelamin' => $item->jenis_kelamin,
+                        'agama' => $item->agama,
+                        'pekerjaan' => $item->pekerjaan,
+                        'alamat' => $item->alamat,
+                        'barang_hilang' => $item->barang_hilang,
+                        'deskripsi_barang' => $item->deskripsi_barang,
+                        'tempat_kehilangan' => $item->tempat_kehilangan,
+                        'tanggal_kehilangan' => $item->tanggal_kehilangan,
+                        'waktu_kehilangan' => $item->waktu_kehilangan,
+                        'kronologi_kehilangan' => $item->kronologi_kehilangan,
+                        'no_laporan_polisi' => $item->no_laporan_polisi,
+                        'tanggal_laporan_polisi' => $item->tanggal_laporan_polisi,
+                        'keperluan' => $item->keperluan,
+                        'status' => $item->status ?? 'menunggu',
+                        'status_pengajuan' => $item->status ?? 'menunggu',
+                        'jenis_surat' => 'kehilangan',
                         'created_at' => $item->created_at,
                         'tanggal_pengajuan' => $item->created_at ? $item->created_at->format('Y-m-d') : '-',
                     ];
