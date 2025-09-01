@@ -22,6 +22,10 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'nik',
+        'wilayah_id',
+        'rt',
+        'rw',
     ];
 
     /**
@@ -43,4 +47,12 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+    
+    /**
+     * Relasi dengan Wilayah
+     */
+    public function wilayah()
+    {
+        return $this->belongsTo(Wilayah::class);
+    }
 }

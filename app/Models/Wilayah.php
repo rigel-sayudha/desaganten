@@ -12,4 +12,20 @@ class Wilayah extends Model
     protected $fillable = [
         'nama', 'jumlah', 'laki_laki', 'perempuan'
     ];
+    
+    /**
+     * Relasi dengan User
+     */
+    public function users()
+    {
+        return $this->hasMany(User::class, 'wilayah_id');
+    }
+    
+    /**
+     * Accessor untuk nama_wilayah (gunakan nama jika ada)
+     */
+    public function getNamaWilayahAttribute()
+    {
+        return $this->nama;
+    }
 }

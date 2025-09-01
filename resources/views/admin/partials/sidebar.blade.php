@@ -171,8 +171,11 @@
                     <a href="{{ route('admin.verification.index') }}" class="block px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm text-gray-600 hover:bg-blue-50 hover:text-[#0088cc] transition-colors {{ request()->is('admin/verification*') ? 'bg-blue-50 text-[#0088cc] font-medium' : '' }}">
                         Verifikasi Surat
                     </a>
-                    <a href="/admin/settings" class="block px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm text-gray-600 hover:bg-blue-50 hover:text-[#0088cc] transition-colors {{ request()->is('admin/settings*') ? 'bg-blue-50 text-[#0088cc] font-medium' : '' }}">
+                    <a href="{{ route('admin.settings.index') }}" class="block px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm text-gray-600 hover:bg-blue-50 hover:text-[#0088cc] transition-colors {{ request()->is('admin/settings*') ? 'bg-blue-50 text-[#0088cc] font-medium' : '' }}">
                         Pengaturan Surat
+                    </a>
+                    <a href="{{ route('admin.test-notification') }}" class="block px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm text-yellow-600 hover:bg-yellow-50 hover:text-yellow-800 transition-colors {{ request()->is('admin/test-notification*') ? 'bg-yellow-50 text-yellow-800 font-medium' : '' }}">
+                        <i class="fas fa-bell mr-2"></i>Test Notifikasi
                     </a>
                 </div>
             </div>

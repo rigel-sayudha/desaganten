@@ -1,6 +1,11 @@
 @extends('layouts.app')
 
 @section('content')
+<!-- Prevent caching -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+
 <div class="min-h-screen bg-gray-50">
     <!-- Header -->
     <div class="bg-gradient-to-r from-[#0088cc] to-blue-600 text-white py-8">
@@ -47,10 +52,11 @@
         @endif
 
         <!-- Statistics Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
             @php
                 $total = $allSurat->count();
-                $diproses = $allSurat->where('status', 'diproses')->count();
+                $diproses = $allSurat->whereIn('status', ['diproses', 'selesai diproses'])->count();
+                $selesaiDiproses = $allSurat->where('status', 'selesai diproses')->count();
                 $sudahVerifikasi = $allSurat->where('status', 'sudah diverifikasi')->count();
                 $ditolak = $allSurat->where('status', 'ditolak')->count();
             @endphp
@@ -74,7 +80,19 @@
                     </div>
                     <div class="ml-4">
                         <p class="text-2xl font-bold text-gray-900">{{ $diproses }}</p>
-                        <p class="text-gray-600">Diproses</p>
+                        <p class="text-gray-600">Sedang Diproses</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <div class="flex items-center">
+                    <div class="p-3 bg-emerald-100 rounded-full">
+                        <i class="fas fa-check-double text-emerald-600 text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-2xl font-bold text-gray-900">{{ $selesaiDiproses }}</p>
+                        <p class="text-gray-600">Selesai Diproses</p>
                     </div>
                 </div>
             </div>
@@ -130,7 +148,22 @@
                                     $jenisSuratMap = [
                                         'domisili' => 'Surat Keterangan Domisili',
                                         'tidak_mampu' => 'Surat Keterangan Tidak Mampu',
-                                        'belum_menikah' => 'Surat Keterangan Belum Menikah'
+                                        'belum_menikah' => 'Surat Keterangan Belum Menikah',
+                                        'kematian' => 'Surat Keterangan Kematian',
+                                        'usaha' => 'Surat Keterangan Usaha',
+                                        'skck' => 'Surat Pengantar SKCK',
+                                        'kk' => 'Surat Pengantar Kartu Keluarga',
+                                        'ktp' => 'Surat Pengantar KTP',
+                                        'kelahiran' => 'Surat Keterangan Kelahiran',
+                                        'kehilangan' => 'Surat Keterangan Kehilangan',
+                                        // Additional mapping for full table names
+                                        'surat_kelahiran' => 'Surat Keterangan Kelahiran',
+                                        'surat_usaha' => 'Surat Keterangan Usaha',
+                                        'surat_skck' => 'Surat Pengantar SKCK',
+                                        'surat_kematian' => 'Surat Keterangan Kematian',
+                                        'surat_kk' => 'Surat Pengantar Kartu Keluarga',
+                                        'surat_ktp' => 'Surat Pengantar KTP',
+                                        'surat_kehilangan' => 'Surat Keterangan Kehilangan'
                                     ];
                                 @endphp
                                 <div class="flex items-center">
@@ -157,6 +190,12 @@
                                     if (str_contains(strtolower($status), 'menunggu') || str_contains(strtolower($status), 'pending')) {
                                         $statusClass = 'bg-yellow-100 text-yellow-800';
                                         $statusIcon = 'fas fa-clock';
+                                    } elseif (str_contains(strtolower($status), 'selesai diproses')) {
+                                        $statusClass = 'bg-emerald-100 text-emerald-800';
+                                        $statusIcon = 'fas fa-check-double';
+                                    } elseif (str_contains(strtolower($status), 'approved') || str_contains(strtolower($status), 'disetujui')) {
+                                        $statusClass = 'bg-emerald-100 text-emerald-800';
+                                        $statusIcon = 'fas fa-check-double';
                                     } elseif (str_contains(strtolower($status), 'sudah diverifikasi') || str_contains(strtolower($status), 'selesai')) {
                                         $statusClass = 'bg-green-100 text-green-800';
                                         $statusIcon = 'fas fa-check-circle';
@@ -198,13 +237,15 @@
                                         <i class="fas fa-eye mr-1"></i>Detail
                                     </a>
                                     
-                                    @if($surat->status === 'sudah diverifikasi' && $progress === 100)
+                                    @if(($progress === 100) || str_contains(strtolower($surat->status ?? ''), 'selesai diproses') || str_contains(strtolower($surat->status ?? ''), 'sudah diverifikasi'))
                                     <a href="{{ route('user.surat.print', [$surat->jenis_surat, $surat->id]) }}" 
                                        class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-lg text-xs"
                                        title="Download PDF Surat">
                                         <i class="fas fa-download mr-1"></i>PDF
                                     </a>
                                     @endif
+
+                                    
                                 </div>
                             </td>
                         </tr>
@@ -220,39 +261,14 @@
             </div>
             @endif
         </div>
-
-        <!-- Quick Actions -->
-        <div class="mt-8 bg-white rounded-xl shadow-lg p-6">
-            <h3 class="text-lg font-bold text-gray-900 mb-4">Ajukan Surat Baru</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <a href="{{ url('/surat/domisili') }}" 
-                   class="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-lg text-center transition">
-                    <i class="fas fa-home text-2xl mb-2"></i>
-                    <p class="font-medium">Surat Keterangan Domisili</p>
-                </a>
-                <a href="{{ url('/surat/belum-menikah') }}" 
-                   class="bg-green-600 hover:bg-green-700 text-white p-4 rounded-lg text-center transition">
-                    <i class="fas fa-user text-2xl mb-2"></i>
-                    <p class="font-medium">Surat Keterangan Belum Menikah</p>
-                </a>
-                <a href="{{ url('/surat/tidak-mampu') }}" 
-                   class="bg-purple-600 hover:bg-purple-700 text-white p-4 rounded-lg text-center transition">
-                    <i class="fas fa-hand-holding-heart text-2xl mb-2"></i>
-                    <p class="font-medium">Surat Keterangan Tidak Mampu</p>
-                </a>
-            </div>
-        </div>
     </div>
 </div>
 
 @if($sudahVerifikasi > 0)
 <script>
-// Show notification for verified letters
 document.addEventListener('DOMContentLoaded', function() {
-    // Check if there are newly verified letters (this can be improved with session data)
     const verifiedCount = {{ $sudahVerifikasi }};
     if (verifiedCount > 0) {
-        // Create notification for verified letters
         const notification = document.createElement('div');
         notification.className = 'fixed bottom-4 right-4 bg-green-500 text-white p-4 rounded-lg shadow-lg z-50';
         notification.innerHTML = `
@@ -265,8 +281,6 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         `;
         document.body.appendChild(notification);
-        
-        // Auto remove after 5 seconds
         setTimeout(() => {
             if (notification.parentElement) {
                 notification.remove();
@@ -276,4 +290,11 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 @endif
+
+<script>
+// Enhanced confirmation for Complete button
+function confirmComplete(jenisSurat) {
+    return confirm(`Yakin ingin menandai "${jenisSurat}" sebagai sudah diverifikasi?\n\nCatatan: Ini akan mengubah status menjadi "Sudah Diverifikasi" dan memungkinkan download PDF.`);
+}
+</script>
 @endsection

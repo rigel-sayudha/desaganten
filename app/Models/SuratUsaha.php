@@ -26,7 +26,9 @@ class SuratUsaha extends Model
         'jenis_usaha',
         'alamat_usaha',
         'tanggal_mulai_usaha',
+        'lama_usaha',
         'modal_usaha',
+        'omzet_usaha',
         'deskripsi_usaha',
         'keperluan',
         'status',
@@ -34,7 +36,13 @@ class SuratUsaha extends Model
         'user_id',
         'tahapan_verifikasi',
         'catatan_verifikasi_detail',
-        'tanggal_verifikasi_terakhir'
+        'tanggal_verifikasi_terakhir',
+        // File upload fields
+        'file_ktp',
+        'file_kk',
+        'file_foto_usaha',
+        'file_izin_usaha',
+        'file_pengantar'
     ];
 
     protected $casts = [

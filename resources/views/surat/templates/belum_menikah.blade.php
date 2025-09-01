@@ -80,7 +80,7 @@ $breadcrumbs = [
                     </div>
                 @endif
 
-                <form action="{{ route('surat.belum-menikah.submit') }}" method="POST" class="space-y-8" 
+                <form action="{{ route('surat.belum-menikah.submit') }}" method="POST" enctype="multipart/form-data" class="space-y-8" 
                       @submit="isSubmitting = true" 
                       x-bind:class="{ 'pointer-events-none opacity-75': isSubmitting }">
                     @csrf
@@ -366,20 +366,136 @@ $breadcrumbs = [
                         </div>
                     </div>
 
+                    <!-- Document Upload Section -->
+                    <div class="space-y-6">
+                        <div class="border-b border-gray-200 pb-4">
+                            <h3 class="text-lg font-semibold text-gray-900 flex items-center space-x-2">
+                                <i class="fas fa-file-upload text-blue-500"></i>
+                                <span>Dokumen Pendukung</span>
+                            </h3>
+                            <p class="text-sm text-gray-600 mt-1">Upload dokumen pendukung untuk mempercepat proses verifikasi (opsional)</p>
+                        </div>
+
+                        <!-- KTP/Identitas -->
+                        <div class="space-y-2">
+                            <label for="ktp_file" class="block text-sm font-medium text-gray-700 flex items-center space-x-2">
+                                <i class="fas fa-id-card text-indigo-500 w-4"></i>
+                                <span>Scan KTP/Identitas</span>
+                                <span class="text-gray-400 text-xs">(PDF, JPG, PNG - Max 2MB)</span>
+                            </label>
+                            <div class="relative">
+                                <input 
+                                    type="file" 
+                                    id="ktp_file"
+                                    name="ktp_file" 
+                                    accept=".pdf,.jpg,.jpeg,.png"
+                                    class="w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition duration-200 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-pink-50 file:text-pink-700 hover:file:bg-pink-100"
+                                >
+                                <p class="text-xs text-gray-500 mt-1">Upload scan KTP untuk verifikasi identitas</p>
+                            </div>
+                        </div>
+
+                        <!-- Kartu Keluarga -->
+                        <div class="space-y-2">
+                            <label for="kk_file" class="block text-sm font-medium text-gray-700 flex items-center space-x-2">
+                                <i class="fas fa-users text-purple-500 w-4"></i>
+                                <span>Scan Kartu Keluarga</span>
+                                <span class="text-gray-400 text-xs">(PDF, JPG, PNG - Max 2MB)</span>
+                            </label>
+                            <div class="relative">
+                                <input 
+                                    type="file" 
+                                    id="kk_file"
+                                    name="kk_file" 
+                                    accept=".pdf,.jpg,.jpeg,.png"
+                                    class="w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition duration-200 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-pink-50 file:text-pink-700 hover:file:bg-pink-100"
+                                >
+                                <p class="text-xs text-gray-500 mt-1">Upload scan Kartu Keluarga untuk verifikasi status</p>
+                            </div>
+                        </div>
+
+                        <!-- Akta Kelahiran -->
+                        <div class="space-y-2">
+                            <label for="akta_file" class="block text-sm font-medium text-gray-700 flex items-center space-x-2">
+                                <i class="fas fa-certificate text-green-500 w-4"></i>
+                                <span>Scan Akta Kelahiran</span>
+                                <span class="text-gray-400 text-xs">(PDF, JPG, PNG - Max 2MB)</span>
+                            </label>
+                            <div class="relative">
+                                <input 
+                                    type="file" 
+                                    id="akta_file"
+                                    name="akta_file" 
+                                    accept=".pdf,.jpg,.jpeg,.png"
+                                    class="w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition duration-200 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-pink-50 file:text-pink-700 hover:file:bg-pink-100"
+                                >
+                                <p class="text-xs text-gray-500 mt-1">Upload scan Akta Kelahiran untuk verifikasi data</p>
+                            </div>
+                        </div>
+
+                        <!-- Upload Guidelines -->
+                        <div class="bg-pink-50 border border-pink-200 rounded-lg p-4">
+                            <h4 class="font-medium text-pink-900 mb-2 flex items-center space-x-2">
+                                <i class="fas fa-info-circle text-pink-600"></i>
+                                <span>Panduan Upload Dokumen</span>
+                            </h4>
+                            <ul class="text-pink-800 text-sm space-y-1">
+                                <li class="flex items-start space-x-2">
+                                    <i class="fas fa-check text-pink-600 mt-0.5 w-3"></i>
+                                    <span>Format file yang diterima: PDF, JPG, JPEG, PNG</span>
+                                </li>
+                                <li class="flex items-start space-x-2">
+                                    <i class="fas fa-check text-pink-600 mt-0.5 w-3"></i>
+                                    <span>Ukuran maksimal setiap file: 2MB</span>
+                                </li>
+                                <li class="flex items-start space-x-2">
+                                    <i class="fas fa-check text-pink-600 mt-0.5 w-3"></i>
+                                    <span>Pastikan dokumen terlihat jelas dan dapat dibaca</span>
+                                </li>
+                                <li class="flex items-start space-x-2">
+                                    <i class="fas fa-check text-pink-600 mt-0.5 w-3"></i>
+                                    <span>Upload dokumen dapat mempercepat proses verifikasi</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
                     <!-- Declaration Section -->
-                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
-                        <h4 class="font-semibold text-yellow-800 mb-3 flex items-center space-x-2">
-                            <i class="fas fa-exclamation-triangle text-yellow-600"></i>
-                            <span>Pernyataan</span>
-                        </h4>
-                        <p class="text-sm text-yellow-700 mb-4">
-                            Dengan ini saya menyatakan bahwa data yang saya berikan adalah benar dan dapat dipertanggungjawabkan. 
-                            Apabila di kemudian hari terbukti data yang saya berikan tidak benar, maka saya bersedia menerima sanksi sesuai ketentuan yang berlaku.
-                        </p>
-                        <label class="flex items-start space-x-3">
-                            <input type="checkbox" name="pernyataan" required class="mt-1 h-4 w-4 text-pink-600 border-gray-300 rounded focus:ring-pink-500">
-                            <span class="text-sm text-gray-700">Saya menyetujui pernyataan di atas dan bertanggung jawab atas kebenaran data yang telah diisi</span>
-                        </label>
+                    <div class="space-y-6">
+                        <div class="border-b border-gray-200 pb-4">
+                            <h3 class="text-lg font-semibold text-gray-900 flex items-center space-x-2">
+                                <i class="fas fa-file-signature text-green-500"></i>
+                                <span>Pernyataan</span>
+                            </h3>
+                            <p class="text-sm text-gray-600 mt-1">Pernyataan kebenaran data dan persetujuan</p>
+                        </div>
+
+                        <!-- Declaration Checkbox -->
+                        <div class="space-y-4">
+                            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                <div class="flex items-start space-x-3">
+                                    <input 
+                                        type="checkbox" 
+                                        id="pernyataan"
+                                        name="pernyataan" 
+                                        value="1"
+                                        {{ old('pernyataan') ? 'checked' : '' }}
+                                        class="w-5 h-5 text-pink-600 bg-gray-100 border-gray-300 rounded focus:ring-pink-500 focus:ring-2 mt-1"
+                                        required
+                                    >
+                                    <label for="pernyataan" class="text-sm text-gray-700 leading-relaxed">
+                                        <span class="font-medium text-gray-900">Saya menyatakan bahwa:</span>
+                                        <ul class="mt-2 space-y-1 list-disc list-inside ml-4">
+                                            <li>Semua data yang saya isi adalah benar dan dapat dipertanggungjawabkan</li>
+                                            <li>Saya belum pernah menikah dan belum pernah terikat dalam perkawinan yang sah</li>
+                                            <li>Jika dikemudian hari terbukti data yang saya berikan tidak benar, saya bersedia menerima sanksi sesuai ketentuan yang berlaku</li>
+                                            <li>Saya memberikan persetujuan kepada Pemerintah Desa Ganten untuk memproses data pribadi saya untuk keperluan penerbitan surat keterangan belum menikah</li>
+                                        </ul>
+                                        <span class="text-red-500 ml-1">*</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Submit Section -->
@@ -428,31 +544,6 @@ $breadcrumbs = [
             </div>
         </div>
 
-        <!-- Information Card -->
-        <div class="mt-8 bg-pink-50 border border-pink-200 rounded-lg p-6">
-            <h4 class="font-semibold text-pink-900 mb-3 flex items-center space-x-2">
-                <i class="fas fa-lightbulb text-pink-600"></i>
-                <span>Informasi Penting</span>
-            </h4>
-            <ul class="text-pink-800 text-sm space-y-2">
-                <li class="flex items-start space-x-2">
-                    <i class="fas fa-check text-pink-600 mt-0.5"></i>
-                    <span>Pastikan semua data yang diisi sesuai dengan dokumen resmi</span>
-                </li>
-                <li class="flex items-start space-x-2">
-                    <i class="fas fa-check text-pink-600 mt-0.5"></i>
-                    <span>Surat keterangan belum menikah akan diproses dalam 1-3 hari kerja</span>
-                </li>
-                <li class="flex items-start space-x-2">
-                    <i class="fas fa-check text-pink-600 mt-0.5"></i>
-                    <span>Pastikan status belum menikah yang dinyatakan sesuai dengan keadaan sebenarnya</span>
-                </li>
-                <li class="flex items-start space-x-2">
-                    <i class="fas fa-check text-pink-600 mt-0.5"></i>
-                    <span>Anda akan dihubungi untuk pengambilan surat</span>
-                </li>
-            </ul>
-        </div>
     </div>
 </div>
 

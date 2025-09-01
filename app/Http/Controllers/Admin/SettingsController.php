@@ -28,6 +28,6 @@ class SettingsController extends Controller
         Setting::set('kepala_desa_nama', $request->kepala_desa_nama, 'Nama Kepala Desa untuk ditampilkan di surat keterangan');
         Setting::set('kepala_desa_jabatan', $request->kepala_desa_jabatan, 'Jabatan Kepala Desa untuk ditampilkan di surat keterangan');
 
-        return redirect()->route('admin.settings')->with('success', 'Pengaturan berhasil diperbarui!');
+        return redirect()->route('admin.settings.index')->with('success', 'Pengaturan berhasil diperbarui!');
     }
 }

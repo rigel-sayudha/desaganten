@@ -11,9 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('surat_ktp', function (Blueprint $table) {
-            $table->unsignedBigInteger('user_id')->after('id');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+        Schema::table('surat_skck', function (Blueprint $table) {
+            $table->string('kewarganegaraan')->after('status_perkawinan');
         });
     }
 
@@ -22,9 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('surat_ktp', function (Blueprint $table) {
-            $table->dropForeign(['user_id']);
-            $table->dropColumn('user_id');
+        Schema::table('surat_skck', function (Blueprint $table) {
+            $table->dropColumn('kewarganegaraan');
         });
     }
 };

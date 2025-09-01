@@ -93,6 +93,37 @@ $breadcrumbs = [
                             <span>Lihat Layanan Lain</span>
                         </a>
                     </div>
+                    
+                    <!-- Preview Form Structure for Future Development -->
+                    <div class="mt-8 bg-gray-50 border border-gray-200 rounded-lg p-6">
+                        <h4 class="font-semibold text-gray-700 mb-4 flex items-center space-x-2">
+                            <i class="fas fa-eye text-gray-500"></i>
+                            <span>Preview Struktur Form (Dalam Pengembangan)</span>
+                        </h4>
+                        <div class="space-y-4 text-sm text-gray-600">
+                            <div class="border border-gray-200 rounded p-3 bg-white">
+                                <p class="font-medium text-gray-700 mb-2">📝 Data Pemohon</p>
+                                <p>• Nama lengkap, NIK, alamat</p>
+                                <p>• Jenis akta yang diminta (kelahiran/kematian/perkawinan)</p>
+                                <p>• Data orang yang bersangkutan</p>
+                            </div>
+                            <div class="border border-gray-200 rounded p-3 bg-white">
+                                <p class="font-medium text-gray-700 mb-2">📎 Upload Dokumen Pendukung</p>
+                                <p>• Scan KTP pemohon</p>
+                                <p>• Scan Kartu Keluarga</p>
+                                <p>• Dokumen pendukung sesuai jenis akta</p>
+                                <p>• Format: PDF, JPG, PNG (Max 2MB per file)</p>
+                            </div>
+                            <div class="border border-gray-200 rounded p-3 bg-white">
+                                <p class="font-medium text-gray-700 mb-2">⚡ Fitur Upload yang Akan Tersedia</p>
+                                <p>• Drag & drop multiple files</p>
+                                <p>• Preview dokumen sebelum submit</p>
+                                <p>• Progress bar upload real-time</p>
+                                <p>• Validasi format dan ukuran otomatis</p>
+                                <p>• Kompres gambar otomatis jika terlalu besar</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

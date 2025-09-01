@@ -39,14 +39,51 @@
         </div>
         @endif
 
+        <!-- Status Notification for Completed Documents -->
+        @if(str_contains(strtolower($surat->status ?? ''), 'selesai diproses'))
+        <div class="mb-6 bg-emerald-100 border border-emerald-400 text-emerald-800 px-4 py-3 rounded-lg">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <i class="fas fa-check-double mr-3 text-lg"></i>
+                    <div>
+                        <div class="font-semibold">{{ $jenisSurat }} Sudah Selesai Diproses!</div>
+                        <div class="text-sm text-emerald-700">Dokumen Anda telah selesai diproses dan siap untuk diunduh dalam format PDF.</div>
+                    </div>
+                </div>
+                <a href="{{ route('user.surat.print', [$type, $surat->id]) }}" 
+                   class="inline-flex items-center bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200">
+                    <i class="fas fa-download mr-2"></i>Download PDF
+                </a>
+            </div>
+        </div>
+        @endif
+
         <!-- Header Card -->
         <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
                 <div class="mb-4 lg:mb-0">
                     <h2 class="text-2xl font-bold text-gray-900 mb-2">{{ $jenisSurat }}</h2>
                     <div class="flex flex-wrap gap-4 text-sm text-gray-600">
-                        <span><i class="fas fa-user mr-2"></i>{{ $surat->nama }}</span>
-                        <span><i class="fas fa-id-card mr-2"></i>NIK: {{ $surat->nik }}</span>
+                        <span><i class="fas fa-user mr-2"></i>
+                            @if(isset($surat->nama_lengkap))
+                                {{ $surat->nama_lengkap }}
+                            @elseif(isset($surat->nama))
+                                {{ $surat->nama }}
+                            @elseif(isset($surat->nama_pelapor))
+                                {{ $surat->nama_pelapor }}
+                            @else
+                                Tidak diketahui
+                            @endif
+                        </span>
+                        <span><i class="fas fa-id-card mr-2"></i>NIK: 
+                            @if(isset($surat->nik))
+                                {{ $surat->nik }}
+                            @elseif(isset($surat->nik_pelapor))
+                                {{ $surat->nik_pelapor }}
+                            @else
+                                Tidak diketahui
+                            @endif
+                        </span>
                         <span><i class="fas fa-calendar mr-2"></i>{{ $surat->created_at->format('d/m/Y H:i') }}</span>
                         @if($surat->tanggal_verifikasi_terakhir)
                         <span><i class="fas fa-clock mr-2"></i>Update terakhir: {{ \Carbon\Carbon::parse($surat->tanggal_verifikasi_terakhir)->format('d/m/Y H:i') }}</span>
@@ -62,7 +99,7 @@
                         <div class="bg-gradient-to-r from-[#0088cc] to-blue-600 h-3 rounded-full transition-all duration-300" 
                              style="width: {{ $progress }}%"></div>
                     </div>
-                    @if($progress === 100)
+                    @if($progress === 100 || str_contains(strtolower($surat->status ?? ''), 'selesai diproses'))
                     <div class="mt-2">
                         <a href="{{ route('user.surat.print', [$type, $surat->id]) }}" 
                            class="inline-flex items-center bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm">
@@ -86,20 +123,20 @@
                         @if(count($stages) > 0)
                         @foreach($stages as $stageNumber => $stage)
                         <div class="relative pb-8 {{ !$loop->last ? 'border-l-2 ml-4' : '' }} 
-                                    {{ $stage['status'] === 'completed' ? 'border-green-300' : 
-                                       ($stage['status'] === 'in_progress' ? 'border-blue-300' : 'border-gray-300') }}">
+                                    {{ ($stage['status'] ?? 'pending') === 'completed' ? 'border-green-300' : 
+                                       (($stage['status'] ?? 'pending') === 'in_progress' ? 'border-blue-300' : 'border-gray-300') }}">>
                             
                             <!-- Stage Icon -->
                             <div class="absolute -left-6 mt-1">
                                 <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold
-                                            {{ $stage['status'] === 'completed' ? 'bg-green-500' : 
-                                               ($stage['status'] === 'in_progress' ? 'bg-blue-500' : 
-                                                ($stage['status'] === 'rejected' ? 'bg-red-500' : 'bg-gray-400')) }}">
-                                    @if($stage['status'] === 'completed')
+                                            {{ ($stage['status'] ?? 'pending') === 'completed' ? 'bg-green-500' : 
+                                               (($stage['status'] ?? 'pending') === 'in_progress' ? 'bg-blue-500' : 
+                                                (($stage['status'] ?? 'pending') === 'rejected' ? 'bg-red-500' : 'bg-gray-400')) }}">
+                                    @if(($stage['status'] ?? 'pending') === 'completed')
                                         <i class="fas fa-check"></i>
-                                    @elseif($stage['status'] === 'rejected')
+                                    @elseif(($stage['status'] ?? 'pending') === 'rejected')
                                         <i class="fas fa-times"></i>
-                                    @elseif($stage['status'] === 'in_progress')
+                                    @elseif(($stage['status'] ?? 'pending') === 'in_progress')
                                         <i class="fas fa-clock"></i>
                                     @else
                                         {{ $stageNumber }}
@@ -110,21 +147,24 @@
                             <!-- Stage Content -->
                             <div class="ml-8">
                                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3">
-                                    <h4 class="text-lg font-semibold text-gray-900">{{ $stage['name'] }}</h4>
+                                    <h4 class="text-lg font-semibold text-gray-900">{{ $stage['name'] ?? 'Tahapan ' . $stageNumber }}</h4>
                                     <div class="flex items-center space-x-2 mt-2 sm:mt-0">
                                         <span class="px-3 py-1 rounded-full text-xs font-medium
-                                                     {{ $stage['status'] === 'completed' ? 'bg-green-100 text-green-800' : 
-                                                        ($stage['status'] === 'in_progress' ? 'bg-blue-100 text-blue-800' : 
-                                                         ($stage['status'] === 'rejected' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800')) }}">
-                                            {{ ucfirst(str_replace('_', ' ', $stage['status'])) }}
+                                                     {{ ($stage['status'] ?? 'pending') === 'completed' ? 'bg-green-100 text-green-800' : 
+                                                        (($stage['status'] ?? 'pending') === 'in_progress' ? 'bg-blue-100 text-blue-800' : 
+                                                         (($stage['status'] ?? 'pending') === 'rejected' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800')) }}">
+                                            {{ ucfirst(str_replace('_', ' ', $stage['status'] ?? 'pending')) }}
                                         </span>
+                                        @if(isset($stage['duration_days']))
                                         <span class="text-xs text-gray-500">{{ $stage['duration_days'] }} hari</span>
+                                        @endif
                                     </div>
                                 </div>
                                 
-                                <p class="text-gray-600 mb-3">{{ $stage['description'] }}</p>
+                                <p class="text-gray-600 mb-3">{{ $stage['description'] ?? 'Tidak ada deskripsi' }}</p>
                                 
                                 <!-- Required Documents -->
+                                @if(isset($stage['required_documents']) && is_array($stage['required_documents']) && count($stage['required_documents']) > 0)
                                 <div class="mb-4">
                                     <h5 class="font-medium text-gray-700 mb-2">Dokumen yang Diperlukan:</h5>
                                     <div class="flex flex-wrap gap-2">
@@ -133,6 +173,7 @@
                                         @endforeach
                                     </div>
                                 </div>
+                                @endif
 
                                 @if(isset($stage['completed_at']) && $stage['completed_at'])
                                 <p class="text-sm text-green-600 mb-2">
@@ -180,6 +221,12 @@
                             if (str_contains(strtolower($status), 'menunggu') || str_contains(strtolower($status), 'pending')) {
                                 $statusClass = 'bg-yellow-100 text-yellow-800';
                                 $statusIcon = 'fas fa-clock';
+                            } elseif (str_contains(strtolower($status), 'selesai diproses')) {
+                                $statusClass = 'bg-emerald-100 text-emerald-800';
+                                $statusIcon = 'fas fa-check-double';
+                            } elseif (str_contains(strtolower($status), 'approved') || str_contains(strtolower($status), 'disetujui')) {
+                                $statusClass = 'bg-emerald-100 text-emerald-800';
+                                $statusIcon = 'fas fa-check-double';
                             } elseif (str_contains(strtolower($status), 'sudah diverifikasi') || str_contains(strtolower($status), 'selesai')) {
                                 $statusClass = 'bg-green-100 text-green-800';
                                 $statusIcon = 'fas fa-check-circle';
@@ -242,11 +289,25 @@
                 @endif
 
                 <!-- Action Button -->
-                @if($progress === 100)
+                @if($progress === 100 || str_contains(strtolower($surat->status ?? ''), 'selesai diproses'))
                 <div class="bg-gradient-to-r from-green-500 to-green-600 rounded-xl shadow-lg p-6 text-white text-center">
                     <i class="fas fa-check-circle text-3xl mb-3"></i>
-                    <h3 class="text-lg font-bold mb-2">Surat Sudah Diverifikasi!</h3>
-                    <p class="text-green-100 mb-4 text-sm">Surat Anda telah selesai diverifikasi dan siap untuk diunduh.</p>
+                    <h3 class="text-lg font-bold mb-2">
+                        @if($surat->status === 'approved')
+                            Surat Sudah Disetujui!
+                        @elseif(str_contains(strtolower($surat->status ?? ''), 'selesai diproses'))
+                            Surat Selesai Diproses!
+                        @else
+                            Surat Sudah Diverifikasi!
+                        @endif
+                    </h3>
+                    <p class="text-green-100 mb-4 text-sm">
+                        @if(str_contains(strtolower($surat->status ?? ''), 'selesai diproses'))
+                            Surat Anda telah selesai diproses dan siap untuk diunduh.
+                        @else
+                            Surat Anda telah selesai diverifikasi dan siap untuk diunduh.
+                        @endif
+                    </p>
                     <a href="{{ route('user.surat.print', [$type, $surat->id]) }}" 
                        class="inline-flex items-center bg-white text-green-600 hover:bg-gray-100 px-4 py-2 rounded-lg font-medium">
                         <i class="fas fa-download mr-2"></i>Download PDF
@@ -256,5 +317,18 @@
             </div>
         </div>
     </div>
+
+    <!-- Floating Action Button for Download PDF when Ready -->
+    @if(str_contains(strtolower($surat->status ?? ''), 'selesai diproses') && $progress < 100)
+    <div class="fixed bottom-6 right-6 z-50">
+        <a href="{{ route('user.surat.print', [$type, $surat->id]) }}" 
+           class="group bg-emerald-500 hover:bg-emerald-600 text-white rounded-full p-4 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+            <div class="flex items-center">
+                <i class="fas fa-download text-xl"></i>
+                <span class="ml-2 text-sm font-medium hidden group-hover:inline-block transition-all duration-300">Download PDF</span>
+            </div>
+        </a>
+    </div>
+    @endif
 </div>
 @endsection

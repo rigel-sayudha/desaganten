@@ -52,6 +52,19 @@ $jenisSurat = [
                     </select>
                 </div>
                 <div class="md:w-1/2 flex flex-col md:flex-row items-start md:items-center justify-end gap-4">
+                    <div class="flex items-center gap-2">
+                        <label for="perPageSelect" class="text-sm text-gray-600 font-medium whitespace-nowrap">
+                            Tampilkan:
+                        </label>
+                        <select id="perPageSelect" class="border rounded px-2 py-1 text-sm focus:outline-none focus:border-blue-500">
+                            <option value="10">10</option>
+                            <option value="20" selected>20</option>
+                            <option value="50">50</option>
+                        </select>
+                        <span class="text-sm text-gray-600 font-medium whitespace-nowrap">
+                            per halaman
+                        </span>
+                    </div>
                     <span id="totalSurat" class="text-sm text-gray-600 font-medium">
                         Total: {{ count($suratList) }} surat
                     </span>
@@ -67,7 +80,6 @@ $jenisSurat = [
                                 <th class="px-4 py-4 text-left font-semibold">Jenis Surat</th>
                                 <th class="px-4 py-4 text-left font-semibold">Tanggal Pengajuan</th>
                                 <th class="px-4 py-4 text-left font-semibold">Status</th>
-                                <th class="px-4 py-4 text-center font-semibold">Progress</th>
                                 <th class="px-4 py-4 text-center font-semibold">Aksi</th>
                             </tr>
                         </thead>
@@ -84,43 +96,48 @@ $jenisSurat = [
                                     <td class="py-3 px-4">{{ $surat->created_at ? $surat->created_at->format('d/m/Y') : '-' }}</td>
                                     <td class="py-3 px-4">
                                         @php
-                                            $status = $surat->status ?? '-';
-                                            $statusClass = 'bg-gray-100 text-gray-800';
-                                            if (str_contains(strtolower($status), 'menunggu') || str_contains(strtolower($status), 'pending')) {
+                                            $status = $surat->status ?? 'menunggu';
+                                            
+                                            // Check if verification is 100% complete based on stages
+                                            $verificationProgress = 0;
+                                            if (in_array($surat->jenis_surat, ['domisili', 'tidak_mampu', 'belum_menikah', 'skck', 'ktp', 'kk', 'usaha', 'kematian', 'kelahiran', 'kehilangan']) && ($surat->tahapan_verifikasi ?? false)) {
+                                                $stages = is_string($surat->tahapan_verifikasi) ? json_decode($surat->tahapan_verifikasi, true) : $surat->tahapan_verifikasi;
+                                                if (is_array($stages) && count($stages) > 0) {
+                                                    $totalStages = count($stages);
+                                                    $completedStages = collect($stages)->where('status', 'completed')->count();
+                                                    $verificationProgress = $totalStages > 0 ? round(($completedStages / $totalStages) * 100) : 0;
+                                                }
+                                            }
+                                            
+                                            // Standardize status names - if verification is 100%, override status
+                                            $standardStatus = 'menunggu verifikasi';
+                                            $statusClass = 'bg-yellow-100 text-yellow-800';
+                                            
+                                            if ($verificationProgress >= 100) {
+                                                // If verification stages are 100% complete, status should be "sudah diverifikasi"
+                                                $standardStatus = 'sudah diverifikasi';
+                                                $statusClass = 'bg-green-100 text-green-800';
+                                            } elseif ($verificationProgress > 0 && $verificationProgress < 100) {
+                                                // If verification is in progress
+                                                $standardStatus = 'diproses';
+                                                $statusClass = 'bg-blue-100 text-blue-800';
+                                            } elseif (str_contains(strtolower($status), 'menunggu') || str_contains(strtolower($status), 'pending')) {
+                                                $standardStatus = 'menunggu verifikasi';
                                                 $statusClass = 'bg-yellow-100 text-yellow-800';
                                             } elseif (str_contains(strtolower($status), 'sudah diverifikasi') || str_contains(strtolower($status), 'selesai')) {
+                                                $standardStatus = 'sudah diverifikasi';
                                                 $statusClass = 'bg-green-100 text-green-800';
                                             } elseif (str_contains(strtolower($status), 'diproses')) {
+                                                $standardStatus = 'diproses';
                                                 $statusClass = 'bg-blue-100 text-blue-800';
                                             } elseif (str_contains(strtolower($status), 'ditolak')) {
+                                                $standardStatus = 'ditolak';
                                                 $statusClass = 'bg-red-100 text-red-800';
                                             }
                                         @endphp
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $statusClass }}">
-                                            {{ $status }}
+                                            {{ $standardStatus }}
                                         </span>
-                                    </td>
-                                    <td class="py-3 px-4 text-center">
-                                        @if(in_array($surat->jenis_surat, ['domisili', 'tidak_mampu', 'belum_menikah']))
-                                            @php
-                                                $progress = 0;
-                                                if ($surat->tahapan_verifikasi ?? false) {
-                                                    $stages = is_string($surat->tahapan_verifikasi) ? json_decode($surat->tahapan_verifikasi, true) : $surat->tahapan_verifikasi;
-                                                    $totalStages = count($stages);
-                                                    $completedStages = collect($stages)->where('status', 'completed')->count();
-                                                    $progress = $totalStages > 0 ? round(($completedStages / $totalStages) * 100) : 0;
-                                                }
-                                            @endphp
-                                            <div class="flex items-center justify-center space-x-2">
-                                                <div class="w-16 bg-gray-200 rounded-full h-2">
-                                                    <div class="bg-gradient-to-r from-[#0088cc] to-blue-600 h-2 rounded-full" 
-                                                         style="width: {{ $progress }}%"></div>
-                                                </div>
-                                                <span class="text-xs font-medium text-gray-600">{{ $progress }}%</span>
-                                            </div>
-                                        @else
-                                            <span class="text-xs text-gray-400">-</span>
-                                        @endif
                                     </td>
                                     <td class="py-3 px-4">
                                         <div class="flex gap-1 justify-center flex-wrap">
@@ -131,15 +148,49 @@ $jenisSurat = [
                                                 <i class="fas fa-tasks mr-1"></i>Verifikasi
                                             </a>
                                             
+                                            @php
+                                                // Log debug info for admin Complete button visibility
+                                                \Log::info('Admin Complete button check', [
+                                                    'surat_id' => $surat->id,
+                                                    'jenis_surat' => $surat->jenis_surat,
+                                                    'raw_status' => $status,
+                                                    'standard_status' => $standardStatus,
+                                                    'verification_progress' => $verificationProgress,
+                                                    'button_will_show' => ($standardStatus !== 'sudah diverifikasi' && $standardStatus !== 'ditolak')
+                                                ]);
+                                            @endphp
+
+                                            <!-- Tombol Complete (untuk semua status kecuali sudah diverifikasi dan ditolak) -->
+                                            @if($standardStatus !== 'sudah diverifikasi' && $standardStatus !== 'ditolak')
+                                            
+                                                <!-- Method 2: Form Submission Fallback -->
+                                                <form action="{{ route('admin.surat.complete', $surat->id) }}" method="POST" 
+                                                      class="inline" 
+                                                      onsubmit="return confirm('Yakin ingin menandai surat ini sebagai sudah diverifikasi?')">
+                                                    @csrf
+                                                    <input type="hidden" name="jenis_surat" value="{{ $surat->jenis_surat }}">
+                                                    <button type="submit" 
+                                                            class="inline-flex items-center px-2 py-1 text-xs font-medium text-green-600 hover:text-green-800 hover:bg-green-50 rounded transition"
+                                                            title="Tandai Sudah Diverifikasi (Alt Complete) - Current Status: {{ $standardStatus }}">
+                                                        <i class="fas fa-check-double mr-1"></i>Alt-Complete
+                                                    </button>
+                                                </form>
+                                            @else
+                                                <!-- Debug: Show why button is hidden -->
+                                                <span class="text-xs text-gray-400" title="Alt-Complete tidak tersedia untuk status: {{ $standardStatus }}">
+                                                    <i class="fas fa-info-circle"></i>
+                                                </span>
+                                            @endif
+                                            
                                             <!-- Tombol Edit -->
-                                            <a href="{{ route('admin.surat.edit', $surat->id) }}" 
+                                            <a href="{{ route('surat.edit', $surat->id) }}" 
                                                class="inline-flex items-center px-2 py-1 text-xs font-medium text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition"
                                                title="Edit Surat">
                                                 <i class="fas fa-edit mr-1"></i>Edit
                                             </a>
                                             
                                             <!-- Tombol Detail/Lihat -->
-                                            <a href="{{ route('admin.surat.show', $surat->id) }}" 
+                                            <a href="{{ route('surat.show', $surat->id) }}?jenis={{ $surat->jenis_surat }}" 
                                                class="inline-flex items-center px-2 py-1 text-xs font-medium text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded transition"
                                                title="Lihat Detail Surat">
                                                 <i class="fas fa-eye mr-1"></i>Detail
@@ -153,7 +204,7 @@ $jenisSurat = [
                                             </a>
                                             
                                             <!-- Tombol Hapus -->
-                                            <form action="{{ route('admin.surat.destroy', $surat->id) }}" method="POST" class="inline">
+                                            <form action="{{ route('surat.destroy', $surat->id) }}" method="POST" class="inline">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" 
@@ -170,83 +221,305 @@ $jenisSurat = [
                         </tbody>
                     </table>
                 </div>
+                
+                <!-- Pagination Controls -->
+                <div id="paginationContainer" class="bg-white border-t px-4 py-3 flex flex-col sm:flex-row items-center justify-between">
+                    <div class="flex-1 flex flex-col sm:flex-row items-center justify-between">
+                        <div class="mb-2 sm:mb-0">
+                            <p class="text-sm text-gray-700">
+                                Menampilkan 
+                                <span id="showingFrom" class="font-medium">1</span>
+                                sampai 
+                                <span id="showingTo" class="font-medium">20</span>
+                                dari 
+                                <span id="showingTotal" class="font-medium">{{ count($suratList) }}</span>
+                                hasil
+                            </p>
+                        </div>
+                        <div>
+                            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                                <!-- Previous Button -->
+                                <button id="prevBtn" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                                    <span class="sr-only">Previous</span>
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                
+                                <!-- Page Numbers Container -->
+                                <div id="pageNumbers" class="flex">
+                                    <!-- Page numbers will be inserted here by JavaScript -->
+                                </div>
+                                
+                                <!-- Next Button -->
+                                <button id="nextBtn" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                                    <span class="sr-only">Next</span>
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </main>
 </div>
 @include('admin.partials.footer')
 @endsection
+@push('styles')
+<style>
+    /* Pagination custom styling */
+    #paginationContainer .relative.inline-flex.items-center {
+        transition: all 0.2s ease-in-out;
+    }
+    
+    #paginationContainer .relative.inline-flex.items-center:hover:not(:disabled) {
+        background-color: #f3f4f6;
+        transform: translateY(-1px);
+    }
+    
+    #paginationContainer .z-10 {
+        background-color: #3b82f6 !important;
+        color: white !important;
+        border-color: #3b82f6 !important;
+    }
+    
+    /* Loading animation */
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+    
+    .loading-row {
+        animation: pulse 1.5s ease-in-out infinite;
+    }
+    
+    /* Responsive pagination */
+    @media (max-width: 640px) {
+        #paginationContainer {
+            padding: 1rem;
+        }
+        
+        #paginationContainer .flex-col {
+            gap: 1rem;
+        }
+        
+        #pageNumbers button {
+            padding: 0.5rem 0.75rem;
+        }
+    }
+</style>
+@endpush
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 Admin Surat Management System Initialized');
+    
     const select = document.getElementById('jenisSuratSelect');
+    const perPageSelect = document.getElementById('perPageSelect');
     const tbody = document.getElementById('suratTableBody');
     const totalSpan = document.getElementById('totalSurat');
+    const showingFrom = document.getElementById('showingFrom');
+    const showingTo = document.getElementById('showingTo');
+    const showingTotal = document.getElementById('showingTotal');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const pageNumbers = document.getElementById('pageNumbers');
     
     // Store original data untuk filtering
     const originalRows = Array.from(tbody.querySelectorAll('tr'));
+    console.log('📊 Total original rows:', originalRows.length);
     
-    function updateTotalCount(count) {
-        totalSpan.textContent = `Total: ${count} surat`;
-    }
-
+    // Pagination state
+    let currentPage = 1;
+    let perPage = 20;
+    let totalItems = originalRows.length;
+    let filteredData = [...originalRows]; // Data setelah filtering
+    
+    console.log('⚙️ Initial state:', { currentPage, perPage, totalItems });
+    
+    // ===============================
+    // FILTERING FUNCTIONS
+    // ===============================
+    
     function filterSuratByJenis(jenis = '') {
-        // Hide semua rows dulu
-        originalRows.forEach(row => row.style.display = 'none');
+        console.log('🔍 Filtering by jenis:', jenis);
         
-        let visibleCount = 0;
+        // Reset pagination to first page
+        currentPage = 1;
         
+        // Filter data berdasarkan jenis
         if (jenis === '') {
-            // Show semua rows jika tidak ada filter
-            originalRows.forEach(row => {
-                row.style.display = '';
-                visibleCount++;
-            });
+            filteredData = [...originalRows];
+            console.log('📋 Showing all data:', filteredData.length);
         } else {
-            // Show hanya rows yang sesuai dengan jenis
-            originalRows.forEach(row => {
-                const rowJenis = row.getAttribute('data-jenis');
-                if (rowJenis === jenis) {
-                    row.style.display = '';
-                    visibleCount++;
+            filteredData = originalRows.filter(row => {
+                const jenisAttribute = row.getAttribute('data-jenis');
+                const matches = jenisAttribute === jenis;
+                if (matches) {
+                    console.log('✅ Row matches filter:', jenisAttribute);
                 }
+                return matches;
             });
+            console.log(`📋 Filtered to ${filteredData.length} rows for jenis: ${jenis}`);
         }
         
-        // Update nomor urut
-        updateRowNumbers();
-        updateTotalCount(visibleCount);
+        totalItems = filteredData.length;
+        updateTotalCount(totalItems);
+        displayCurrentPage();
+    }
+    
+    function updateTotalCount(count) {
+        console.log('📊 Updating total count to:', count);
+        totalSpan.textContent = `Total: ${count} surat`;
+        showingTotal.textContent = count;
+        totalItems = count;
+        updatePaginationInfo();
+    }
+
+    
+    // ===============================
+    // PAGINATION FUNCTIONS  
+    // ===============================
+    
+    function updatePaginationInfo() {
+        const startIndex = totalItems > 0 ? (currentPage - 1) * perPage + 1 : 0;
+        const endIndex = Math.min(currentPage * perPage, totalItems);
         
-        // Show pesan jika tidak ada data
-        if (visibleCount === 0) {
-            showNoDataMessage(jenis);
+        console.log('📄 Pagination info:', { startIndex, endIndex, totalItems, currentPage, perPage });
+        
+        showingFrom.textContent = startIndex;
+        showingTo.textContent = endIndex;
+        
+        // Update pagination buttons
+        updatePaginationButtons();
+    }
+
+    function updatePaginationButtons() {
+        const totalPages = Math.ceil(totalItems / perPage);
+        
+        console.log('🔘 Updating pagination buttons - Total pages:', totalPages);
+        
+        // Update prev/next buttons
+        prevBtn.disabled = currentPage <= 1;
+        nextBtn.disabled = currentPage >= totalPages;
+        
+        // Clear and rebuild page numbers
+        pageNumbers.innerHTML = '';
+        
+        if (totalPages <= 1) {
+            console.log('📄 Single page, hiding pagination');
+            return;
+        }
+        
+        // Calculate page range to show
+        let startPage = Math.max(1, currentPage - 2);
+        let endPage = Math.min(totalPages, currentPage + 2);
+        
+        // Show first page if not in range
+        if (startPage > 1) {
+            addPageButton(1);
+            if (startPage > 2) {
+                addEllipsis();
+            }
+        }
+        
+        // Show page range
+        for (let i = startPage; i <= endPage; i++) {
+            addPageButton(i, i === currentPage);
+        }
+        
+        // Show last page if not in range
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) {
+                addEllipsis();
+            }
+            addPageButton(totalPages);
+        }
+        
+        console.log('🔘 Pagination buttons updated for pages', startPage, 'to', endPage);
+    }
+
+    function addPageButton(pageNum, isActive = false) {
+        const button = document.createElement('button');
+        button.className = `relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+            isActive 
+                ? 'z-10 bg-blue-50 border-blue-500 text-blue-600' 
+                : 'border-gray-300 bg-white text-gray-500 hover:bg-gray-50'
+        }`;
+        button.textContent = pageNum;
+        button.onclick = () => goToPage(pageNum);
+        pageNumbers.appendChild(button);
+    }
+
+    function addEllipsis() {
+        const span = document.createElement('span');
+        span.className = 'relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700';
+        span.textContent = '...';
+        pageNumbers.appendChild(span);
+    }
+
+    function goToPage(page) {
+        console.log('📄 Going to page:', page);
+        currentPage = page;
+        displayCurrentPage();
+        updatePaginationInfo();
+    }
+
+    function displayCurrentPage() {
+        console.log('🖥️ Displaying current page:', currentPage);
+        
+        // Hide all rows first
+        originalRows.forEach(row => {
+            row.style.display = 'none';
+        });
+        
+        // Calculate pagination bounds
+        const startIndex = (currentPage - 1) * perPage;
+        const endIndex = startIndex + perPage;
+        
+        console.log('📊 Page bounds:', { startIndex, endIndex, filteredDataLength: filteredData.length });
+        
+        // Show rows for current page from filtered data
+        const visibleRows = filteredData.slice(startIndex, endIndex);
+        console.log('👁️ Visible rows count:', visibleRows.length);
+        
+        visibleRows.forEach((row, index) => {
+            row.style.display = '';
+            // Update row number
+            const firstCell = row.querySelector('td:first-child');
+            if (firstCell && !row.classList.contains('no-data-row')) {
+                firstCell.textContent = startIndex + index + 1;
+            }
+        });
+        
+        // Handle no data message
+        if (visibleRows.length === 0 && totalItems === 0) {
+            const currentFilter = select.value;
+            showNoDataMessage(currentFilter);
         } else {
             hideNoDataMessage();
         }
-    }
-    
-    function updateRowNumbers() {
-        const visibleRows = Array.from(tbody.querySelectorAll('tr')).filter(row => 
-            row.style.display !== 'none' && !row.classList.contains('no-data-row')
-        );
         
-        visibleRows.forEach((row, index) => {
-            const firstCell = row.querySelector('td:first-child');
-            if (firstCell && !row.classList.contains('no-data-row')) {
-                firstCell.textContent = index + 1;
-            }
-        });
+        console.log('✅ Page display updated');
     }
+
+    
+    // ===============================
+    // HELPER FUNCTIONS
+    // ===============================
     
     function showNoDataMessage(jenis) {
         hideNoDataMessage(); // Remove existing message first
         
+        console.log('❌ Showing no data message for jenis:', jenis);
+        
         const noDataRow = document.createElement('tr');
         noDataRow.className = 'no-data-row border-b';
+        
+        const jenisText = jenis ? `jenis ${getJenisSuratDisplay(jenis)}` : 'yang dipilih';
         noDataRow.innerHTML = `
             <td colspan="6" class="text-center py-8 text-gray-500">
                 <i class="fas fa-inbox text-4xl mb-2 block"></i>
-                <p class="text-lg">Tidak ada data surat ${getJenisSuratDisplay(jenis)}</p>
+                <p class="text-lg">Tidak ada data surat ${jenisText}</p>
             </td>
         `;
         tbody.appendChild(noDataRow);
@@ -256,120 +529,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const noDataRows = tbody.querySelectorAll('.no-data-row');
         noDataRows.forEach(row => row.remove());
     }
-
-    function loadSuratData(jenis = '') {
-        if (jenis === '') {
-            // Jika tidak ada filter, gunakan data yang sudah ada di halaman
-            filterSuratByJenis('');
-            return;
-        }
-        
-        // Show loading state
-        tbody.innerHTML = '<tr class="loading-row"><td colspan="6" class="text-center py-4"><i class="fas fa-spinner fa-spin mr-2"></i>Memuat data...</td></tr>';
-        
-        const url = `/admin/surat/data?jenis=${jenis}`;
-        
-        fetch(url)
-            .then(response => response.json())
-            .then(data => {
-                displaySuratData(data, jenis);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-red-500"><i class="fas fa-exclamation-triangle mr-2"></i>Gagal memuat data.</td></tr>';
-            });
-    }
-
-    function displaySuratData(data, jenis) {
-        tbody.innerHTML = '';
-        
-        if (!data || data.length === 0) {
-            showNoDataMessage(jenis);
-            updateTotalCount(0);
-            return;
-        }
-
-        data.forEach((item, index) => {
-            const row = document.createElement('tr');
-            row.className = 'border-b hover:bg-gray-50 transition-colors';
-            row.setAttribute('data-jenis', jenis);
-            
-            const nama = item.nama || item.nama_pemohon || item.nama_lengkap || '-';
-            const status = item.status_pengajuan || item.status || '-';
-            const tanggal = formatDate(item.created_at || item.tanggal_pengajuan);
-            const jenisSuratDisplay = getJenisSuratDisplay(jenis);
-            
-            // Status badge styling
-            const statusClass = getStatusClass(status);
-            
-            row.innerHTML = `
-                <td class="py-3 px-4 text-center font-medium">${index + 1}</td>
-                <td class="py-3 px-4">${nama}</td>
-                <td class="py-3 px-4">
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                        ${jenisSuratDisplay}
-                    </span>
-                </td>
-                <td class="py-3 px-4">${tanggal}</td>
-                <td class="py-3 px-4">
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusClass}">
-                        ${status}
-                    </span>
-                </td>
-                <td class="py-3 px-4">
-                    <div class="flex gap-1 flex-wrap">
-                        <a href="/admin/verification/${jenis}/${item.id}" 
-                           class="inline-flex items-center px-2 py-1 text-xs font-medium text-purple-600 hover:text-purple-800 hover:bg-purple-50 rounded transition" 
-                           title="Lihat Tahapan Verifikasi">
-                            <i class="fas fa-tasks mr-1"></i>Verifikasi
-                        </a>
-                        <a href="/admin/surat/${item.id}/edit" 
-                           class="inline-flex items-center px-2 py-1 text-xs font-medium text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition"
-                           title="Edit Surat">
-                            <i class="fas fa-edit mr-1"></i>Edit
-                        </a>
-                        <a href="/admin/surat/${item.id}" 
-                           class="inline-flex items-center px-2 py-1 text-xs font-medium text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded transition"
-                           title="Lihat Detail Surat">
-                            <i class="fas fa-eye mr-1"></i>Detail
-                        </a>
-                        <a href="/admin/surat/print-pdf/${jenis.toLowerCase()}/${item.id}" target="_blank" 
-                           class="inline-flex items-center px-2 py-1 text-xs font-medium text-green-600 hover:text-green-800 hover:bg-green-50 rounded transition" 
-                           title="Print PDF">
-                            <i class="fas fa-print mr-1"></i>Print
-                        </a>
-                        <button onclick="deleteSurat(${item.id})" 
-                                class="inline-flex items-center px-2 py-1 text-xs font-medium text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition"
-                                title="Hapus Surat">
-                            <i class="fas fa-trash mr-1"></i>Hapus
-                        </button>
-                    </div>
-                </td>
-            `;
-            tbody.appendChild(row);
-        });
-        
-        updateTotalCount(data.length);
-    }
     
-    function formatDate(dateString) {
-        if (!dateString) return '-';
-        const date = new Date(dateString);
-        return date.toLocaleDateString('id-ID');
-    }
-    
-    function getStatusClass(status) {
-        const statusLower = status.toLowerCase();
-        if (statusLower.includes('menunggu') || statusLower.includes('pending')) {
-            return 'bg-yellow-100 text-yellow-800';
-        } else if (statusLower.includes('disetujui') || statusLower.includes('selesai')) {
-            return 'bg-green-100 text-green-800';
-        } else if (statusLower.includes('ditolak')) {
-            return 'bg-red-100 text-red-800';
-        }
-        return 'bg-gray-100 text-gray-800';
-    }
-
     function getJenisSuratDisplay(jenis) {
         const jenisSuratMap = {
             'domisili': 'Surat Keterangan Domisili',
@@ -383,7 +543,169 @@ document.addEventListener('DOMContentLoaded', function() {
             'usaha': 'Surat Keterangan Usaha',
             'kehilangan': 'Surat Keterangan Kehilangan'
         };
-        return jenisSuratMap[jenis] || jenis.toUpperCase();
+        return jenisSuratMap[jenis] || jenis.charAt(0).toUpperCase() + jenis.slice(1);
+    }
+
+    function completeSurat(id, jenis) {
+        console.log('🔄 completeSurat function called');
+        console.log('Parameters:', { id, jenis });
+        console.log('Current URL:', window.location.href);
+        console.log('Event target:', event ? event.target : 'No event object');
+        
+        if (confirm('Yakin ingin menandai surat ini sebagai "Sudah Diverifikasi"?')) {
+            console.log('✅ User confirmed the action');
+            
+            // Find the button that was clicked
+            let completeBtn = null;
+            if (event && event.target) {
+                completeBtn = event.target.closest('button');
+            }
+            
+            // If no button found from event, try to find it by data attributes
+            if (!completeBtn) {
+                completeBtn = document.querySelector(`button[data-surat-id="${id}"][data-jenis="${jenis}"]`);
+            }
+            
+            // If still not found, try a more general selector
+            if (!completeBtn) {
+                completeBtn = document.querySelector(`button[onclick*="completeSurat(${id}"]`);
+            }
+            
+            if (!completeBtn) {
+                console.error('❌ Could not find Complete button element');
+                alert('Error: Tidak dapat menemukan tombol Complete. Halaman akan di-refresh.');
+                location.reload();
+                return;
+            }
+            
+            console.log('🔘 Button found:', completeBtn);
+            
+            // Store original button content
+            const originalContent = completeBtn.innerHTML;
+            
+            completeBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>Processing...';
+            completeBtn.disabled = true;
+            
+            const url = `/admin/surat/${id}/complete`;
+            const csrfToken = document.querySelector('meta[name="csrf-token"]');
+            
+            console.log('🌐 Making request to:', url);
+            console.log('CSRF token:', csrfToken ? csrfToken.getAttribute('content') : 'Not found');
+            
+            // Prepare request data
+            const requestData = {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    jenis_surat: jenis
+                })
+            };
+            
+            // Add CSRF token if available
+            if (csrfToken) {
+                requestData.headers['X-CSRF-TOKEN'] = csrfToken.getAttribute('content');
+            }
+            
+            console.log('📤 Request data:', requestData);
+            
+            fetch(url, requestData)
+            .then(response => {
+                console.log('📡 Response received:', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    headers: Object.fromEntries(response.headers.entries())
+                });
+                
+                // Handle specific error status codes
+                if (response.status === 419) {
+                    throw new Error('CSRF_TOKEN_MISMATCH');
+                }
+                if (response.status === 401) {
+                    throw new Error('AUTHENTICATION_REQUIRED');
+                }
+                if (response.status === 403) {
+                    throw new Error('ACCESS_DENIED');
+                }
+                if (response.status === 404) {
+                    throw new Error('ROUTE_NOT_FOUND');
+                }
+                if (response.status === 500) {
+                    throw new Error('SERVER_ERROR');
+                }
+                
+                // Try to parse JSON response
+                return response.text().then(text => {
+                    console.log('� Raw response:', text);
+                    
+                    try {
+                        return JSON.parse(text);
+                    } catch (e) {
+                        console.error('Failed to parse JSON:', e);
+                        throw new Error('INVALID_RESPONSE_FORMAT');
+                    }
+                });
+            })
+            .then(data => {
+                console.log('📦 Parsed data:', data);
+                
+                if (data && data.success) {
+                    console.log('✅ Success! Updating UI...');
+                    
+                    // Show success message
+                    alert('✅ Verifikasi surat berhasil diselesaikan!');
+                    
+                    // Reload the page to show updated data
+                    location.reload();
+                } else {
+                    console.error('❌ Server returned error:', data);
+                    const errorMessage = data && data.message ? data.message : 'Unknown error occurred';
+                    alert('Gagal mengubah status: ' + errorMessage);
+                    
+                    // Restore button
+                    completeBtn.innerHTML = originalContent;
+                    completeBtn.disabled = false;
+                }
+            })
+            .catch(error => {
+                console.error('💥 Error occurred:', error);
+                
+                // Handle specific error types
+                let errorMessage = 'Terjadi kesalahan tidak dikenal';
+                
+                if (error.message === 'CSRF_TOKEN_MISMATCH') {
+                    errorMessage = 'Session expired. Halaman akan di-refresh.';
+                    alert('🔒 ' + errorMessage);
+                    location.reload();
+                    return;
+                } else if (error.message === 'AUTHENTICATION_REQUIRED') {
+                    errorMessage = 'Anda perlu login sebagai admin terlebih dahulu.';
+                    alert('🔐 ' + errorMessage);
+                    window.location.href = '/login';
+                    return;
+                } else if (error.message === 'ACCESS_DENIED') {
+                    errorMessage = 'Akses ditolak. Anda perlu role admin.';
+                } else if (error.message === 'ROUTE_NOT_FOUND') {
+                    errorMessage = 'Route tidak ditemukan. Hubungi administrator.';
+                } else if (error.message === 'SERVER_ERROR') {
+                    errorMessage = 'Server error. Coba lagi nanti.';
+                } else if (error.message === 'INVALID_RESPONSE_FORMAT') {
+                    errorMessage = 'Format response tidak valid dari server.';
+                } else {
+                    errorMessage = error.message || 'Network error occurred';
+                }
+                
+                alert('❌ ' + errorMessage);
+                
+                // Restore button
+                completeBtn.innerHTML = originalContent;
+                completeBtn.disabled = false;
+            });
+        } else {
+            console.log('❌ User cancelled the action');
+        }
     }
 
     function deleteSurat(id) {
@@ -424,126 +746,63 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    function verifikasiSurat(id, jenis) {
-        // Modal untuk verifikasi surat
-        const statusOptions = [
-            { value: 'Menunggu Verifikasi', text: 'Menunggu Verifikasi' },
-            { value: 'Sedang Diproses', text: 'Sedang Diproses' },
-            { value: 'Sudah Diverifikasi', text: 'Sudah Diverifikasi' },
-            { value: 'Ditolak', text: 'Ditolak' }
-        ];
-
-        let optionsHtml = '';
-        statusOptions.forEach(option => {
-            optionsHtml += `<option value="${option.value}">${option.text}</option>`;
-        });
-
-        const modal = document.createElement('div');
-        modal.className = 'fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50';
-        modal.innerHTML = `
-            <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-                <div class="mt-3">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-medium text-gray-900">Verifikasi Surat</h3>
-                        <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                    <div class="mb-4">
-                        <p class="text-sm text-gray-600 mb-3">Ubah status verifikasi untuk surat ${jenis.replace('_', ' ').toUpperCase()}:</p>
-                        <select id="statusSelect" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
-                            ${optionsHtml}
-                        </select>
-                    </div>
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Catatan (opsional):</label>
-                        <textarea id="catatanVerifikasi" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Tambahkan catatan verifikasi..."></textarea>
-                    </div>
-                    <div class="flex justify-end gap-3">
-                        <button onclick="closeModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition">
-                            Batal
-                        </button>
-                        <button onclick="updateVerifikasi(${id}, '${jenis}')" class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition">
-                            <i class="fas fa-check mr-2"></i>Update Status
-                        </button>
-                    </div>
-                </div>
-            </div>
-        `;
-        document.body.appendChild(modal);
-
-        // Function to close modal
-        window.closeModal = function() {
-            document.body.removeChild(modal);
-        };
-
-        // Function to update verification
-        window.updateVerifikasi = function(suratId, jenisSurat) {
-            const status = document.getElementById('statusSelect').value;
-            const catatan = document.getElementById('catatanVerifikasi').value;
-            
-            const updateBtn = event.target;
-            updateBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Updating...';
-            updateBtn.disabled = true;
-
-            fetch(`/admin/surat/${suratId}/status`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    status: status,
-                    catatan: catatan,
-                    jenis_surat: jenisSurat
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    closeModal();
-                    // Reload current filter to show updated status
-                    const currentFilter = select.value;
-                    if (currentFilter === '') {
-                        location.reload();
-                    } else {
-                        loadSuratData(currentFilter);
-                    }
-                    alert('Status verifikasi berhasil diperbarui');
-                } else {
-                    alert('Gagal memperbarui status: ' + (data.message || 'Unknown error'));
-                    updateBtn.innerHTML = '<i class="fas fa-check mr-2"></i>Update Status';
-                    updateBtn.disabled = false;
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Gagal memperbarui status verifikasi');
-                updateBtn.innerHTML = '<i class="fas fa-check mr-2"></i>Update Status';
-                updateBtn.disabled = false;
-            });
-        };
-    }
-
-    // Event listener untuk select change
+    
+    // ===============================
+    // EVENT LISTENERS
+    // ===============================
+    
+    // Event listener untuk filter jenis surat
     select.addEventListener('change', function() {
         const selectedValue = this.value;
-        
-        if (selectedValue === '') {
-            // Jika pilih "Semua Jenis Surat", tampilkan semua data original
-            filterSuratByJenis('');
-        } else {
-            // Load data spesifik untuk jenis tertentu
-            loadSuratData(selectedValue);
+        console.log('🔄 Filter changed to:', selectedValue);
+        filterSuratByJenis(selectedValue);
+    });
+
+    // Event listener untuk perPage change
+    perPageSelect.addEventListener('change', function() {
+        perPage = parseInt(this.value);
+        currentPage = 1; // Reset to first page
+        console.log('📄 Per page changed to:', perPage);
+        displayCurrentPage();
+        updatePaginationInfo();
+    });
+
+    // Event listener untuk pagination buttons
+    prevBtn.addEventListener('click', function() {
+        if (currentPage > 1) {
+            goToPage(currentPage - 1);
         }
     });
 
-    // Make functions global
+    nextBtn.addEventListener('click', function() {
+        const totalPages = Math.ceil(totalItems / perPage);
+        if (currentPage < totalPages) {
+            goToPage(currentPage + 1);
+        }
+    });
+
+    // Make functions global for onclick handlers
     window.deleteSurat = deleteSurat;
-    window.verifikasiSurat = verifikasiSurat;
+    window.completeSurat = completeSurat;
     
-    // Initialize dengan menampilkan semua data
+    // ===============================
+    // INITIALIZATION
+    // ===============================
+    
+    console.log('� Initializing admin surat management...');
     updateTotalCount(originalRows.length);
+    displayCurrentPage();
+    
+    // Add success/error message handling from Laravel session
+    @if(session('success'))
+        alert('✅ {{ session('success') }}');
+    @endif
+    
+    @if(session('error'))
+        alert('❌ {{ session('error') }}');
+    @endif
+    
+    console.log('✅ Admin surat management initialized successfully');
 });
 </script>
 @endpush

@@ -56,7 +56,7 @@ $breadcrumbs = [
                             <i class="fas fa-users fa-2x"></i>
                         </div>
                         <div class="text-center">
-                            <div class="text-3xl font-extrabold tracking-tight">5.280</div>
+                            <div class="text-3xl font-extrabold tracking-tight">{{ isset($jumlahPenduduk) ? number_format($jumlahPenduduk) : '0' }}</div>
                             <div class="text-gray-500 font-medium">Penduduk</div>
                         </div>
                     </div>
@@ -65,20 +65,76 @@ $breadcrumbs = [
                             <i class="fas fa-envelope-open-text fa-2x"></i>
                         </div>
                         <div class="text-center">
-                            <div class="text-3xl font-extrabold tracking-tight">120</div>
+                            <div class="text-3xl font-extrabold tracking-tight">{{ isset($jumlahSuratMasuk) ? number_format($jumlahSuratMasuk) : '0' }}</div>
                             <div class="text-gray-500 font-medium">Surat Masuk</div>
                         </div>
                     </div>
                     <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col items-center justify-center hover:shadow-xl transition duration-300">
                         <div class="bg-gradient-to-br from-[#0088cc] to-[#0073b1] text-white rounded-full p-5 mb-4 flex items-center justify-center shadow-lg">
-                            <i class="fas fa-file-alt fa-2x"></i>
+                            <i class="fas fa-map-marker-alt fa-2x"></i>
                         </div>
                         <div class="text-center">
-                            <div class="text-3xl font-extrabold tracking-tight">12</div>
-                            <div class="text-gray-500 font-medium">Laporan Bulanan</div>
+                            <div class="text-3xl font-extrabold tracking-tight">{{ isset($jumlahWilayah) ? number_format($jumlahWilayah) : '0' }}</div>
+                            <div class="text-gray-500 font-medium">Wilayah</div>
                         </div>
                     </div>
                 </div>
+                
+                <!-- Report Generation Section -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                    <div class="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition duration-300">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center">
+                                <div class="bg-gradient-to-br from-green-500 to-green-600 text-white rounded-full p-3 mr-4">
+                                    <i class="fas fa-file-pdf fa-lg"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-bold text-gray-800">Laporan Sistem</h3>
+                                    <p class="text-sm text-gray-600">Generate laporan lengkap sistem</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <a href="{{ route('report.system.view') }}" 
+                               class="flex-1 bg-blue-500 hover:bg-blue-600 text-white text-center py-2 px-4 rounded-lg transition duration-300 text-sm font-medium">
+                                <i class="fas fa-eye mr-2"></i>Lihat Laporan
+                            </a>
+                            <a href="{{ route('report.system.pdf') }}" 
+                               class="flex-1 bg-green-500 hover:bg-green-600 text-white text-center py-2 px-4 rounded-lg transition duration-300 text-sm font-medium">
+                                <i class="fas fa-download mr-2"></i>Download PDF
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition duration-300">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center">
+                                <div class="bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-full p-3 mr-4">
+                                    <i class="fas fa-chart-bar fa-lg"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-bold text-gray-800">Status Sistem</h3>
+                                    <p class="text-sm text-gray-600">Monitoring kesehatan sistem</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-gray-600">Database</span>
+                                <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">Online</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-gray-600">PDF Generator</span>
+                                <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">Active</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-gray-600">User System</span>
+                                <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">Working</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
                 <div class="bg-white rounded-2xl shadow-lg p-6 mb-8 flex flex-col md:flex-row items-center justify-between gap-8">
                     <div class="w-full md:w-1/2">
                         <h2 class="text-xl font-bold mb-4 text-[#0088cc] text-center md:text-left">Statistik Penduduk</h2>
@@ -88,10 +144,10 @@ $breadcrumbs = [
                         <div class="bg-gradient-to-br from-[#0088cc] to-[#0073b1] text-white rounded-xl p-6 shadow-lg w-full mb-4">
                             <div class="text-lg font-bold mb-2">Info Desa</div>
                             <ul class="text-sm text-white space-y-1">
-                                <li>Jumlah RT: 12</li>
-                                <li>Jumlah RW: 4</li>
-                                <li>Jumlah Dusun: 7</li>
-                                <li>Wilayah: Ganten, Karang, Sumber, Ngasem, Jaten, Sidoharjo, Sumberagung</li>
+                                <li>Jumlah RT: {{ isset($infoDesa) ? $infoDesa['jumlah_rt'] : '12' }}</li>
+                                <li>Jumlah RW: {{ isset($infoDesa) ? $infoDesa['jumlah_rw'] : '4' }}</li>
+                                <li>Jumlah Dusun: {{ isset($infoDesa) ? $infoDesa['jumlah_dusun'] : '7' }}</li>
+                                <li>Wilayah: {{ isset($infoDesa) ? $infoDesa['nama_wilayah'] : 'Ganten, Karang, Sumber, Ngasem, Jaten, Sidoharjo, Sumberagung' }}</li>
                             </ul>
                         </div>
                     </div>
@@ -104,13 +160,23 @@ $breadcrumbs = [
     <script>
         // Chart.js example
         const ctx = document.getElementById('statistikChart').getContext('2d');
+        
+        // Default data if not provided
+        @if(isset($statistikWilayah))
+            const chartLabels = {!! json_encode($statistikWilayah['labels']) !!};
+            const chartData = {!! json_encode($statistikWilayah['data']) !!};
+        @else
+            const chartLabels = ['Ganten', 'Karang', 'Sumber', 'Ngasem', 'Jaten', 'Sidoharjo', 'Sumberagung'];
+            const chartData = [0, 0, 0, 0, 0, 0, 0];
+        @endif
+        
         new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: ['Ganten', 'Karang', 'Sumber', 'Ngasem', 'Jaten', 'Sidoharjo', 'Sumberagung'],
+                labels: chartLabels,
                 datasets: [{
                     label: 'Penduduk',
-                    data: [1200, 950, 800, 700, 630, 500, 500],
+                    data: chartData,
                     backgroundColor: '#0088cc',
                 }]
             },
@@ -118,6 +184,14 @@ $breadcrumbs = [
                 responsive: true,
                 plugins: {
                     legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
                 }
             }
         });

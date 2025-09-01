@@ -32,11 +32,12 @@ $breadcrumbs = [
             <div class="p-8 space-y-8" x-data="{ 
                 formData: {
                     nama: '',
-                    tempat_tanggal_lahir: '',
+                    nik: '',
+                    tempat_lahir: '',
+                    tanggal_lahir: '',
                     alamat: '',
-                    barang_hilang: '',
-                    tempat_kehilangan: '',
-                    tanggal_kehilangan: ''
+                    jenis_barang: '',
+                    waktu_tempat: ''
                 },
                 isSubmitting: false
             }">
@@ -67,7 +68,7 @@ $breadcrumbs = [
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('surat.kehilangan.submit') }}" class="space-y-6">
+                <form method="POST" action="{{ route('surat.kehilangan.submit') }}" enctype="multipart/form-data" class="space-y-6">
                     @csrf
                     
                     <!-- Personal Information Section -->
@@ -91,7 +92,6 @@ $breadcrumbs = [
                                 type="text" 
                                 id="nama"
                                 name="nama" 
-                                x-model="formData.nama"
                                 value="{{ old('nama') }}"
                                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0088cc] focus:border-transparent transition duration-200 placeholder-gray-400"
                                 placeholder="Masukkan nama lengkap sesuai KTP"
@@ -99,23 +99,62 @@ $breadcrumbs = [
                             >
                         </div>
 
-                        <!-- Tempat, Tanggal Lahir -->
+                        <!-- NIK -->
                         <div class="space-y-2">
-                            <label for="tempat_tanggal_lahir" class="block text-sm font-medium text-gray-700 flex items-center space-x-2">
-                                <i class="fas fa-birthday-cake text-purple-500 w-4"></i>
-                                <span>Tempat, Tanggal Lahir</span>
+                            <label for="nik" class="block text-sm font-medium text-gray-700 flex items-center space-x-2">
+                                <i class="fas fa-id-card text-green-500 w-4"></i>
+                                <span>NIK</span>
                                 <span class="text-red-500">*</span>
                             </label>
                             <input 
                                 type="text" 
-                                id="tempat_tanggal_lahir"
-                                name="tempat_tanggal_lahir" 
-                                x-model="formData.tempat_tanggal_lahir"
-                                value="{{ old('tempat_tanggal_lahir') }}"
+                                id="nik"
+                                name="nik" 
+                                value="{{ old('nik') }}"
                                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0088cc] focus:border-transparent transition duration-200 placeholder-gray-400"
-                                placeholder="Contoh: Jakarta, 15 Agustus 1990"
+                                placeholder="Masukkan 16 digit NIK"
+                                pattern="[0-9]{16}"
+                                maxlength="16"
                                 required
                             >
+                        </div>
+
+                        <!-- Grid for Birth Info -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Tempat Lahir -->
+                            <div class="space-y-2">
+                                <label for="tempat_lahir" class="block text-sm font-medium text-gray-700 flex items-center space-x-2">
+                                    <i class="fas fa-map-marker-alt text-red-500 w-4"></i>
+                                    <span>Tempat Lahir</span>
+                                    <span class="text-red-500">*</span>
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="tempat_lahir"
+                                    name="tempat_lahir" 
+                                    value="{{ old('tempat_lahir') }}"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0088cc] focus:border-transparent transition duration-200 placeholder-gray-400"
+                                    placeholder="Contoh: Jakarta"
+                                    required
+                                >
+                            </div>
+
+                            <!-- Tanggal Lahir -->
+                            <div class="space-y-2">
+                                <label for="tanggal_lahir" class="block text-sm font-medium text-gray-700 flex items-center space-x-2">
+                                    <i class="fas fa-birthday-cake text-pink-500 w-4"></i>
+                                    <span>Tanggal Lahir</span>
+                                    <span class="text-red-500">*</span>
+                                </label>
+                                <input 
+                                    type="date" 
+                                    id="tanggal_lahir"
+                                    name="tanggal_lahir" 
+                                    value="{{ old('tanggal_lahir') }}"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0088cc] focus:border-transparent transition duration-200"
+                                    required
+                                >
+                            </div>
                         </div>
 
                         <!-- Alamat -->
@@ -128,7 +167,6 @@ $breadcrumbs = [
                             <textarea 
                                 id="alamat"
                                 name="alamat" 
-                                x-model="formData.alamat"
                                 rows="3"
                                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0088cc] focus:border-transparent transition duration-200 placeholder-gray-400 resize-none"
                                 placeholder="Masukkan alamat lengkap sesuai KTP"
@@ -149,61 +187,131 @@ $breadcrumbs = [
 
                         <!-- Barang yang Hilang -->
                         <div class="space-y-2">
-                            <label for="barang_hilang" class="block text-sm font-medium text-gray-700 flex items-center space-x-2">
+                            <label for="jenis_barang" class="block text-sm font-medium text-gray-700 flex items-center space-x-2">
                                 <i class="fas fa-box text-orange-500 w-4"></i>
-                                <span>Barang yang Hilang</span>
+                                <span>Jenis Barang yang Hilang</span>
                                 <span class="text-red-500">*</span>
                             </label>
                             <input 
                                 type="text" 
-                                id="barang_hilang"
-                                name="barang_hilang" 
-                                x-model="formData.barang_hilang"
-                                value="{{ old('barang_hilang') }}"
+                                id="jenis_barang"
+                                name="jenis_barang" 
+                                value="{{ old('jenis_barang') }}"
                                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0088cc] focus:border-transparent transition duration-200 placeholder-gray-400"
                                 placeholder="Contoh: KTP, SIM, STNK, dll"
                                 required
                             >
                         </div>
 
-                        <!-- Grid for Location and Date -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <!-- Tempat Kehilangan -->
-                            <div class="space-y-2">
-                                <label for="tempat_kehilangan" class="block text-sm font-medium text-gray-700 flex items-center space-x-2">
-                                    <i class="fas fa-location-arrow text-red-500 w-4"></i>
-                                    <span>Tempat Kehilangan</span>
-                                    <span class="text-red-500">*</span>
-                                </label>
-                                <input 
-                                    type="text" 
-                                    id="tempat_kehilangan"
-                                    name="tempat_kehilangan" 
-                                    x-model="formData.tempat_kehilangan"
-                                    value="{{ old('tempat_kehilangan') }}"
-                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0088cc] focus:border-transparent transition duration-200 placeholder-gray-400"
-                                    placeholder="Lokasi kehilangan"
-                                    required
-                                >
-                            </div>
+                        <!-- Waktu dan Tempat Kehilangan -->
+                        <div class="space-y-2">
+                            <label for="waktu_tempat" class="block text-sm font-medium text-gray-700 flex items-center space-x-2">
+                                <i class="fas fa-clock text-red-500 w-4"></i>
+                                <span>Waktu dan Tempat Kehilangan</span>
+                                <span class="text-red-500">*</span>
+                            </label>
+                            <textarea 
+                                id="waktu_tempat"
+                                name="waktu_tempat" 
+                                rows="3"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0088cc] focus:border-transparent transition duration-200 placeholder-gray-400 resize-none"
+                                placeholder="Jelaskan kapan dan dimana barang tersebut hilang. Contoh: Pada hari Senin, 20 Agustus 2025 sekitar pukul 14.00 WIB di area pasar tradisional Karanganyar"
+                                required
+                            >{{ old('waktu_tempat') }}</textarea>
+                        </div>
+                    </div>
 
-                            <!-- Tanggal Kehilangan -->
-                            <div class="space-y-2">
-                                <label for="tanggal_kehilangan" class="block text-sm font-medium text-gray-700 flex items-center space-x-2">
-                                    <i class="fas fa-calendar text-blue-500 w-4"></i>
-                                    <span>Tanggal Kehilangan</span>
-                                    <span class="text-red-500">*</span>
-                                </label>
+                    <!-- Document Upload Section -->
+                    <div class="space-y-6">
+                        <div class="border-b border-gray-200 pb-4">
+                            <h3 class="text-lg font-semibold text-gray-900 flex items-center space-x-2">
+                                <i class="fas fa-file-upload text-blue-500"></i>
+                                <span>Dokumen Pendukung</span>
+                            </h3>
+                            <p class="text-sm text-gray-600 mt-1">Upload dokumen pendukung untuk memperkuat laporan kehilangan (opsional)</p>
+                        </div>
+
+                        <!-- KTP/Identitas -->
+                        <div class="space-y-2">
+                            <label for="ktp_file" class="block text-sm font-medium text-gray-700 flex items-center space-x-2">
+                                <i class="fas fa-id-card text-indigo-500 w-4"></i>
+                                <span>Scan KTP/Identitas</span>
+                                <span class="text-gray-400 text-xs">(PDF, JPG, PNG - Max 2MB)</span>
+                            </label>
+                            <div class="relative">
                                 <input 
-                                    type="date" 
-                                    id="tanggal_kehilangan"
-                                    name="tanggal_kehilangan" 
-                                    x-model="formData.tanggal_kehilangan"
-                                    value="{{ old('tanggal_kehilangan') }}"
-                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0088cc] focus:border-transparent transition duration-200"
-                                    required
+                                    type="file" 
+                                    id="ktp_file"
+                                    name="ktp_file" 
+                                    accept=".pdf,.jpg,.jpeg,.png"
+                                    class="w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition duration-200 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-red-50 file:text-red-700 hover:file:bg-red-100"
                                 >
+                                <p class="text-xs text-gray-500 mt-1">Upload scan KTP untuk verifikasi identitas pelapor</p>
                             </div>
+                        </div>
+
+                        <!-- Bukti Kepemilikan -->
+                        <div class="space-y-2">
+                            <label for="bukti_file" class="block text-sm font-medium text-gray-700 flex items-center space-x-2">
+                                <i class="fas fa-receipt text-orange-500 w-4"></i>
+                                <span>Bukti Kepemilikan</span>
+                                <span class="text-gray-400 text-xs">(PDF, JPG, PNG - Max 2MB)</span>
+                            </label>
+                            <div class="relative">
+                                <input 
+                                    type="file" 
+                                    id="bukti_file"
+                                    name="bukti_file" 
+                                    accept=".pdf,.jpg,.jpeg,.png"
+                                    class="w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition duration-200 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-red-50 file:text-red-700 hover:file:bg-red-100"
+                                >
+                                <p class="text-xs text-gray-500 mt-1">Upload bukti kepemilikan barang yang hilang (kuitansi, STNK, dll)</p>
+                            </div>
+                        </div>
+
+                        <!-- Foto Barang -->
+                        <div class="space-y-2">
+                            <label for="foto_file" class="block text-sm font-medium text-gray-700 flex items-center space-x-2">
+                                <i class="fas fa-camera text-purple-500 w-4"></i>
+                                <span>Foto Barang</span>
+                                <span class="text-gray-400 text-xs">(JPG, PNG - Max 2MB)</span>
+                            </label>
+                            <div class="relative">
+                                <input 
+                                    type="file" 
+                                    id="foto_file"
+                                    name="foto_file" 
+                                    accept=".jpg,.jpeg,.png"
+                                    class="w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition duration-200 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-red-50 file:text-red-700 hover:file:bg-red-100"
+                                >
+                                <p class="text-xs text-gray-500 mt-1">Upload foto barang yang hilang untuk identifikasi</p>
+                            </div>
+                        </div>
+
+                        <!-- Upload Guidelines -->
+                        <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                            <h4 class="font-medium text-red-900 mb-2 flex items-center space-x-2">
+                                <i class="fas fa-info-circle text-red-600"></i>
+                                <span>Panduan Upload Dokumen</span>
+                            </h4>
+                            <ul class="text-red-800 text-sm space-y-1">
+                                <li class="flex items-start space-x-2">
+                                    <i class="fas fa-check text-red-600 mt-0.5 w-3"></i>
+                                    <span>Format file yang diterima: PDF, JPG, JPEG, PNG</span>
+                                </li>
+                                <li class="flex items-start space-x-2">
+                                    <i class="fas fa-check text-red-600 mt-0.5 w-3"></i>
+                                    <span>Ukuran maksimal setiap file: 2MB</span>
+                                </li>
+                                <li class="flex items-start space-x-2">
+                                    <i class="fas fa-check text-red-600 mt-0.5 w-3"></i>
+                                    <span>Dokumen pendukung dapat memperkuat laporan kehilangan</span>
+                                </li>
+                                <li class="flex items-start space-x-2">
+                                    <i class="fas fa-check text-red-600 mt-0.5 w-3"></i>
+                                    <span>Semua dokumen bersifat opsional tetapi sangat direkomendasikan</span>
+                                </li>
+                            </ul>
                         </div>
                     </div>
 

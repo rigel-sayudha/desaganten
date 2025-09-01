@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('surat_skck', function (Blueprint $table) {
-            $table->enum('kewarganegaraan', ['WNI', 'WNA'])->after('status_perkawinan');
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('nik')->nullable()->after('role');
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('surat_skck', function (Blueprint $table) {
-            $table->dropColumn('kewarganegaraan');
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('nik');
         });
     }
 };

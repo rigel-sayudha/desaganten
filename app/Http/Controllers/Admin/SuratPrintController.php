@@ -200,4 +200,65 @@ class SuratPrintController extends Controller
             ->setPaper('A4', 'portrait')
             ->stream('Surat_Keterangan_Tidak_Mampu_'.$surat->nama.'.pdf');
     }
+
+    public function printUsaha($id)
+    {
+        $surat = null;
+        
+        // Try SuratUsaha model first
+        if (class_exists('App\\Models\\SuratUsaha')) {
+            $surat = \App\Models\SuratUsaha::find($id);
+        }
+        
+        // If not found, try general Surat model - only if table exists
+        if (!$surat) {
+            try {
+                if (class_exists('App\\Models\\Surat') && Schema::hasTable('surat')) {
+                    $surat = \App\Models\Surat::find($id);
+                }
+            } catch (\Exception $e) {
+                // Ignore error if table doesn't exist
+            }
+        }
+        
+        if (!$surat) {
+            abort(404, 'Surat tidak ditemukan');
+        }
+        
+        $data = ['surat' => $surat];
+        return PDF::loadView('admin.surat.templates.usaha_pdf', $data)
+            ->setPaper('A4', 'portrait')
+            ->stream('Surat_Keterangan_Usaha_'.(($surat->nama_lengkap ?? $surat->nama ?? 'unknown')).'.pdf');
+    }
+
+    /**
+     * General printPdf method that routes to specific print methods
+     */
+    public function printPdf($type, $id)
+    {
+        switch (strtolower($type)) {
+            case 'domisili':
+                return $this->printDomisili($id);
+            case 'ktp':
+                return $this->printKtp($id);
+            case 'kk':
+                return $this->printKk($id);
+            case 'skck':
+                return $this->printSkck($id);
+            case 'kematian':
+                return $this->printKematian($id);
+            case 'kelahiran':
+                return $this->printKelahiran($id);
+            case 'belum_menikah':
+            case 'belum-menikah':
+                return $this->printBelumMenikah($id);
+            case 'tidak_mampu':
+            case 'tidak-mampu':
+                return $this->printTidakMampu($id);
+            case 'usaha':
+                return $this->printUsaha($id);
+            default:
+                abort(404, 'Jenis surat tidak ditemukan');
+        }
+    }
 }

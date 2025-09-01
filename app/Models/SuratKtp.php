@@ -22,10 +22,17 @@ class SuratKtp extends Model
         'alamat',
         'keperluan',
         'status',
+        'file_uploads',
+        'tahapan_verifikasi',
+        'catatan_verifikasi',
+        'tanggal_verifikasi_terakhir',
     ];
 
     protected $casts = [
         'tanggal_lahir' => 'date',
+        'file_uploads' => 'array',
+        'tahapan_verifikasi' => 'array',
+        'tanggal_verifikasi_terakhir' => 'datetime',
     ];
 
     public function user()

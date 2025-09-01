@@ -397,29 +397,6 @@ $breadcrumbs = [
                         </div>
                     </div>
 
-                    <!-- Declaration Section -->
-                    <div class="bg-gradient-to-r from-yellow-50 to-orange-50 border-l-4 border-yellow-400 p-6 rounded-lg">
-                        <div class="flex items-start space-x-3">
-                            <i class="fas fa-exclamation-triangle text-yellow-500 mt-1"></i>
-                            <div class="flex-1">
-                                <h4 class="font-semibold text-yellow-800 mb-2">Pernyataan Pemohon</h4>
-                                <p class="text-sm text-yellow-700 mb-4 leading-relaxed">
-                                    Dengan ini saya menyatakan bahwa data yang saya berikan adalah benar dan sesuai dengan kondisi ekonomi keluarga saya yang sebenarnya. 
-                                    Apabila di kemudian hari terbukti data yang saya berikan tidak benar, maka saya bersedia menerima sanksi sesuai ketentuan yang berlaku.
-                                </p>
-                                <label class="flex items-start space-x-3 cursor-pointer">
-                                    <input 
-                                        type="checkbox" 
-                                        name="pernyataan" 
-                                        required 
-                                        class="mt-1 h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
-                                    >
-                                    <span class="text-sm text-gray-700 font-medium">Saya menyetujui pernyataan di atas dan bertanggung jawab atas kebenaran data yang diberikan</span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-
                     <!-- Submit Button -->
                     <div class="pt-6 border-t border-gray-200">
                         <div class="flex flex-col sm:flex-row gap-4 justify-between">

@@ -175,26 +175,88 @@ class VerificationStageService
             'skck' => [
                 1 => [
                     'name' => 'Penerimaan Berkas',
-                    'description' => 'Berkas permohonan diterima dan dicatat',
-                    'required_documents' => ['KTP', 'KK', 'Surat permohonan', 'Pas foto'],
+                    'description' => 'Berkas permohonan surat pengantar SKCK diterima dan dicatat dalam sistem',
+                    'required_documents' => [
+                        'KTP Asli', 
+                        'Fotocopy KTP', 
+                        'Fotocopy KK', 
+                        'Surat permohonan bermaterai', 
+                        'Pas foto 4x6 (2 lembar)',
+                        'Surat pengantar dari RT/RW'
+                    ],
                     'duration_days' => 1
                 ],
                 2 => [
-                    'name' => 'Verifikasi Dokumen',
-                    'description' => 'Pengecekan kelengkapan dokumen pendukung',
-                    'required_documents' => ['Verifikasi KTP', 'Verifikasi KK'],
+                    'name' => 'Verifikasi Dokumen Identitas',
+                    'description' => 'Pengecekan kelengkapan dan keabsahan dokumen identitas pemohon',
+                    'required_documents' => [
+                        'Verifikasi KTP dengan database Dukcapil',
+                        'Verifikasi data KK',
+                        'Cek status kependudukan di sistem',
+                        'Validasi foto dengan identitas'
+                    ],
                     'duration_days' => 1
                 ],
                 3 => [
-                    'name' => 'Survey Kelakuan',
-                    'description' => 'Verifikasi kelakuan baik dari lingkungan',
-                    'required_documents' => ['Keterangan RT/RW', 'Konfirmasi tetangga'],
-                    'duration_days' => 3
+                    'name' => 'Verifikasi Domisili',
+                    'description' => 'Konfirmasi alamat tempat tinggal pemohon saat ini',
+                    'required_documents' => [
+                        'Konfirmasi alamat dengan RT/RW',
+                        'Verifikasi tempat tinggal',
+                        'Cek riwayat domisili'
+                    ],
+                    'duration_days' => 2
                 ],
                 4 => [
-                    'name' => 'Penandatanganan Pengantar',
-                    'description' => 'Pembuatan surat pengantar ke Polres',
-                    'required_documents' => ['Surat pengantar'],
+                    'name' => 'Survey Kelakuan dan Reputasi',
+                    'description' => 'Penyelidikan terhadap kelakuan dan reputasi pemohon di lingkungan',
+                    'required_documents' => [
+                        'Keterangan kelakuan dari RT/RW',
+                        'Konfirmasi dari tetangga sekitar',
+                        'Cek riwayat di lingkungan',
+                        'Wawancara dengan tokoh masyarakat'
+                    ],
+                    'duration_days' => 3
+                ],
+                5 => [
+                    'name' => 'Verifikasi Riwayat Hukum',
+                    'description' => 'Pengecekan riwayat hukum dan catatan kriminal (jika ada)',
+                    'required_documents' => [
+                        'Cek database kriminal lokal',
+                        'Konfirmasi dengan pihak keamanan setempat',
+                        'Verifikasi dengan aparat desa'
+                    ],
+                    'duration_days' => 2
+                ],
+                6 => [
+                    'name' => 'Review dan Validasi',
+                    'description' => 'Review menyeluruh terhadap hasil verifikasi sebelum persetujuan',
+                    'required_documents' => [
+                        'Laporan verifikasi identitas',
+                        'Laporan survey kelakuan',
+                        'Laporan verifikasi domisili',
+                        'Rekomendasi perangkat desa'
+                    ],
+                    'duration_days' => 1
+                ],
+                7 => [
+                    'name' => 'Persetujuan Kepala Desa',
+                    'description' => 'Review dan persetujuan akhir dari Kepala Desa untuk penerbitan surat pengantar',
+                    'required_documents' => [
+                        'Laporan verifikasi lengkap',
+                        'Rekomendasi dari perangkat desa',
+                        'Dokumen pendukung lainnya'
+                    ],
+                    'duration_days' => 2
+                ],
+                8 => [
+                    'name' => 'Penerbitan Surat Pengantar',
+                    'description' => 'Pembuatan dan penandatanganan surat pengantar SKCK ke Polres',
+                    'required_documents' => [
+                        'Surat pengantar yang sudah ditandatangani',
+                        'Cap desa resmi',
+                        'Nomor surat yang terdaftar'
+                    ],
                     'duration_days' => 1
                 ]
             ],
@@ -387,7 +449,7 @@ class VerificationStageService
                 'stage_number' => $stageNumber,
                 'name' => $stageInfo['name'],
                 'description' => $stageInfo['description'],
-                'status' => $stageNumber == 1 ? 'in_progress' : 'pending',
+                'status' => $stageNumber == 1 ? 'in_progress' : 'waiting',
                 'started_at' => $stageNumber == 1 ? now() : null,
                 'completed_at' => null,
                 'notes' => null,
@@ -445,9 +507,9 @@ class VerificationStageService
             }
         }
 
-        // Jika tidak ada yang in_progress, cari yang pertama dengan status pending
+        // Jika tidak ada yang in_progress, cari yang pertama dengan status waiting
         foreach ($stages as $stageNumber => $stage) {
-            if (isset($stage['status']) && $stage['status'] === 'pending') {
+            if (isset($stage['status']) && $stage['status'] === 'waiting') {
                 return $stage;
             }
         }
@@ -471,7 +533,7 @@ class VerificationStageService
 
         $remainingDays = 0;
         foreach ($stages as $stage) {
-            if (isset($stage['status']) && in_array($stage['status'], ['pending', 'in_progress'])) {
+            if (isset($stage['status']) && in_array($stage['status'], ['waiting', 'in_progress'])) {
                 $remainingDays += $stage['estimated_duration_days'] ?? 1;
             }
         }
@@ -503,7 +565,7 @@ class VerificationStageService
             
             // Activate next stage if available
             $nextStageNumber = $stageNumber + 1;
-            if (isset($stages[$nextStageNumber]) && $stages[$nextStageNumber]['status'] === 'pending') {
+            if (isset($stages[$nextStageNumber]) && $stages[$nextStageNumber]['status'] === 'waiting') {
                 $stages[$nextStageNumber]['status'] = 'in_progress';
                 $stages[$nextStageNumber]['started_at'] = now();
             }

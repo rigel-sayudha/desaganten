@@ -78,7 +78,7 @@ $breadcrumbs = [
                     </div>
                 @endif
 
-                <form action="{{ route('surat.domisili.submit') }}" method="POST" class="space-y-8" 
+                <form action="{{ route('surat.domisili.submit') }}" method="POST" enctype="multipart/form-data" class="space-y-8" 
                       @submit="isSubmitting = true" 
                       x-bind:class="{ 'pointer-events-none opacity-75': isSubmitting }">
                     @csrf
@@ -249,8 +249,8 @@ $breadcrumbs = [
                                     <option value="">Pilih Status Perkawinan</option>
                                     <option value="Belum Kawin" {{ old('status') == 'Belum Kawin' ? 'selected' : '' }}>Belum Kawin</option>
                                     <option value="Kawin" {{ old('status') == 'Kawin' ? 'selected' : '' }}>Kawin</option>
-                                    <option value="Cerai Hidup" {{ old('status') == 'Cerai Hidup' ? 'selected' : '' }}>Cerai Hidup</option>
-                                    <option value="Cerai Mati" {{ old('status') == 'Cerai Mati' ? 'selected' : '' }}>Cerai Mati</option>
+                                    <option value="Cerai" {{ old('status') == 'Cerai' ? 'selected' : '' }}>Cerai</option>
+                                    <option value="Mati" {{ old('status') == 'Mati' ? 'selected' : '' }}>Mati</option>
                                 </select>
                             </div>
                         </div>
@@ -309,6 +309,100 @@ $breadcrumbs = [
                                 placeholder="Contoh: Pendaftaran sekolah, Melamar pekerjaan"
                                 required
                             >
+                        </div>
+                    </div>
+
+                    <!-- Document Upload Section -->
+                    <div class="space-y-6">
+                        <div class="border-b border-gray-200 pb-4">
+                            <h3 class="text-lg font-semibold text-gray-900 flex items-center space-x-2">
+                                <i class="fas fa-file-upload text-blue-500"></i>
+                                <span>Dokumen Pendukung</span>
+                            </h3>
+                            <p class="text-sm text-gray-600 mt-1">Upload dokumen pendukung untuk mempercepat proses verifikasi (opsional)</p>
+                        </div>
+
+                        <!-- KTP/Identitas -->
+                        <div class="space-y-2">
+                            <label for="ktp_file" class="block text-sm font-medium text-gray-700 flex items-center space-x-2">
+                                <i class="fas fa-id-card text-indigo-500 w-4"></i>
+                                <span>Scan KTP/Identitas</span>
+                                <span class="text-gray-400 text-xs">(PDF, JPG, PNG - Max 2MB)</span>
+                            </label>
+                            <div class="relative">
+                                <input 
+                                    type="file" 
+                                    id="ktp_file"
+                                    name="ktp_file" 
+                                    accept=".pdf,.jpg,.jpeg,.png"
+                                    class="w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition duration-200 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-green-50 file:text-green-700 hover:file:bg-green-100"
+                                >
+                                <p class="text-xs text-gray-500 mt-1">Upload scan KTP atau dokumen identitas lainnya</p>
+                            </div>
+                        </div>
+
+                        <!-- Kartu Keluarga -->
+                        <div class="space-y-2">
+                            <label for="kk_file" class="block text-sm font-medium text-gray-700 flex items-center space-x-2">
+                                <i class="fas fa-users text-purple-500 w-4"></i>
+                                <span>Scan Kartu Keluarga</span>
+                                <span class="text-gray-400 text-xs">(PDF, JPG, PNG - Max 2MB)</span>
+                            </label>
+                            <div class="relative">
+                                <input 
+                                    type="file" 
+                                    id="kk_file"
+                                    name="kk_file" 
+                                    accept=".pdf,.jpg,.jpeg,.png"
+                                    class="w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition duration-200 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-green-50 file:text-green-700 hover:file:bg-green-100"
+                                >
+                                <p class="text-xs text-gray-500 mt-1">Upload scan Kartu Keluarga untuk verifikasi alamat</p>
+                            </div>
+                        </div>
+
+                        <!-- Dokumen Tambahan -->
+                        <div class="space-y-2">
+                            <label for="additional_file" class="block text-sm font-medium text-gray-700 flex items-center space-x-2">
+                                <i class="fas fa-paperclip text-orange-500 w-4"></i>
+                                <span>Dokumen Tambahan</span>
+                                <span class="text-gray-400 text-xs">(PDF, JPG, PNG - Max 2MB)</span>
+                            </label>
+                            <div class="relative">
+                                <input 
+                                    type="file" 
+                                    id="additional_file"
+                                    name="additional_file" 
+                                    accept=".pdf,.jpg,.jpeg,.png"
+                                    class="w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition duration-200 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-green-50 file:text-green-700 hover:file:bg-green-100"
+                                >
+                                <p class="text-xs text-gray-500 mt-1">Upload dokumen pendukung lainnya jika diperlukan</p>
+                            </div>
+                        </div>
+
+                        <!-- Upload Guidelines -->
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                            <h4 class="font-medium text-blue-900 mb-2 flex items-center space-x-2">
+                                <i class="fas fa-info-circle text-blue-600"></i>
+                                <span>Panduan Upload Dokumen</span>
+                            </h4>
+                            <ul class="text-blue-800 text-sm space-y-1">
+                                <li class="flex items-start space-x-2">
+                                    <i class="fas fa-check text-blue-600 mt-0.5 w-3"></i>
+                                    <span>Format file yang diterima: PDF, JPG, JPEG, PNG</span>
+                                </li>
+                                <li class="flex items-start space-x-2">
+                                    <i class="fas fa-check text-blue-600 mt-0.5 w-3"></i>
+                                    <span>Ukuran maksimal setiap file: 2MB</span>
+                                </li>
+                                <li class="flex items-start space-x-2">
+                                    <i class="fas fa-check text-blue-600 mt-0.5 w-3"></i>
+                                    <span>Pastikan dokumen terlihat jelas dan dapat dibaca</span>
+                                </li>
+                                <li class="flex items-start space-x-2">
+                                    <i class="fas fa-check text-blue-600 mt-0.5 w-3"></i>
+                                    <span>Upload dokumen dapat mempercepat proses verifikasi</span>
+                                </li>
+                            </ul>
                         </div>
                     </div>
 

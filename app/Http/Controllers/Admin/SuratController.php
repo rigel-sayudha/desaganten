@@ -11,6 +11,8 @@ use App\Models\SuratSkck;
 use App\Models\SuratKk;
 use App\Models\SuratKematian;
 use App\Models\SuratKelahiran;
+use App\Services\VerificationStageService;
+use App\Services\NotificationService;
 
 class SuratController extends Controller
 {
@@ -284,97 +286,176 @@ class SuratController extends Controller
                 return redirect()->back()->with('error', 'Jenis surat tidak valid.');
         }
         
-        return redirect()->route('admin.surat.index')->with('success', 'Surat ' . ucwords(str_replace('_', ' ', $jenis)) . ' berhasil ditambahkan.');
+        return redirect()->route('surat.index')->with('success', 'Surat ' . ucwords(str_replace('_', ' ', $jenis)) . ' berhasil ditambahkan.');
     }
 
-    public function show($id)
+    public function show($id, Request $request)
     {
         // Find and show specific surat
         $surat = null;
-        $jenis = '';
+        $jenis = $request->query('jenis'); // Get jenis from query parameter
         
-        // Try to find in Domisili
-        $domisili = \App\Models\Domisili::find($id);
-        if ($domisili) {
-            $surat = $domisili;
-            $jenis = 'domisili';
-        }
-
-        // Try to find in SuratKtp
-        if (!$surat && class_exists('App\\Models\\SuratKtp')) {
-            $ktp = \App\Models\SuratKtp::find($id);
-            if ($ktp) {
-                $surat = $ktp;
-                $jenis = 'ktp';
-            }
-        }
-
-        // Try to find in SuratSkck
-        if (!$surat) {
-            $skck = SuratSkck::find($id);
-            if ($skck) {
-                $surat = $skck;
-                $jenis = 'skck';
-            }
-        }
-
-        // Try to find in SuratKk
-        if (!$surat && class_exists('App\\Models\\SuratKk')) {
-            $kk = SuratKk::find($id);
-            if ($kk) {
-                $surat = $kk;
-                $jenis = 'kk';
-            }
-        }
-
-        // Try to find in SuratKematian
-        if (!$surat && class_exists('App\\Models\\SuratKematian')) {
-            $kematian = SuratKematian::find($id);
-            if ($kematian) {
-                $surat = $kematian;
-                $jenis = 'kematian';
-            }
-        }
-
-        // Try to find in SuratKelahiran
-        if (!$surat && class_exists('App\\Models\\SuratKelahiran')) {
-            $kelahiran = SuratKelahiran::find($id);
-            if ($kelahiran) {
-                $surat = $kelahiran;
-                $jenis = 'kelahiran';
-            }
-        }
-
-        // Try to find in BelumMenikah
-        if (!$surat) {
-            $belumMenikah = \App\Models\BelumMenikah::find($id);
-            if ($belumMenikah) {
-                $surat = $belumMenikah;
-                $jenis = 'belum_menikah';
-            }
-        }
-
-        // Try to find in TidakMampu
-        if (!$surat) {
-            $tidakMampu = \App\Models\TidakMampu::find($id);
-            if ($tidakMampu) {
-                $surat = $tidakMampu;
-                $jenis = 'tidak_mampu';
-            }
-        }
-
-        // Try to find in Surat (general) - only if table exists
-        if (!$surat) {
-            try {
-                if (class_exists('App\\Models\\Surat') && Schema::hasTable('surat')) {
-                    $suratGeneral = \App\Models\Surat::find($id);
-                    if ($suratGeneral) {
-                        $surat = $suratGeneral;
-                        $jenis = $suratGeneral->jenis_surat;
+        // If jenis is provided, search in specific model first
+        if ($jenis) {
+            switch ($jenis) {
+                case 'domisili':
+                    $surat = \App\Models\Domisili::find($id);
+                    if ($surat) $jenis = 'domisili';
+                    break;
+                case 'ktp':
+                    if (class_exists('App\\Models\\SuratKtp')) {
+                        $surat = \App\Models\SuratKtp::find($id);
+                        if ($surat) $jenis = 'ktp';
                     }
+                    break;
+                case 'skck':
+                    $surat = SuratSkck::find($id);
+                    if ($surat) $jenis = 'skck';
+                    break;
+                case 'kk':
+                    if (class_exists('App\\Models\\SuratKk')) {
+                        $surat = SuratKk::find($id);
+                        if ($surat) $jenis = 'kk';
+                    }
+                    break;
+                case 'kematian':
+                    if (class_exists('App\\Models\\SuratKematian')) {
+                        $surat = SuratKematian::find($id);
+                        if ($surat) $jenis = 'kematian';
+                    }
+                    break;
+                case 'kelahiran':
+                    if (class_exists('App\\Models\\SuratKelahiran')) {
+                        $surat = SuratKelahiran::find($id);
+                        if ($surat) $jenis = 'kelahiran';
+                    }
+                    break;
+                case 'belum_menikah':
+                    $surat = \App\Models\BelumMenikah::find($id);
+                    if ($surat) $jenis = 'belum_menikah';
+                    break;
+                case 'tidak_mampu':
+                    $surat = \App\Models\TidakMampu::find($id);
+                    if ($surat) $jenis = 'tidak_mampu';
+                    break;
+                case 'usaha':
+                    if (class_exists('App\\Models\\SuratUsaha')) {
+                        $surat = \App\Models\SuratUsaha::find($id);
+                        if ($surat) $jenis = 'usaha';
+                    }
+                    break;
+                case 'kehilangan':
+                    if (class_exists('App\\Models\\SuratKehilangan')) {
+                        $surat = \App\Models\SuratKehilangan::find($id);
+                        if ($surat) $jenis = 'kehilangan';
+                    }
+                    break;
+            }
+        }
+        
+        // Fallback: Try to find in all models if not found or jenis not provided
+        if (!$surat) {
+            // Try to find in Domisili
+            $domisili = \App\Models\Domisili::find($id);
+            if ($domisili) {
+                $surat = $domisili;
+                $jenis = 'domisili';
+            }
+
+            // Try to find in SuratKtp
+            if (!$surat && class_exists('App\\Models\\SuratKtp')) {
+                $ktp = \App\Models\SuratKtp::find($id);
+                if ($ktp) {
+                    $surat = $ktp;
+                    $jenis = 'ktp';
                 }
-            } catch (\Exception $e) {
-                // Ignore error if table doesn't exist
+            }
+
+            // Try to find in SuratSkck
+            if (!$surat) {
+                $skck = SuratSkck::find($id);
+                if ($skck) {
+                    $surat = $skck;
+                    $jenis = 'skck';
+                }
+            }
+
+            // Try to find in SuratKk
+            if (!$surat && class_exists('App\\Models\\SuratKk')) {
+                $kk = SuratKk::find($id);
+                if ($kk) {
+                    $surat = $kk;
+                    $jenis = 'kk';
+                }
+            }
+
+            // Try to find in SuratKematian
+            if (!$surat && class_exists('App\\Models\\SuratKematian')) {
+                $kematian = SuratKematian::find($id);
+                if ($kematian) {
+                    $surat = $kematian;
+                    $jenis = 'kematian';
+                }
+            }
+
+            // Try to find in SuratKelahiran
+            if (!$surat && class_exists('App\\Models\\SuratKelahiran')) {
+                $kelahiran = SuratKelahiran::find($id);
+                if ($kelahiran) {
+                    $surat = $kelahiran;
+                    $jenis = 'kelahiran';
+                }
+            }
+
+            // Try to find in BelumMenikah
+            if (!$surat) {
+                $belumMenikah = \App\Models\BelumMenikah::find($id);
+                if ($belumMenikah) {
+                    $surat = $belumMenikah;
+                    $jenis = 'belum_menikah';
+                }
+            }
+
+            // Try to find in TidakMampu
+            if (!$surat) {
+                $tidakMampu = \App\Models\TidakMampu::find($id);
+                if ($tidakMampu) {
+                    $surat = $tidakMampu;
+                    $jenis = 'tidak_mampu';
+                }
+            }
+
+            // Try to find in SuratUsaha
+            if (!$surat && class_exists('App\\Models\\SuratUsaha')) {
+                $usaha = \App\Models\SuratUsaha::find($id);
+                if ($usaha) {
+                    $surat = $usaha;
+                    $jenis = 'usaha';
+                }
+            }
+
+            // Try to find in SuratKehilangan
+            if (!$surat && class_exists('App\\Models\\SuratKehilangan')) {
+                $kehilangan = \App\Models\SuratKehilangan::find($id);
+                if ($kehilangan) {
+                    $surat = $kehilangan;
+                    $jenis = 'kehilangan';
+                }
+            }
+
+            // Try to find in Surat (general) - only if table exists
+            if (!$surat) {
+                try {
+                    if (class_exists('App\\Models\\Surat') && Schema::hasTable('surat')) {
+                        $suratGeneral = \App\Models\Surat::find($id);
+                        if ($suratGeneral) {
+                            $surat = $suratGeneral;
+                            $jenis = $suratGeneral->jenis_surat;
+                        }
+                    }
+                } catch (\Exception $e) {
+                    // Ignore error if table doesn't exist
+                }
             }
         }
 
@@ -601,6 +682,7 @@ class SuratController extends Controller
                     'jenis_surat' => 'domisili',
                     'created_at' => $item->created_at,
                     'tanggal_pengajuan' => $item->created_at ? $item->created_at->format('Y-m-d') : '-',
+                    'tahapan_verifikasi' => $item->tahapan_verifikasi,
                 ];
             });
             return response()->json($result, 200);
@@ -628,6 +710,7 @@ class SuratController extends Controller
                         'jenis_surat' => 'ktp',
                         'created_at' => $item->created_at,
                         'tanggal_pengajuan' => $item->created_at ? $item->created_at->format('Y-m-d') : '-',
+                        'tahapan_verifikasi' => $item->tahapan_verifikasi,
                     ];
                 });
                 return response()->json($result, 200);
@@ -656,6 +739,7 @@ class SuratController extends Controller
                         'jenis_surat' => 'kk',
                         'created_at' => $item->created_at,
                         'tanggal_pengajuan' => $item->created_at ? $item->created_at->format('Y-m-d') : '-',
+                        'tahapan_verifikasi' => $item->tahapan_verifikasi,
                     ];
                 });
                 return response()->json($result, 200);
@@ -686,6 +770,7 @@ class SuratController extends Controller
                     'jenis_surat' => 'skck',
                     'created_at' => $item->created_at,
                     'tanggal_pengajuan' => $item->created_at ? $item->created_at->format('Y-m-d') : '-',
+                    'tahapan_verifikasi' => $item->tahapan_verifikasi,
                 ];
             });
             return response()->json($result, 200);
@@ -712,6 +797,7 @@ class SuratController extends Controller
                         'jenis_surat' => 'kematian',
                         'created_at' => $item->created_at,
                         'tanggal_pengajuan' => $item->created_at ? $item->created_at->format('Y-m-d') : '-',
+                        'tahapan_verifikasi' => $item->tahapan_verifikasi,
                     ];
                 });
                 return response()->json($result, 200);
@@ -740,6 +826,7 @@ class SuratController extends Controller
                     'jenis_surat' => 'belum_menikah',
                     'created_at' => $item->created_at,
                     'tanggal_pengajuan' => $item->created_at ? $item->created_at->format('Y-m-d') : '-',
+                    'tahapan_verifikasi' => $item->tahapan_verifikasi,
                 ];
             });
             return response()->json($result, 200);
@@ -765,6 +852,7 @@ class SuratController extends Controller
                     'jenis_surat' => 'tidak_mampu',
                     'created_at' => $item->created_at,
                     'tanggal_pengajuan' => $item->created_at ? $item->created_at->format('Y-m-d') : '-',
+                    'tahapan_verifikasi' => $item->tahapan_verifikasi,
                 ];
             });
             return response()->json($result, 200);
@@ -795,6 +883,7 @@ class SuratController extends Controller
                         'jenis_surat' => 'kelahiran',
                         'created_at' => $item->created_at,
                         'tanggal_pengajuan' => $item->created_at ? $item->created_at->format('Y-m-d') : '-',
+                        'tahapan_verifikasi' => $item->tahapan_verifikasi,
                     ];
                 });
                 return response()->json($result, 200);
@@ -830,6 +919,7 @@ class SuratController extends Controller
                         'jenis_surat' => 'usaha',
                         'created_at' => $item->created_at,
                         'tanggal_pengajuan' => $item->created_at ? $item->created_at->format('Y-m-d') : '-',
+                        'tahapan_verifikasi' => $item->tahapan_verifikasi,
                     ];
                 });
                 return response()->json($result, 200);
@@ -867,6 +957,7 @@ class SuratController extends Controller
                         'jenis_surat' => 'kehilangan',
                         'created_at' => $item->created_at,
                         'tanggal_pengajuan' => $item->created_at ? $item->created_at->format('Y-m-d') : '-',
+                        'tahapan_verifikasi' => $item->tahapan_verifikasi,
                     ];
                 });
                 return response()->json($result, 200);
@@ -944,6 +1035,17 @@ class SuratController extends Controller
             }
         }
 
+        // Try to find in SuratUsaha
+        if (class_exists('App\\Models\\SuratUsaha')) {
+            $usaha = \App\Models\SuratUsaha::find($id);
+            if ($usaha) {
+                return view('admin.surat.edit', [
+                    'surat' => $usaha,
+                    'jenis' => 'usaha'
+                ]);
+            }
+        }
+
         // Try to find in SuratKematian
         if (class_exists('App\\Models\\SuratKematian')) {
             $kematian = SuratKematian::find($id);
@@ -1008,35 +1110,81 @@ class SuratController extends Controller
         $jenis = $request->input('jenis_surat');
         
         if ($jenis === 'domisili') {
+            // Validate domisili fields
+            $request->validate([
+                'nama' => 'required|string|max:255',
+                'nik' => 'required|string|max:16',
+                'tempat_lahir' => 'required|string|max:255',
+                'tanggal_lahir' => 'required|date',
+                'jenis_kelamin' => 'required|in:Laki-laki,Perempuan',
+                'agama' => 'required|string|max:50',
+                'kewarganegaraan' => 'required|in:WNI,WNA',
+                'pekerjaan' => 'required|string|max:255',
+                'alamat' => 'required|string',
+                'keperluan' => 'required|string',
+            ]);
+            
             $surat = \App\Models\Domisili::findOrFail($id);
-            $surat->update($request->all());
+            $surat->update($request->except(['jenis_surat', '_token', '_method']));
         } elseif ($jenis === 'ktp' && class_exists('App\\Models\\SuratKtp')) {
+            // Validate KTP fields
+            $request->validate([
+                'nama_lengkap' => 'required|string|max:255',
+                'nik' => 'required|string|max:16',
+                'tempat_lahir' => 'required|string|max:255',
+                'tanggal_lahir' => 'required|date',
+                'keperluan' => 'required|string',
+            ]);
+            
             $surat = \App\Models\SuratKtp::findOrFail($id);
-            $surat->update($request->all());
+            $surat->update($request->except(['jenis_surat', '_token', '_method']));
         } elseif ($jenis === 'skck') {
             $surat = SuratSkck::findOrFail($id);
-            $surat->update($request->all());
+            $surat->update($request->except(['jenis_surat', '_token', '_method']));
         } elseif ($jenis === 'kk' && class_exists('App\\Models\\SuratKk')) {
             $surat = SuratKk::findOrFail($id);
-            $surat->update($request->all());
+            $surat->update($request->except(['jenis_surat', '_token', '_method']));
         } elseif ($jenis === 'kematian' && class_exists('App\\Models\\SuratKematian')) {
             $surat = SuratKematian::findOrFail($id);
-            $surat->update($request->all());
+            $surat->update($request->except(['jenis_surat', '_token', '_method']));
         } elseif ($jenis === 'kelahiran' && class_exists('App\\Models\\SuratKelahiran')) {
             $surat = SuratKelahiran::findOrFail($id);
-            $surat->update($request->all());
+            $surat->update($request->except(['jenis_surat', '_token', '_method']));
         } elseif ($jenis === 'belum_menikah') {
             $surat = \App\Models\BelumMenikah::findOrFail($id);
-            $surat->update($request->all());
+            $surat->update($request->except(['jenis_surat', '_token', '_method']));
         } elseif ($jenis === 'tidak_mampu') {
             $surat = \App\Models\TidakMampu::findOrFail($id);
-            $surat->update($request->all());
+            $surat->update($request->except(['jenis_surat', '_token', '_method']));
+        } elseif ($jenis === 'usaha' && class_exists('App\\Models\\SuratUsaha')) {
+            // Validate Surat Usaha fields
+            $request->validate([
+                'nama_lengkap' => 'required|string|max:255',
+                'nik' => 'required|string|max:16',
+                'jenis_kelamin' => 'required|in:Laki-laki,Perempuan',
+                'tempat_lahir' => 'required|string|max:255',
+                'tanggal_lahir' => 'required|date',
+                'agama' => 'required|string|max:50',
+                'status_perkawinan' => 'required|string|max:50',
+                'pekerjaan' => 'required|string|max:255',
+                'alamat' => 'required|string',
+                'nama_usaha' => 'required|string|max:255',
+                'jenis_usaha' => 'required|string|max:100',
+                'alamat_usaha' => 'required|string',
+                'tanggal_mulai_usaha' => 'required|date',
+                'modal_usaha' => 'required|numeric|min:0',
+                'deskripsi_usaha' => 'required|string',
+                'keperluan' => 'required|string',
+            ]);
+            
+            $surat = \App\Models\SuratUsaha::findOrFail($id);
+            $surat->update($request->except(['jenis_surat', '_token', '_method']));
         } else {
             // Try general Surat model only if table exists
             try {
                 if (class_exists('App\\Models\\Surat') && Schema::hasTable('surat')) {
                     $surat = \App\Models\Surat::findOrFail($id);
-                    $surat->update($request->all());
+                    $surat->update($request->except(['jenis_surat', '_token', '_method']));
                 } else {
                     return redirect()->back()->with('error', 'Jenis surat tidak dikenali.');
                 }
@@ -1045,7 +1193,7 @@ class SuratController extends Controller
             }
         }
 
-        return redirect()->route('admin.surat.index')->with('success', 'Surat berhasil diperbarui.');
+        return redirect()->route('surat.index')->with('success', 'Surat berhasil diperbarui.');
     }
 
     public function destroy($id)
@@ -1142,7 +1290,7 @@ class SuratController extends Controller
             if (request()->expectsJson()) {
                 return response()->json(['success' => true, 'message' => 'Surat berhasil dihapus.']);
             }
-            return redirect()->route('admin.surat.index')->with('success', 'Surat berhasil dihapus.');
+            return redirect()->route('surat.index')->with('success', 'Surat berhasil dihapus.');
         }
 
         if (request()->expectsJson()) {
@@ -1174,6 +1322,10 @@ class SuratController extends Controller
                             $surat->catatan_verifikasi = $catatan;
                         }
                         $surat->save();
+                        
+                        // Kirim notifikasi berdasarkan status
+                        $this->sendNotificationBasedOnStatus($surat, $jenis, $status, $catatan);
+                        
                         $updated = true;
                     }
                     break;
@@ -1186,6 +1338,10 @@ class SuratController extends Controller
                             $surat->catatan_verifikasi = $catatan;
                         }
                         $surat->save();
+                        
+                        // Kirim notifikasi berdasarkan status
+                        $this->sendNotificationBasedOnStatus($surat, $jenis, $status, $catatan);
+                        
                         $updated = true;
                     }
                     break;
@@ -1198,6 +1354,10 @@ class SuratController extends Controller
                             $surat->catatan_verifikasi = $catatan;
                         }
                         $surat->save();
+                        
+                        // Kirim notifikasi berdasarkan status
+                        $this->sendNotificationBasedOnStatus($surat, $jenis, $status, $catatan);
+                        
                         $updated = true;
                     }
                     break;
@@ -1210,6 +1370,10 @@ class SuratController extends Controller
                             $surat->catatan_verifikasi = $catatan;
                         }
                         $surat->save();
+                        
+                        // Kirim notifikasi berdasarkan status
+                        $this->sendNotificationBasedOnStatus($surat, $jenis, $status, $catatan);
+                        
                         $updated = true;
                     }
                     break;
@@ -1223,6 +1387,10 @@ class SuratController extends Controller
                                 $surat->catatan_verifikasi = $catatan;
                             }
                             $surat->save();
+                            
+                            // Kirim notifikasi berdasarkan status
+                            $this->sendNotificationBasedOnStatus($surat, $jenis, $status, $catatan);
+                            
                             $updated = true;
                         }
                     }
@@ -1237,6 +1405,10 @@ class SuratController extends Controller
                                 $surat->catatan_verifikasi = $catatan;
                             }
                             $surat->save();
+                            
+                            // Kirim notifikasi berdasarkan status
+                            $this->sendNotificationBasedOnStatus($surat, $jenis, $status, $catatan);
+                            
                             $updated = true;
                         }
                     }
@@ -1251,6 +1423,10 @@ class SuratController extends Controller
                                 $surat->catatan_verifikasi = $catatan;
                             }
                             $surat->save();
+                            
+                            // Kirim notifikasi berdasarkan status
+                            $this->sendNotificationBasedOnStatus($surat, $jenis, $status, $catatan);
+                            
                             $updated = true;
                         }
                     }
@@ -1265,6 +1441,46 @@ class SuratController extends Controller
                                 $surat->catatan_verifikasi = $catatan;
                             }
                             $surat->save();
+                            
+                            // Kirim notifikasi berdasarkan status
+                            $this->sendNotificationBasedOnStatus($surat, $jenis, $status, $catatan);
+                            
+                            $updated = true;
+                        }
+                    }
+                    break;
+
+                case 'usaha':
+                    if (class_exists('App\\Models\\SuratUsaha')) {
+                        $surat = \App\Models\SuratUsaha::find($id);
+                        if ($surat) {
+                            $surat->status = $status;
+                            if ($catatan) {
+                                $surat->catatan_verifikasi = $catatan;
+                            }
+                            $surat->save();
+                            
+                            // Kirim notifikasi berdasarkan status
+                            $this->sendNotificationBasedOnStatus($surat, $jenis, $status, $catatan);
+                            
+                            $updated = true;
+                        }
+                    }
+                    break;
+
+                case 'kehilangan':
+                    if (class_exists('App\\Models\\SuratKehilangan')) {
+                        $surat = \App\Models\SuratKehilangan::find($id);
+                        if ($surat) {
+                            $surat->status = $status;
+                            if ($catatan) {
+                                $surat->catatan_verifikasi = $catatan;
+                            }
+                            $surat->save();
+                            
+                            // Kirim notifikasi berdasarkan status
+                            $this->sendNotificationBasedOnStatus($surat, $jenis, $status, $catatan);
+                            
                             $updated = true;
                         }
                     }
@@ -1310,6 +1526,443 @@ class SuratController extends Controller
         }
     }
 
+    /**
+     * Complete verification for a surat - specific method for the Complete button
+     * This method changes status from "diproses" to "sudah diverifikasi"
+     */
+    public function completeVerification(Request $request, $id)
+    {
+        // Add detailed logging
+        \Log::info('Complete verification called', [
+            'id' => $id,
+            'request_data' => $request->all(),
+            'user' => auth()->user() ? auth()->user()->id : 'not authenticated'
+        ]);
+
+        try {
+            $request->validate([
+                'jenis_surat' => 'required|string'
+            ]);
+
+            $jenis = $request->input('jenis_surat');
+            $updated = false;
+            $suratData = null;
+
+            \Log::info('Processing jenis surat: ' . $jenis);
+
+            switch($jenis) {
+                case 'domisili':
+                    $surat = \App\Models\Domisili::find($id);
+                    \Log::info('Domisili found: ' . ($surat ? 'yes' : 'no'));
+                    if ($surat) {
+                        $currentStatus = $surat->status_pengajuan ?? $surat->status ?? 'menunggu';
+                        \Log::info('Domisili current status: ' . $currentStatus);
+                        
+                        // Allow complete for all statuses except "sudah diverifikasi" and "ditolak"
+                        if ($currentStatus !== 'sudah diverifikasi' && $currentStatus !== 'ditolak') {
+                            $surat->status_pengajuan = 'sudah diverifikasi';
+                            $surat->catatan_verifikasi = 'Verifikasi diselesaikan oleh admin pada ' . now();
+                            $surat->save();
+                            
+                            $suratData = $surat;
+                            $updated = true;
+                            \Log::info('Domisili updated successfully from status: ' . $currentStatus);
+                        } else {
+                            \Log::warning('Domisili cannot be completed from status: ' . $currentStatus);
+                        }
+                    }
+                    break;
+
+                case 'belum_menikah':
+                    $surat = BelumMenikah::find($id);
+                    \Log::info('BelumMenikah found: ' . ($surat ? 'yes' : 'no'));
+                    if ($surat) {
+                        $currentStatus = $surat->status ?? 'menunggu';
+                        \Log::info('BelumMenikah current status: ' . $currentStatus);
+                        
+                        // Allow complete for all statuses except "sudah diverifikasi" and "ditolak"
+                        if ($currentStatus !== 'sudah diverifikasi' && $currentStatus !== 'ditolak') {
+                            $surat->status = 'sudah diverifikasi';
+                            $surat->catatan_verifikasi = 'Verifikasi diselesaikan oleh admin pada ' . now();
+                            $surat->save();
+                            
+                            $suratData = $surat;
+                            $updated = true;
+                            \Log::info('BelumMenikah updated successfully from status: ' . $currentStatus);
+                        } else {
+                            \Log::warning('BelumMenikah cannot be completed from status: ' . $currentStatus);
+                        }
+                    }
+                    break;
+
+                case 'tidak_mampu':
+                    $surat = TidakMampu::find($id);
+                    if ($surat) {
+                        $currentStatus = $surat->status ?? 'menunggu';
+                        \Log::info('TidakMampu current status: ' . $currentStatus);
+                        
+                        // Allow complete for all statuses except "sudah diverifikasi" and "ditolak"
+                        if ($currentStatus !== 'sudah diverifikasi' && $currentStatus !== 'ditolak') {
+                            $surat->status = 'sudah diverifikasi';
+                            $surat->catatan_verifikasi = 'Verifikasi diselesaikan oleh admin pada ' . now();
+                            $surat->save();
+                            
+                            $suratData = $surat;
+                            $updated = true;
+                            \Log::info('TidakMampu updated successfully from status: ' . $currentStatus);
+                        }
+                    }
+                    break;
+
+                case 'skck':
+                    $surat = SuratSkck::find($id);
+                    if ($surat) {
+                        $currentStatus = $surat->status ?? 'menunggu';
+                        \Log::info('SKCK current status: ' . $currentStatus);
+                        
+                        // Allow complete for all statuses except "sudah diverifikasi" and "ditolak"
+                        if ($currentStatus !== 'sudah diverifikasi' && $currentStatus !== 'ditolak') {
+                            $surat->status = 'sudah diverifikasi';
+                            $surat->catatan_verifikasi = 'Verifikasi diselesaikan oleh admin pada ' . now();
+                            $surat->save();
+                            
+                            $suratData = $surat;
+                            $updated = true;
+                            \Log::info('SKCK updated successfully from status: ' . $currentStatus);
+                        }
+                    }
+                    break;
+
+                case 'kk':
+                    if (class_exists('App\\Models\\SuratKk')) {
+                        $surat = SuratKk::find($id);
+                        if ($surat) {
+                            $currentStatus = $surat->status ?? 'menunggu';
+                            \Log::info('KK current status: ' . $currentStatus);
+                            
+                            // Allow complete for all statuses except "sudah diverifikasi" and "ditolak"
+                            if ($currentStatus !== 'sudah diverifikasi' && $currentStatus !== 'ditolak') {
+                                $surat->status = 'sudah diverifikasi';
+                                $surat->catatan_verifikasi = 'Verifikasi diselesaikan oleh admin pada ' . now();
+                                $surat->save();
+                                
+                                $suratData = $surat;
+                                $updated = true;
+                                \Log::info('KK updated successfully from status: ' . $currentStatus);
+                            }
+                        }
+                    }
+                    break;
+
+                case 'kematian':
+                    if (class_exists('App\\Models\\SuratKematian')) {
+                        $surat = SuratKematian::find($id);
+                        if ($surat) {
+                            $currentStatus = $surat->status ?? 'menunggu';
+                            \Log::info('Kematian current status: ' . $currentStatus);
+                            
+                            // Allow complete for all statuses except "sudah diverifikasi" and "ditolak"
+                            if ($currentStatus !== 'sudah diverifikasi' && $currentStatus !== 'ditolak') {
+                                $surat->status = 'sudah diverifikasi';
+                                $surat->catatan_verifikasi = 'Verifikasi diselesaikan oleh admin pada ' . now();
+                                $surat->save();
+                                
+                                $suratData = $surat;
+                                $updated = true;
+                                \Log::info('Kematian updated successfully from status: ' . $currentStatus);
+                            }
+                        }
+                    }
+                    break;
+
+                case 'kelahiran':
+                    if (class_exists('App\\Models\\SuratKelahiran')) {
+                        $surat = SuratKelahiran::find($id);
+                        if ($surat) {
+                            $currentStatus = $surat->status ?? 'menunggu';
+                            \Log::info('Kelahiran current status: ' . $currentStatus);
+                            
+                            // Allow complete for all statuses except "sudah diverifikasi" and "ditolak"
+                            if ($currentStatus !== 'sudah diverifikasi' && $currentStatus !== 'ditolak') {
+                                $surat->status = 'sudah diverifikasi';
+                                $surat->catatan_verifikasi = 'Verifikasi diselesaikan oleh admin pada ' . now();
+                                $surat->save();
+                                
+                                $suratData = $surat;
+                                $updated = true;
+                                \Log::info('Kelahiran updated successfully from status: ' . $currentStatus);
+                            }
+                        }
+                    }
+                    break;
+
+                case 'ktp':
+                    if (class_exists('App\\Models\\SuratKtp')) {
+                        $surat = \App\Models\SuratKtp::find($id);
+                        if ($surat) {
+                            $currentStatus = $surat->status ?? 'menunggu';
+                            \Log::info('KTP current status: ' . $currentStatus);
+                            
+                            // Allow complete for all statuses except "sudah diverifikasi" and "ditolak"
+                            if ($currentStatus !== 'sudah diverifikasi' && $currentStatus !== 'ditolak') {
+                                $surat->status = 'sudah diverifikasi';
+                                $surat->catatan_verifikasi = 'Verifikasi diselesaikan oleh admin pada ' . now();
+                                $surat->save();
+                                
+                                $suratData = $surat;
+                                $updated = true;
+                                \Log::info('KTP updated successfully from status: ' . $currentStatus);
+                            }
+                        }
+                    }
+                    break;
+
+                case 'usaha':
+                    if (class_exists('App\\Models\\SuratUsaha')) {
+                        $surat = \App\Models\SuratUsaha::find($id);
+                        if ($surat) {
+                            $currentStatus = $surat->status ?? 'menunggu';
+                            \Log::info('Usaha current status: ' . $currentStatus);
+                            
+                            // Allow complete for all statuses except "sudah diverifikasi" and "ditolak"
+                            if ($currentStatus !== 'sudah diverifikasi' && $currentStatus !== 'ditolak') {
+                                $surat->status = 'sudah diverifikasi';
+                                $surat->catatan_verifikasi = 'Verifikasi diselesaikan oleh admin pada ' . now();
+                                $surat->save();
+                                
+                                $suratData = $surat;
+                                $updated = true;
+                                \Log::info('Usaha updated successfully from status: ' . $currentStatus);
+                            }
+                        }
+                    }
+                    break;
+
+                case 'kehilangan':
+                    if (class_exists('App\\Models\\SuratKehilangan')) {
+                        $surat = \App\Models\SuratKehilangan::find($id);
+                        if ($surat) {
+                            $currentStatus = $surat->status ?? 'menunggu';
+                            \Log::info('Kehilangan current status: ' . $currentStatus);
+                            
+                            // Allow complete for all statuses except "sudah diverifikasi" and "ditolak"
+                            if ($currentStatus !== 'sudah diverifikasi' && $currentStatus !== 'ditolak') {
+                                $surat->status = 'sudah diverifikasi';
+                                $surat->catatan_verifikasi = 'Verifikasi diselesaikan oleh admin pada ' . now();
+                                $surat->save();
+                                
+                                $suratData = $surat;
+                                $updated = true;
+                                \Log::info('Kehilangan updated successfully from status: ' . $currentStatus);
+                            }
+                        }
+                    }
+                    break;
+
+                default:
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Jenis surat tidak didukung'
+                    ]);
+            }
+
+            if ($updated && $suratData) {
+                // Send completion notification
+                $this->sendCompletionNotification($suratData, $jenis);
+                
+                \Log::info('Complete verification successful', [
+                    'id' => $id,
+                    'jenis' => $jenis,
+                    'updated_status' => 'sudah diverifikasi'
+                ]);
+                
+                // Return appropriate response based on request type
+                if ($request->expectsJson() || $request->ajax()) {
+                    return response()->json([
+                        'success' => true,
+                        'message' => 'Verifikasi surat berhasil diselesaikan',
+                        'data' => [
+                            'id' => $id,
+                            'jenis_surat' => $jenis,
+                            'status' => 'sudah diverifikasi',
+                            'completed_at' => now()->format('Y-m-d H:i:s')
+                        ]
+                    ]);
+                } else {
+                    // Form submission - redirect back with success message
+                    return redirect()->back()->with('success', 'Verifikasi surat berhasil diselesaikan!');
+                }
+            } else {
+                \Log::warning('Complete verification failed', [
+                    'id' => $id,
+                    'jenis' => $jenis,
+                    'updated' => $updated,
+                    'surat_found' => $suratData ? 'yes' : 'no'
+                ]);
+                
+                $errorMessage = 'Surat tidak ditemukan atau status bukan "diproses"';
+                
+                if ($request->expectsJson() || $request->ajax()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => $errorMessage
+                    ]);
+                } else {
+                    return redirect()->back()->with('error', $errorMessage);
+                }
+            }
+
+        } catch (\Exception $e) {
+            \Log::error('Complete verification exception', [
+                'id' => $id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            $errorMessage = 'Terjadi kesalahan: ' . $e->getMessage();
+            
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $errorMessage
+                ]);
+            } else {
+                return redirect()->back()->with('error', $errorMessage);
+            }
+        }
+    }
+
+    /**
+     * Send notification when verification is completed
+     */
+    private function sendCompletionNotification($surat, $jenis)
+    {
+        try {
+            // Check if NotificationService exists
+            if (class_exists('App\\Services\\NotificationService')) {
+                $notificationService = new \App\Services\NotificationService();
+                
+                // Get user contact info
+                $phoneNumber = $surat->no_hp ?? $surat->no_handphone ?? null;
+                $email = $surat->email ?? null;
+                $nama = $surat->nama ?? $surat->nama_lengkap ?? $surat->nama_pemohon ?? 'Pemohon';
+                
+                $message = "Halo {$nama}, verifikasi surat keterangan {$jenis} Anda telah selesai dan sudah diverifikasi. Silakan ambil surat Anda di kantor desa.";
+                
+                // Send WhatsApp notification if phone number exists
+                if ($phoneNumber) {
+                    $notificationService->sendWhatsApp($phoneNumber, $message);
+                }
+                
+                // Send email notification if email exists
+                if ($email) {
+                    $notificationService->sendEmail($email, "Verifikasi Surat Selesai", $message);
+                }
+            }
+        } catch (\Exception $e) {
+            // Log error but don't stop the main process
+            \Log::error('Failed to send completion notification: ' . $e->getMessage());
+        }
+    }
+
+    public function usahaSubmit(Request $request)
+    {
+        try {
+            // Validate the request
+            $request->validate([
+                'nama_lengkap' => 'required|string|max:255',
+                'nik' => 'required|string|max:16',
+                'jenis_kelamin' => 'required|in:Laki-laki,Perempuan',
+                'tempat_lahir' => 'required|string|max:255',
+                'tanggal_lahir' => 'required|date',
+                'agama' => 'required|string|max:50',
+                'status_perkawinan' => 'required|string|max:50',
+                'pekerjaan' => 'required|string|max:255',
+                'alamat' => 'required|string',
+                'nama_usaha' => 'required|string|max:255',
+                'jenis_usaha' => 'required|string|max:100',
+                'alamat_usaha' => 'required|string',
+                'lama_usaha' => 'required|string|max:100',
+                'modal_usaha' => 'required|string|max:100',
+                'omzet_usaha' => 'required|string|max:100',
+                'keperluan' => 'required|string',
+                // File upload validations
+                'file_ktp' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
+                'file_kk' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
+                'file_foto_usaha' => 'required|file|mimes:jpg,jpeg,png|max:2048',
+                'file_izin_usaha' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+                'file_pengantar' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+            ]);
+
+            // Handle file uploads
+            $fileKtp = null;
+            $fileKk = null;
+            $fileFotoUsaha = null;
+            $fileIzinUsaha = null;
+            $filePengantar = null;
+
+            if ($request->hasFile('file_ktp')) {
+                $fileKtp = $request->file('file_ktp')->store('uploads/usaha/ktp', 'public');
+            }
+
+            if ($request->hasFile('file_kk')) {
+                $fileKk = $request->file('file_kk')->store('uploads/usaha/kk', 'public');
+            }
+
+            if ($request->hasFile('file_foto_usaha')) {
+                $fileFotoUsaha = $request->file('file_foto_usaha')->store('uploads/usaha/foto', 'public');
+            }
+
+            if ($request->hasFile('file_izin_usaha')) {
+                $fileIzinUsaha = $request->file('file_izin_usaha')->store('uploads/usaha/izin', 'public');
+            }
+
+            if ($request->hasFile('file_pengantar')) {
+                $filePengantar = $request->file('file_pengantar')->store('uploads/usaha/pengantar', 'public');
+            }
+
+            // Create the surat usaha record
+            \App\Models\SuratUsaha::create([
+                'user_id' => auth()->id(),
+                'nama_lengkap' => $request->nama_lengkap,
+                'nik' => $request->nik,
+                'jenis_kelamin' => $request->jenis_kelamin,
+                'tempat_lahir' => $request->tempat_lahir,
+                'tanggal_lahir' => $request->tanggal_lahir,
+                'agama' => $request->agama,
+                'status_perkawinan' => $request->status_perkawinan,
+                'kewarganegaraan' => 'WNI', // Default value
+                'pekerjaan' => $request->pekerjaan,
+                'alamat' => $request->alamat,
+                'nama_usaha' => $request->nama_usaha,
+                'jenis_usaha' => $request->jenis_usaha,
+                'alamat_usaha' => $request->alamat_usaha,
+                'lama_usaha' => $request->lama_usaha,
+                'modal_usaha' => $request->modal_usaha,
+                'omzet_usaha' => $request->omzet_usaha,
+                'keperluan' => $request->keperluan,
+                'status' => 'menunggu',
+                'tahapan_verifikasi' => null,
+                'catatan_verifikasi' => null,
+                'catatan_verifikasi_detail' => null,
+                'tanggal_verifikasi_terakhir' => null,
+                // File paths
+                'file_ktp' => $fileKtp,
+                'file_kk' => $fileKk,
+                'file_foto_usaha' => $fileFotoUsaha,
+                'file_izin_usaha' => $fileIzinUsaha,
+                'file_pengantar' => $filePengantar,
+            ]);
+
+            return redirect()->back()->with('success', 'Surat keterangan usaha berhasil diajukan! Silakan tunggu proses verifikasi dari admin.');
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()->withErrors($e->errors())->withInput();
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat mengajukan surat: ' . $e->getMessage())->withInput();
+        }
+    }
+
     public function domisiliSubmit(Request $request)
     {
         try {
@@ -1343,7 +1996,7 @@ class SuratController extends Controller
                 'alamat' => $request->alamat,
                 'keperluan' => $request->keperluan,
                 'status_pengajuan' => 'Menunggu Verifikasi',
-                'tahapan_verifikasi' => ['submitted' => now()],
+                'tahapan_verifikasi' => \App\Services\VerificationStageService::initializeStages('domisili'),
                 'tanggal_verifikasi_terakhir' => now(),
             ]);
 
@@ -1351,6 +2004,144 @@ class SuratController extends Controller
 
         } catch (\Exception $e) {
             return back()->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()])->withInput();
+        }
+    }
+
+    /**
+     * Mengirim notifikasi berdasarkan status verifikasi surat
+     */
+    private function sendNotificationBasedOnStatus($surat, $jenisSurat, $status, $catatan = null)
+    {
+        // Pastikan surat memiliki user_id
+        if (!isset($surat->user_id) || !$surat->user_id) {
+            return false;
+        }
+
+        $userId = $surat->user_id;
+        $suratId = $surat->id;
+        
+        // Ambil nama pemohon berdasarkan jenis surat
+        $namaPemohon = $this->getNamaPemohonFromSurat($surat, $jenisSurat);
+
+        // Kirim notifikasi berdasarkan status
+        switch (strtolower($status)) {
+            case 'diverifikasi':
+            case 'verified':
+            case 'selesai':
+            case 'approved':
+                NotificationService::createSuratApprovedNotification($userId, $suratId, $jenisSurat, $namaPemohon);
+                break;
+                
+            case 'dalam proses':
+            case 'diproses':
+            case 'processing':
+                NotificationService::createSuratDiprosesNotification($userId, $suratId, $jenisSurat, $namaPemohon);
+                break;
+                
+            case 'ditolak':
+            case 'rejected':
+                NotificationService::createSuratDitolakNotification($userId, $suratId, $jenisSurat, $namaPemohon, $catatan);
+                break;
+                
+            default:
+                // Untuk status lainnya, buat notifikasi umum
+                NotificationService::createSuratDiprosesNotification($userId, $suratId, $jenisSurat, $namaPemohon);
+                break;
+        }
+
+        return true;
+    }
+
+    /**
+     * Mendapatkan nama pemohon dari model surat berdasarkan jenis surat
+     */
+    private function getNamaPemohonFromSurat($surat, $jenisSurat)
+    {
+        switch($jenisSurat) {
+            case 'domisili':
+                return $surat->nama ?? 'Unknown';
+            case 'ktp':
+                return $surat->nama_lengkap ?? 'Unknown';
+            case 'belum_menikah':
+            case 'tidak_mampu':
+            case 'skck':
+            case 'kk':
+            case 'kematian':
+            case 'kelahiran':
+                return $surat->nama_lengkap ?? $surat->nama ?? 'Unknown';
+            default:
+                return $surat->nama ?? $surat->nama_lengkap ?? 'Unknown';
+        }
+    }
+
+    /**
+     * Halaman test notifikasi
+     */
+    public function testNotificationPage()
+    {
+        return view('admin.test-notification');
+    }
+
+    /**
+     * API untuk test notifikasi
+     */
+    public function testNotification(Request $request)
+    {
+        $request->validate([
+            'jenis_surat' => 'required|string',
+            'status' => 'required|string'
+        ]);
+
+        $jenisSurat = $request->input('jenis_surat');
+        $status = $request->input('status');
+
+        try {
+            // Cari surat pertama dari jenis yang diminta untuk test
+            $surat = null;
+            
+            switch($jenisSurat) {
+                case 'domisili':
+                    $surat = \App\Models\Domisili::whereNotNull('user_id')->first();
+                    break;
+                case 'ktp':
+                    $surat = \App\Models\SuratKtp::whereNotNull('user_id')->first();
+                    break;
+                case 'belum_menikah':
+                    $surat = \App\Models\BelumMenikah::whereNotNull('user_id')->first();
+                    break;
+                case 'skck':
+                    $surat = \App\Models\SuratSkck::whereNotNull('user_id')->first();
+                    break;
+                case 'tidak_mampu':
+                    $surat = \App\Models\TidakMampu::whereNotNull('user_id')->first();
+                    break;
+                default:
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Jenis surat tidak valid'
+                    ]);
+            }
+
+            if (!$surat) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "Tidak ada data surat {$jenisSurat} dengan user_id valid untuk test"
+                ]);
+            }
+
+            // Kirim notifikasi test
+            $this->sendNotificationBasedOnStatus($surat, $jenisSurat, $status, "Test notifikasi dari admin");
+
+            return response()->json([
+                'success' => true,
+                'message' => "Notifikasi {$status} untuk surat {$jenisSurat} berhasil dikirim ke user {$surat->user_id}"
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage()
+            ]);
         }
     }
 }

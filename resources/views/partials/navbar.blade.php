@@ -134,21 +134,83 @@
 
             <!-- Right Section - Notifications & User Menu -->
             <div class="flex items-center space-x-3">
+                @auth
                 <!-- Notification Bell -->
-                <div class="relative" x-data="{ open: false }" x-ref="notifDropdown">
+                <div class="relative" x-data="{ 
+                    open: false, 
+                    notifCount: 0, 
+                    notifications: [],
+                    loading: false,
+                    async loadNotifications() {
+                        this.loading = true;
+                        try {
+                            const response = await fetch('/notifications');
+                            const data = await response.json();
+                            this.notifications = data.notifications;
+                        } catch (error) {
+                            console.error('Error loading notifications:', error);
+                        }
+                        this.loading = false;
+                    },
+                    async loadNotifCount() {
+                        try {
+                            const response = await fetch('/notifications/count');
+                            const data = await response.json();
+                            this.notifCount = data.count;
+                        } catch (error) {
+                            console.error('Error loading notification count:', error);
+                        }
+                    },
+                    async markAsRead(notifId) {
+                        try {
+                            await fetch(`/notifications/${notifId}/read`, {
+                                method: 'POST',
+                                headers: {
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').getAttribute('content'),
+                                    'Content-Type': 'application/json'
+                                }
+                            });
+                            await this.loadNotifCount();
+                            await this.loadNotifications();
+                        } catch (error) {
+                            console.error('Error marking notification as read:', error);
+                        }
+                    },
+                    async markAllAsRead() {
+                        try {
+                            await fetch('/notifications/read-all', {
+                                method: 'POST',
+                                headers: {
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').getAttribute('content'),
+                                    'Content-Type': 'application/json'
+                                }
+                            });
+                            await this.loadNotifCount();
+                            await this.loadNotifications();
+                        } catch (error) {
+                            console.error('Error marking all notifications as read:', error);
+                        }
+                    }
+                }" 
+                x-init="
+                    loadNotifCount();
+                    // Refresh count every 30 seconds
+                    setInterval(() => loadNotifCount(), 30000);
+                "
+                x-ref="notifDropdown">
                     <button 
-                        @click="open = !open"
+                        @click="
+                            open = !open; 
+                            if (open && notifications.length === 0) loadNotifications()
+                        "
                         class="p-2 rounded-lg text-black hover:bg-blue-50 transition-colors relative"
                     >
                         <i class="fas fa-bell text-xl"></i>
-                        @php
-                            $notifCount = isset($surat_approved) ? count($surat_approved) : 0;
-                        @endphp
-                        @if($notifCount > 0)
-                            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
-                                {{ $notifCount }}
-                            </span>
-                        @endif
+                        <span 
+                            x-show="notifCount > 0"
+                            x-text="notifCount > 99 ? '99+' : notifCount"
+                            class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full min-w-5 h-5 flex items-center justify-center font-bold px-1"
+                        ></span>
                     </button>
                     
                     <div 
@@ -159,38 +221,65 @@
                         x-transition:leave="transition ease-in duration-150"
                         x-transition:leave-start="opacity-100 transform scale-100"
                         x-transition:leave-end="opacity-0 transform scale-95"
-                        class="absolute right-0 top-full mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-100 z-50 max-h-96 overflow-y-auto"
+                        class="absolute right-0 top-full mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-100 z-50 max-h-96 overflow-hidden"
                         style="display: none;"
                     >
-                        <div class="px-4 py-3 border-b border-gray-100">
+                        <!-- Header -->
+                        <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
                             <h3 class="font-semibold text-gray-900">Notifikasi</h3>
+                            <button 
+                                @click="markAllAsRead()"
+                                x-show="notifCount > 0"
+                                class="text-sm text-blue-600 hover:text-blue-800 transition-colors"
+                            >
+                                Tandai Semua Dibaca
+                            </button>
                         </div>
-                        <div class="py-2">
-                            @if($notifCount > 0)
-                                @foreach($surat_approved as $surat)
-                                    <div class="px-4 py-3 hover:bg-gray-50 border-b border-gray-50 last:border-b-0">
-                                        <div class="flex items-start space-x-3">
-                                            <div class="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
-                                            <div class="flex-1">
-                                                <p class="text-sm font-medium text-gray-900">
-                                                    Surat {{ ucfirst($surat->jenis_surat) }} Disetujui
-                                                </p>
-                                                <p class="text-xs text-gray-500 mt-1">
-                                                    {{ $surat->updated_at->format('d M Y H:i') }}
-                                                </p>
-                                            </div>
+
+                        <!-- Loading State -->
+                        <div x-show="loading" class="p-4 text-center">
+                            <i class="fas fa-spinner fa-spin text-gray-400"></i>
+                            <p class="text-gray-500 text-sm mt-2">Memuat notifikasi...</p>
+                        </div>
+
+                        <!-- Notifications List -->
+                        <div class="max-h-64 overflow-y-auto" x-show="!loading">
+                            <template x-for="notification in notifications" :key="notification.id">
+                                <div 
+                                    @click="
+                                        if (notification.is_unread) markAsRead(notification.id)
+                                    "
+                                    :class="{
+                                        'bg-blue-50': notification.is_unread,
+                                        'bg-white': !notification.is_unread
+                                    }"
+                                    class="px-4 py-3 border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer"
+                                >
+                                    <div class="flex items-start space-x-3">
+                                        <div :class="notification.color" class="mt-1">
+                                            <i :class="notification.icon"></i>
                                         </div>
+                                        <div class="flex-1 min-w-0">
+                                            <p class="font-medium text-gray-900 text-sm" x-text="notification.title"></p>
+                                            <p class="text-gray-600 text-sm" x-text="notification.message"></p>
+                                            <p class="text-gray-400 text-xs mt-1" x-text="notification.created_at"></p>
+                                        </div>
+                                        <div x-show="notification.is_unread" class="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
                                     </div>
-                                @endforeach
-                            @else
-                                <div class="px-4 py-6 text-center">
-                                    <i class="fas fa-bell-slash text-3xl text-gray-300 mb-2"></i>
-                                    <p class="text-sm text-gray-500">Belum ada notifikasi</p>
                                 </div>
-                            @endif
+                            </template>
+
+                            <!-- Empty State -->
+                            <div x-show="!loading && notifications.length === 0" class="p-6 text-center">
+                                <i class="fas fa-bell-slash text-gray-300 text-3xl mb-3"></i>
+                                <p class="text-gray-500">Belum ada notifikasi</p>
+                            </div>
                         </div>
                     </div>
                 </div>
+                @else
+                <!-- Guest users - no notifications -->
+                @endauth
 
                 <!-- User Menu or Auth Buttons -->
                 @if(Auth::check())

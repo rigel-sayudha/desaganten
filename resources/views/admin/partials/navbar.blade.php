@@ -172,7 +172,7 @@ class="fixed top-0 left-0 w-full bg-[#0088cc] text-white shadow-lg z-50">
             </div>
 
             <!-- Modal Body -->
-            <form @submit.prevent="updateProfile()" class="p-6 space-y-6">
+            <form onsubmit="event.preventDefault(); updateProfile();" class="p-6 space-y-6">
                 <!-- Profile Picture Section -->
                 <div class="text-center">
                     <div class="w-20 h-20 bg-gradient-to-br from-[#0088cc] to-blue-600 rounded-full mx-auto mb-4 flex items-center justify-center">
@@ -193,7 +193,7 @@ class="fixed top-0 left-0 w-full bg-[#0088cc] text-white shadow-lg z-50">
                     <input 
                         x-model="profileForm.name"
                         type="text" 
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0088cc] focus:border-transparent transition-all duration-200"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0088cc] focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-500"
                         placeholder="Masukkan nama lengkap"
                         required
                     >
@@ -209,7 +209,7 @@ class="fixed top-0 left-0 w-full bg-[#0088cc] text-white shadow-lg z-50">
                     <input 
                         x-model="profileForm.email"
                         type="email" 
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0088cc] focus:border-transparent transition-all duration-200"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0088cc] focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-500"
                         placeholder="Masukkan email"
                         required
                     >
@@ -239,7 +239,7 @@ class="fixed top-0 left-0 w-full bg-[#0088cc] text-white shadow-lg z-50">
                             <input 
                                 x-model="profileForm.current_password"
                                 type="password" 
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0088cc] focus:border-transparent transition-all duration-200"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0088cc] focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-500"
                                 placeholder="Masukkan password saat ini"
                             >
                             <div x-show="errors.current_password" class="text-red-500 text-sm mt-1" x-text="errors.current_password"></div>
@@ -254,7 +254,7 @@ class="fixed top-0 left-0 w-full bg-[#0088cc] text-white shadow-lg z-50">
                             <input 
                                 x-model="profileForm.password"
                                 type="password" 
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0088cc] focus:border-transparent transition-all duration-200"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0088cc] focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-500"
                                 placeholder="Masukkan password baru"
                             >
                             <div x-show="errors.password" class="text-red-500 text-sm mt-1" x-text="errors.password"></div>
@@ -269,7 +269,7 @@ class="fixed top-0 left-0 w-full bg-[#0088cc] text-white shadow-lg z-50">
                             <input 
                                 x-model="profileForm.password_confirmation"
                                 type="password" 
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0088cc] focus:border-transparent transition-all duration-200"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0088cc] focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-500"
                                 placeholder="Konfirmasi password baru"
                             >
                             <div x-show="errors.password_confirmation" class="text-red-500 text-sm mt-1" x-text="errors.password_confirmation"></div>
@@ -331,129 +331,218 @@ class="fixed top-0 left-0 w-full bg-[#0088cc] text-white shadow-lg z-50">
             }
         }
 
-        // Add Alpine.js methods globally for the navbar component
-        document.addEventListener('alpine:init', () => {
-            Alpine.data('adminNavbar', () => ({
-                updateProfile() {
-                    this.isLoading = true;
-                    this.errors = {};
-
-                    // Validate password fields if changing password
-                    if (this.showPasswordFields) {
-                        if (!this.profileForm.current_password) {
-                            this.errors.current_password = 'Password saat ini harus diisi';
-                            this.isLoading = false;
-                            return;
-                        }
-                        if (!this.profileForm.password) {
-                            this.errors.password = 'Password baru harus diisi';
-                            this.isLoading = false;
-                            return;
-                        }
-                        if (this.profileForm.password !== this.profileForm.password_confirmation) {
-                            this.errors.password_confirmation = 'Konfirmasi password tidak cocok';
-                            this.isLoading = false;
-                            return;
-                        }
-                        if (this.profileForm.password.length < 8) {
-                            this.errors.password = 'Password minimal 8 karakter';
-                            this.isLoading = false;
-                            return;
-                        }
-                    }
-
-                    // Prepare form data
-                    const formData = new FormData();
-                    formData.append('name', this.profileForm.name);
-                    formData.append('email', this.profileForm.email);
-                    
-                    if (this.showPasswordFields) {
-                        formData.append('current_password', this.profileForm.current_password);
-                        formData.append('password', this.profileForm.password);
-                        formData.append('password_confirmation', this.profileForm.password_confirmation);
-                    }
-
-                    // Add CSRF token
-                    formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
-                    formData.append('_method', 'PUT');
-
-                    // Send request
-                    fetch('{{ route("admin.profile.update") }}', {
-                        method: 'POST',
-                        body: formData,
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest',
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        this.isLoading = false;
-                        
-                        if (data.success) {
-                            // Show success message
-                            if (typeof Swal !== 'undefined') {
-                                Swal.fire({
-                                    title: 'Berhasil!',
-                                    text: data.message || 'Profil berhasil diperbarui',
-                                    icon: 'success',
-                                    confirmButtonColor: '#0088cc'
-                                });
-                            } else {
-                                alert(data.message || 'Profil berhasil diperbarui');
-                            }
-                            
-                            // Close modal and reset form
-                            this.editProfile = false;
-                            this.showPasswordFields = false;
-                            this.profileForm.current_password = '';
-                            this.profileForm.password = '';
-                            this.profileForm.password_confirmation = '';
-                            
-                            // Update navbar display if name changed
-                            if (data.user) {
-                                this.profileForm.name = data.user.name;
-                                this.profileForm.email = data.user.email;
-                                // Refresh page to update all name displays
-                                setTimeout(() => {
-                                    window.location.reload();
-                                }, 1000);
-                            }
-                        } else {
-                            // Handle validation errors
-                            if (data.errors) {
-                                this.errors = data.errors;
-                            } else {
-                                if (typeof Swal !== 'undefined') {
-                                    Swal.fire({
-                                        title: 'Error!',
-                                        text: data.message || 'Terjadi kesalahan saat memperbarui profil',
-                                        icon: 'error',
-                                        confirmButtonColor: '#0088cc'
-                                    });
-                                } else {
-                                    alert(data.message || 'Terjadi kesalahan saat memperbarui profil');
-                                }
-                            }
-                        }
-                    })
-                    .catch(error => {
-                        this.isLoading = false;
-                        console.error('Error:', error);
-                        
-                        if (typeof Swal !== 'undefined') {
-                            Swal.fire({
-                                title: 'Error!',
-                                text: 'Terjadi kesalahan jaringan',
-                                icon: 'error',
-                                confirmButtonColor: '#0088cc'
-                            });
-                        } else {
-                            alert('Terjadi kesalahan jaringan');
-                        }
-                    });
+        // Simple and robust function to update profile
+        function updateProfile() {
+            console.log('updateProfile function called');
+            
+            // Show basic loading indicator
+            const submitButton = document.querySelector('button[type="submit"]');
+            if (submitButton) {
+                submitButton.disabled = true;
+                const buttonText = submitButton.querySelector('span');
+                if (buttonText) {
+                    buttonText.textContent = 'Menyimpan...';
                 }
-            }));
-        });
+            }
+            
+            // Get form values directly from inputs
+            const nameInput = document.querySelector('input[x-model="profileForm.name"]');
+            const emailInput = document.querySelector('input[x-model="profileForm.email"]');
+            const currentPasswordInput = document.querySelector('input[x-model="profileForm.current_password"]');
+            const passwordInput = document.querySelector('input[x-model="profileForm.password"]');
+            const passwordConfirmationInput = document.querySelector('input[x-model="profileForm.password_confirmation"]');
+            
+            if (!nameInput || !emailInput) {
+                alert('Form elements not found');
+                if (submitButton) {
+                    submitButton.disabled = false;
+                    const buttonText = submitButton.querySelector('span');
+                    if (buttonText) buttonText.textContent = 'Simpan Perubahan';
+                }
+                return;
+            }
+            
+            const name = nameInput.value.trim();
+            const email = emailInput.value.trim();
+            const currentPassword = currentPasswordInput ? currentPasswordInput.value : '';
+            const password = passwordInput ? passwordInput.value : '';
+            const passwordConfirmation = passwordConfirmationInput ? passwordConfirmationInput.value : '';
+            
+            console.log('Form values:', { name, email, hasCurrentPassword: !!currentPassword, hasPassword: !!password });
+
+            // Basic validation
+            if (!name || !email) {
+                alert('Nama dan email harus diisi');
+                if (submitButton) {
+                    submitButton.disabled = false;
+                    const buttonText = submitButton.querySelector('span');
+                    if (buttonText) buttonText.textContent = 'Simpan Perubahan';
+                }
+                return;
+            }
+
+            // Check if password fields are visible (not just exist in DOM)
+            const showPasswordFields = currentPasswordInput && currentPasswordInput.offsetParent !== null;
+            
+            // Validate password fields if visible and filled
+            if (showPasswordFields && (currentPassword || password || passwordConfirmation)) {
+                if (!currentPassword) {
+                    alert('Password saat ini harus diisi');
+                    if (submitButton) {
+                        submitButton.disabled = false;
+                        const buttonText = submitButton.querySelector('span');
+                        if (buttonText) buttonText.textContent = 'Simpan Perubahan';
+                    }
+                    return;
+                }
+                if (!password) {
+                    alert('Password baru harus diisi');
+                    if (submitButton) {
+                        submitButton.disabled = false;
+                        const buttonText = submitButton.querySelector('span');
+                        if (buttonText) buttonText.textContent = 'Simpan Perubahan';
+                    }
+                    return;
+                }
+                if (password !== passwordConfirmation) {
+                    alert('Konfirmasi password tidak cocok');
+                    if (submitButton) {
+                        submitButton.disabled = false;
+                        const buttonText = submitButton.querySelector('span');
+                        if (buttonText) buttonText.textContent = 'Simpan Perubahan';
+                    }
+                    return;
+                }
+                if (password.length < 8) {
+                    alert('Password minimal 8 karakter');
+                    if (submitButton) {
+                        submitButton.disabled = false;
+                        const buttonText = submitButton.querySelector('span');
+                        if (buttonText) buttonText.textContent = 'Simpan Perubahan';
+                    }
+                    return;
+                }
+            }
+
+            // Get CSRF token from meta tag
+            const csrfToken = document.querySelector('meta[name="csrf-token"]');
+            if (!csrfToken) {
+                console.error('CSRF token not found in meta tag');
+                alert('Error: CSRF token tidak ditemukan. Silakan refresh halaman.');
+                if (submitButton) {
+                    submitButton.disabled = false;
+                    const buttonText = submitButton.querySelector('span');
+                    if (buttonText) buttonText.textContent = 'Simpan Perubahan';
+                }
+                return;
+            }
+
+            // Prepare FormData
+            const formData = new FormData();
+            formData.append('name', name);
+            formData.append('email', email);
+            formData.append('_token', csrfToken.getAttribute('content'));
+            formData.append('_method', 'PUT');
+            
+            // Only include password fields if they are visible and filled
+            if (showPasswordFields && currentPassword && password) {
+                formData.append('current_password', currentPassword);
+                formData.append('password', password);
+                formData.append('password_confirmation', passwordConfirmation);
+            }
+
+            console.log('Sending request to profile update endpoint...');
+
+            // Make the request
+            fetch('{{ route("admin.profile.update") }}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => {
+                console.log('Response received, status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                return response.json();
+            })
+            .then(data => {
+                console.log('Response data:', data);
+                
+                if (data.success) {
+                    // Success response
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            title: 'Berhasil!',
+                            text: data.message || 'Profil berhasil diperbarui',
+                            icon: 'success',
+                            confirmButtonColor: '#0088cc'
+                        }).then(() => {
+                            // Reload the page to reflect changes
+                            window.location.reload();
+                        });
+                    } else {
+                        alert(data.message || 'Profil berhasil diperbarui');
+                        window.location.reload();
+                    }
+                } else {
+                    // Error response
+                    let errorMessage = data.message || 'Terjadi kesalahan saat memperbarui profil';
+                    
+                    if (data.errors) {
+                        const errorArray = Object.values(data.errors).flat();
+                        errorMessage = errorArray.join('\n');
+                    }
+                    
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: errorMessage,
+                            icon: 'error',
+                            confirmButtonColor: '#0088cc'
+                        });
+                    } else {
+                        alert(errorMessage);
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Request failed:', error);
+                
+                let errorMessage = 'Terjadi kesalahan jaringan';
+                if (error.message.includes('419')) {
+                    errorMessage = 'Session expired. Silakan refresh halaman dan coba lagi.';
+                } else if (error.message.includes('500')) {
+                    errorMessage = 'Terjadi kesalahan server. Silakan coba lagi.';
+                }
+                
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: errorMessage,
+                        icon: 'error',
+                        confirmButtonColor: '#0088cc'
+                    });
+                } else {
+                    alert(errorMessage);
+                }
+            })
+            .finally(() => {
+                // Re-enable the submit button
+                if (submitButton) {
+                    submitButton.disabled = false;
+                    const buttonText = submitButton.querySelector('span');
+                    if (buttonText) {
+                        buttonText.textContent = 'Simpan Perubahan';
+                    }
+                }
+            });
+        }
     </script>
 </nav>
 

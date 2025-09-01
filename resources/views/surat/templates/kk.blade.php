@@ -30,6 +30,7 @@ $breadcrumbs = [
                     id="kk-form"
                     method="POST" 
                     action="{{ route('surat.kk.submit') }}" 
+                    enctype="multipart/form-data"
                     x-data="submitForm()"
                     @submit.prevent="submitForm()"
                     class="space-y-8"
@@ -290,6 +291,120 @@ $breadcrumbs = [
                             @error('keperluan')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
+                        </div>
+                    </div>
+
+                    <!-- Document Upload Section -->
+                    <div class="space-y-6">
+                        <div class="border-b border-gray-200 pb-4">
+                            <h3 class="text-lg font-semibold text-gray-900 flex items-center space-x-2">
+                                <i class="fas fa-cloud-upload-alt text-blue-500"></i>
+                                <span>Upload Dokumen Pendukung</span>
+                            </h3>
+                            <p class="text-sm text-gray-600 mt-1">Upload dokumen yang diperlukan untuk verifikasi</p>
+                        </div>
+
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                            <div class="flex items-start space-x-3">
+                                <i class="fas fa-info-circle text-blue-500 mt-0.5"></i>
+                                <div class="text-sm text-blue-700">
+                                    <p class="font-medium mb-2">Dokumen yang diperlukan:</p>
+                                    <ul class="list-disc list-inside space-y-1">
+                                        <li>Scan KTP Pemohon (wajib)</li>
+                                        <li>Scan Kartu Keluarga lama atau hilang (jika ada)</li>
+                                        <li>Dokumen pendukung lainnya</li>
+                                    </ul>
+                                    <p class="mt-2"><strong>Format:</strong> PDF, JPG, PNG | <strong>Ukuran maksimal:</strong> 2MB per file</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Upload KTP -->
+                            <div class="space-y-2">
+                                <label for="file_ktp" class="block text-sm font-medium text-black flex items-center space-x-2">
+                                    <i class="fas fa-id-card text-blue-500 w-4"></i>
+                                    <span>Upload KTP</span>
+                                    <span class="text-red-500">*</span>
+                                </label>
+                                <div class="relative">
+                                    <input 
+                                        type="file" 
+                                        id="file_ktp"
+                                        name="file_ktp" 
+                                        accept=".pdf,.jpg,.jpeg,.png"
+                                        class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                        required
+                                    >
+                                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors duration-200">
+                                        <i class="fas fa-cloud-upload-alt text-gray-400 text-2xl mb-2"></i>
+                                        <p class="text-sm text-gray-600">
+                                            <span class="font-medium text-blue-600">Klik untuk upload</span> atau drag file ke sini
+                                        </p>
+                                        <p class="text-xs text-gray-500 mt-1">PDF, JPG, PNG (Max 2MB)</p>
+                                    </div>
+                                </div>
+                                @error('file_ktp')
+                                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <!-- Upload KK Lama -->
+                            <div class="space-y-2">
+                                <label for="file_kk_lama" class="block text-sm font-medium text-black flex items-center space-x-2">
+                                    <i class="fas fa-users text-purple-500 w-4"></i>
+                                    <span>Upload KK Lama/Hilang</span>
+                                    <span class="text-gray-500 text-xs">(Opsional)</span>
+                                </label>
+                                <div class="relative">
+                                    <input 
+                                        type="file" 
+                                        id="file_kk_lama"
+                                        name="file_kk_lama" 
+                                        accept=".pdf,.jpg,.jpeg,.png"
+                                        class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                    >
+                                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-purple-400 transition-colors duration-200">
+                                        <i class="fas fa-cloud-upload-alt text-gray-400 text-2xl mb-2"></i>
+                                        <p class="text-sm text-gray-600">
+                                            <span class="font-medium text-purple-600">Klik untuk upload</span> atau drag file ke sini
+                                        </p>
+                                        <p class="text-xs text-gray-500 mt-1">PDF, JPG, PNG (Max 2MB)</p>
+                                    </div>
+                                </div>
+                                @error('file_kk_lama')
+                                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <!-- Upload Dokumen Tambahan -->
+                            <div class="space-y-2 md:col-span-2">
+                                <label for="file_pendukung" class="block text-sm font-medium text-black flex items-center space-x-2">
+                                    <i class="fas fa-paperclip text-green-500 w-4"></i>
+                                    <span>Upload Dokumen Pendukung</span>
+                                    <span class="text-gray-500 text-xs">(Opsional)</span>
+                                </label>
+                                <div class="relative">
+                                    <input 
+                                        type="file" 
+                                        id="file_pendukung"
+                                        name="file_pendukung[]" 
+                                        accept=".pdf,.jpg,.jpeg,.png"
+                                        multiple
+                                        class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                    >
+                                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-green-400 transition-colors duration-200">
+                                        <i class="fas fa-cloud-upload-alt text-gray-400 text-2xl mb-2"></i>
+                                        <p class="text-sm text-gray-600">
+                                            <span class="font-medium text-green-600">Klik untuk upload</span> atau drag file ke sini
+                                        </p>
+                                        <p class="text-xs text-gray-500 mt-1">Bisa upload multiple files - PDF, JPG, PNG (Max 2MB per file)</p>
+                                    </div>
+                                </div>
+                                @error('file_pendukung')
+                                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
                         </div>
                     </div>
 

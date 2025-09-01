@@ -1,247 +1,223 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="utf-8">
     <title>Surat Keterangan Belum Menikah</title>
     <style>
+        @page {
+            size: A4;
+            margin: 1.5cm 2cm;
+        }
         body {
-            font-family: 'Times New Roman', serif;
-            font-size: 12pt;
-            line-height: 1.6;
+            font-family: 'Arial', sans-serif;
+            font-size: 11pt;
+            line-height: 1.3;
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
-        
-        .header {
+        .kop-surat {
             text-align: center;
-            border-bottom: 3px solid #000;
-            padding-bottom: 10px;
-            margin-bottom: 30px;
+            border-bottom: 2px solid #000;
+            padding-bottom: 8px;
+            margin-bottom: 15px;
+            position: relative;
+            min-height: 70px;
         }
-        
         .logo {
-            width: 80px;
-            height: 80px;
-            float: left;
-            margin-right: 20px;
+            position: absolute;
+            left: 0;
+            top: 5px;
+            width: 60px;
+            height: 60px;
         }
-        
-        .header-text {
-            margin-left: 100px;
+        .kop-text {
+            text-align: center;
+            margin-left: 80px;
+            margin-right: 80px;
         }
-        
-        .header h1 {
-            font-size: 18pt;
-            font-weight: bold;
+        .kop-surat h1 {
             margin: 0;
-            text-transform: uppercase;
-        }
-        
-        .header h2 {
             font-size: 16pt;
             font-weight: bold;
-            margin: 5px 0;
+            color: #000;
         }
-        
-        .header p {
-            font-size: 11pt;
+        .kop-surat h2 {
             margin: 2px 0;
-        }
-        
-        .title {
-            text-align: center;
             font-size: 14pt;
             font-weight: bold;
-            text-decoration: underline;
-            margin: 30px 0 20px 0;
-            text-transform: uppercase;
+            color: #000;
         }
-        
-        .nomor {
-            text-align: center;
-            font-size: 12pt;
-            margin-bottom: 30px;
+        .kop-surat h3 {
+            margin: 2px 0;
+            font-size: 13pt;
+            font-weight: bold;
+            color: #000;
         }
-        
-        .content {
-            text-align: justify;
-            margin-bottom: 30px;
-        }
-        
-        .content p {
-            margin-bottom: 15px;
-        }
-        
-        .data-table {
-            margin: 20px 0;
-        }
-        
-        .data-table td {
-            padding: 3px 0;
-            vertical-align: top;
-        }
-        
-        .data-table .label {
-            width: 200px;
-            font-weight: normal;
-        }
-        
-        .data-table .separator {
-            width: 20px;
-            text-align: center;
-        }
-        
-        .signature {
-            margin-top: 50px;
-        }
-        
-        .signature-left {
-            float: left;
-            width: 45%;
-            text-align: center;
-        }
-        
-        .signature-right {
-            float: right;
-            width: 45%;
-            text-align: center;
-        }
-        
-        .signature-space {
-            height: 80px;
-        }
-        
-        .clear {
-            clear: both;
-        }
-        
-        .verification-info {
-            background-color: #f9f9f9;
-            border: 1px solid #ddd;
-            padding: 10px;
-            margin-top: 20px;
+        .kop-surat p {
+            margin: 1px 0;
             font-size: 10pt;
         }
-        
-        .verification-info h4 {
-            margin: 0 0 10px 0;
-            font-size: 11pt;
+        .nomor-surat {
+            text-align: center;
+            margin: 15px 0;
+            font-weight: bold;
+            font-size: 13pt;
+            text-decoration: underline;
+        }
+        .content {
+            text-align: justify;
+            margin: 10px 0;
+            line-height: 1.4;
+            flex: 1;
+        }
+        .data-table {
+            margin: 12px 0;
+            width: 100%;
+        }
+        .data-table tr td {
+            padding: 2px 0;
+            vertical-align: top;
+            font-size: 10.5pt;
+        }
+        .data-table tr td:first-child {
+            width: 180px;
+        }
+        .data-table tr td:nth-child(2) {
+            width: 15px;
+            text-align: center;
+        }
+        .pejabat-info table {
+            margin: 8px 0 !important;
+        }
+        .pejabat-info td {
+            padding: 1px 0 !important;
+            font-size: 10.5pt !important;
+        }
+        .content p {
+            margin: 8px 0;
+            font-size: 10.5pt;
+        }
+        .ttd {
+            margin-top: 20px;
+            text-align: right;
+        }
+        .ttd-content {
+            display: inline-block;
+            text-align: center;
+            margin-right: 60px;
+        }
+        .ttd-content p {
+            margin: 3px 0;
+            font-size: 10.5pt;
+        }
+        .ttd-space {
+            margin: 40px 0 8px 0;
+        }
+        .clear {
+            clear: both;
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <img src="{{ public_path('img/logo karanganyar.png') }}" alt="Logo" class="logo">
-        <div class="header-text">
-            <h1>Pemerintah Kabupaten Karanganyar</h1>
-            <h2>Kecamatan Gondangrejo</h2>
-            <h1>Desa Ganten</h1>
-            <p>Alamat: Jl. Raya Ganten No. 123, Gondangrejo, Karanganyar</p>
-            <p>Telepon: (0271) 123456 | Email: desaganten@karanganyar.go.id</p>
+    <div class="kop-surat">
+        <div class="logo">
+            <img src="{{ public_path('img/logo-karanganyar.png') }}" alt="Logo Desa Ganten" style="width: 60px; height: 60px;">
+        </div>
+        <div class="kop-text">
+            <h1>PEMERINTAH KABUPATEN KARANGANYAR</h1>
+            <h2>KECAMATAN KERJO</h2>
+            <h3>DESA GANTEN</h3>
+            <p>Geneng, RT 004 Rw 004, Ganten, Kerjo, Karanganyar</p>
+            <p>Telp: 081292252634, Kode Pos: 57753</p>
         </div>
         <div class="clear"></div>
     </div>
 
-    <div class="title">
-        Surat Keterangan Belum Menikah
-    </div>
-
-    <div class="nomor">
-        Nomor: {{ sprintf('%03d', $surat->id) }}/SKBM/{{ date('Y') }}
+    <div class="nomor-surat">
+        Surat Keterangan Belum Menikah<br>
+        Nomor: {{ sprintf('%03d', $surat->id) }}/{{ date('m') }}/{{ date('Y') }}
     </div>
 
     <div class="content">
-        <p>Yang bertanda tangan di bawah ini, Kepala Desa Ganten, Kecamatan Gondangrejo, Kabupaten Karanganyar, dengan ini menerangkan bahwa:</p>
+        <p><strong>Yang bertanda tangan dibawah ini:</strong></p>
+        
+        <div class="pejabat-info">
+            <table style="margin: 10px 0;">
+                <tr>
+                    <td style="width: 100px;">Nama</td>
+                    <td style="width: 20px;">:</td>
+                    <td>{{ \App\Models\Setting::get('kepala_desa_nama', 'Munadi') }}</td>
+                </tr>
+                <tr>
+                    <td>Jabatan</td>
+                    <td>:</td>
+                    <td>{{ \App\Models\Setting::get('kepala_desa_jabatan', 'Kepala Desa Ganten') }}</td>
+                </tr>
+            </table>
+        </div>
+
+        <p><strong>Dengan ini menerangkan bahwa:</strong></p>
 
         <table class="data-table">
             <tr>
-                <td class="label">Nama Lengkap</td>
-                <td class="separator">:</td>
+                <td>Nama Lengkap</td>
+                <td>:</td>
                 <td><strong>{{ strtoupper($surat->nama) }}</strong></td>
             </tr>
             <tr>
-                <td class="label">NIK</td>
-                <td class="separator">:</td>
+                <td>NIK</td>
+                <td>:</td>
                 <td>{{ $surat->nik }}</td>
             </tr>
             <tr>
-                <td class="label">Jenis Kelamin</td>
-                <td class="separator">:</td>
-                <td>{{ ucfirst($surat->jenis_kelamin) }}</td>
-            </tr>
-            <tr>
-                <td class="label">Tempat, Tanggal Lahir</td>
-                <td class="separator">:</td>
+                <td>Tempat/Tanggal Lahir</td>
+                <td>:</td>
                 <td>{{ $surat->tempat_lahir }}, {{ \Carbon\Carbon::parse($surat->tanggal_lahir)->format('d F Y') }}</td>
             </tr>
             <tr>
-                <td class="label">Agama</td>
-                <td class="separator">:</td>
-                <td>{{ ucfirst($surat->agama) }}</td>
+                <td>Jenis Kelamin</td>
+                <td>:</td>
+                <td>{{ $surat->jenis_kelamin }}</td>
             </tr>
             <tr>
-                <td class="label">Pekerjaan</td>
-                <td class="separator">:</td>
-                <td>{{ ucfirst($surat->pekerjaan) }}</td>
+                <td>Agama</td>
+                <td>:</td>
+                <td>{{ $surat->agama }}</td>
             </tr>
             <tr>
-                <td class="label">Kewarganegaraan</td>
-                <td class="separator">:</td>
-                <td>{{ ucfirst($surat->kewarganegaraan) }}</td>
+                <td>Kewarganegaraan</td>
+                <td>:</td>
+                <td>{{ $surat->kewarganegaraan }}</td>
             </tr>
             <tr>
-                <td class="label">Alamat</td>
-                <td class="separator">:</td>
+                <td>Pekerjaan</td>
+                <td>:</td>
+                <td>{{ $surat->pekerjaan }}</td>
+            </tr>
+            <tr>
+                <td>Alamat</td>
+                <td>:</td>
                 <td>{{ $surat->alamat }}</td>
             </tr>
-            @if($surat->nama_ayah)
-            <tr>
-                <td class="label">Nama Ayah</td>
-                <td class="separator">:</td>
-                <td>{{ $surat->nama_ayah }}</td>
-            </tr>
-            @endif
-            @if($surat->nama_ibu)
-            <tr>
-                <td class="label">Nama Ibu</td>
-                <td class="separator">:</td>
-                <td>{{ $surat->nama_ibu }}</td>
-            </tr>
-            @endif
         </table>
 
-        <p>Adalah benar-benar penduduk Desa Ganten, Kecamatan Gondangrejo, Kabupaten Karanganyar, dan sampai dengan dikeluarkannya surat keterangan ini yang bersangkutan berstatus <strong>BELUM MENIKAH</strong>.</p>
+        <p>Berdasarkan pernyataan, bahwa yang bersangkutan benar-benar penduduk yang berdomisili di Desa Ganten, Kecamatan Kerjo, Kabupaten Karanganyar, dan <strong>sampai saat ini belum pernah menikah</strong>.</p>
 
-        <p>Surat keterangan ini dibuat berdasarkan keterangan yang bersangkutan dan untuk {{ $surat->keperluan ?? 'keperluan yang bersangkutan' }}.</p>
+        <p>Surat keterangan ini dibuat untuk keperluan <strong>{{ $surat->keperluan }}</strong>.</p>
 
-        <p>Demikian surat keterangan ini dibuat dengan sebenar-benarnya dan dapat dipergunakan sebagaimana mestinya.</p>
+        <p>Demikian surat keterangan ini dibuat untuk dipergunakan sebagaimana mestinya.</p>
     </div>
 
-    <div class="signature">
-        <div class="signature-left">
-            <p>Mengetahui,</p>
-            <p><strong>Ketua RT {{ $surat->rt ?? '001' }}/RW {{ $surat->rw ?? '001' }}</strong></p>
-            <div class="signature-space"></div>
-            <p><strong><u>Slamet Riyadi</u></strong></p>
+    <div class="ttd">
+        <div class="ttd-content">
+            <p>Ganten, {{ \Carbon\Carbon::now()->format('d F Y') }}</p>
+            <p><strong>{{ \App\Models\Setting::get('kepala_desa_jabatan', 'Kepala Desa Ganten') }}</strong></p>
+            <div class="ttd-space"></div>
+            <p><strong><u>{{ \App\Models\Setting::get('kepala_desa_nama', 'Munadi') }}</u></strong></p>
         </div>
-        
-        <div class="signature-right">
-            <p>Ganten, {{ $tanggal_cetak }}</p>
-            <p><strong>Kepala Desa Ganten</strong></p>
-            <div class="signature-space"></div>
-            <p><strong><u>Budi Santoso, S.AP</u></strong></p>
-            <p>NIP. 19701010 199003 1 001</p>
-        </div>
-        <div class="clear"></div>
-    </div>
-
-    <div class="verification-info">
-        <h4>Informasi Verifikasi</h4>
-        <p><strong>Status:</strong> {{ ucfirst($surat->status) }}</p>
-        <p><strong>Tanggal Pengajuan:</strong> {{ $surat->created_at->format('d F Y H:i') }}</p>
-        @if($surat->tanggal_verifikasi_terakhir)
-        <p><strong>Tanggal Verifikasi:</strong> {{ \Carbon\Carbon::parse($surat->tanggal_verifikasi_terakhir)->format('d F Y H:i') }}</p>
-        @endif
-        <p><strong>Dokumen ini telah diverifikasi secara digital oleh sistem</strong></p>
     </div>
 </body>
 </html>
