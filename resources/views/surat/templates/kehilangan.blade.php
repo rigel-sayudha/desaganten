@@ -42,6 +42,22 @@ $breadcrumbs = [
                 isSubmitting: false
             }">
                 
+                <!-- Alert for Login Requirement -->
+                @guest
+                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-exclamation-triangle text-yellow-500"></i>
+                            <div class="flex-1">
+                                <span class="text-yellow-700 font-medium text-sm">Informasi Penting:</span>
+                                <p class="text-yellow-700 text-sm mt-1">
+                                    Anda harus <a href="{{ route('login') }}" class="font-semibold underline">login</a> terlebih dahulu untuk mengajukan surat keterangan kehilangan. 
+                                    Belum punya akun? <a href="{{ route('register') }}" class="font-semibold underline">Daftar di sini</a>.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                @endguest
+
                 <!-- Alert for Success/Error Messages -->
                 @if(session('success'))
                     <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
@@ -68,7 +84,16 @@ $breadcrumbs = [
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('surat.kehilangan.submit') }}" enctype="multipart/form-data" class="space-y-6">
+                <form method="POST" action="{{ route('surat.kehilangan.submit') }}" enctype="multipart/form-data" class="space-y-6" 
+                      x-on:submit="console.log('Form submitted'); isSubmitting = true" 
+                      @if(!auth()->check())
+                      x-on:submit.prevent="
+                          console.log('User not authenticated, redirecting to login');
+                          alert('Anda harus login terlebih dahulu untuk mengajukan surat. Anda akan diarahkan ke halaman login.');
+                          window.location.href = '{{ route('login') }}';
+                      "
+                      @endif
+                >
                     @csrf
                     
                     <!-- Personal Information Section -->
@@ -335,25 +360,39 @@ $breadcrumbs = [
                                 
                                 <button 
                                     type="submit"
-                                    @click="isSubmitting = true"
-                                    :disabled="isSubmitting"
-                                    :class="{
-                                        'opacity-50 cursor-not-allowed': isSubmitting,
-                                        'hover:bg-blue-600 hover:shadow-lg transform hover:-translate-y-0.5': !isSubmitting
-                                    }"
+                                    @if(!auth()->check())
+                                        @click.prevent="
+                                            alert('Silakan login terlebih dahulu untuk mengajukan surat keterangan kehilangan.');
+                                            window.location.href = '{{ route('login') }}';
+                                        "
+                                    @else
+                                        @click="isSubmitting = true"
+                                        :disabled="isSubmitting"
+                                        :class="{
+                                            'opacity-50 cursor-not-allowed': isSubmitting,
+                                            'hover:bg-blue-600 hover:shadow-lg transform hover:-translate-y-0.5': !isSubmitting
+                                        }"
+                                    @endif
                                     class="px-8 py-3 bg-gradient-to-r from-[#0088cc] to-blue-500 text-white rounded-lg transition-all duration-200 font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-[#0088cc] focus:ring-offset-2"
                                 >
-                                    <span x-show="!isSubmitting" class="flex items-center space-x-2">
-                                        <i class="fas fa-paper-plane"></i>
-                                        <span>Kirim Permohonan</span>
-                                    </span>
-                                    <span x-show="isSubmitting" class="flex items-center space-x-2">
-                                        <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
-                                        </svg>
-                                        <span>Memproses...</span>
-                                    </span>
+                                    @guest
+                                        <span class="flex items-center space-x-2">
+                                            <i class="fas fa-sign-in-alt"></i>
+                                            <span>Login untuk Mengajukan</span>
+                                        </span>
+                                    @else
+                                        <span x-show="!isSubmitting" class="flex items-center space-x-2">
+                                            <i class="fas fa-paper-plane"></i>
+                                            <span>Kirim Permohonan</span>
+                                        </span>
+                                        <span x-show="isSubmitting" class="flex items-center space-x-2">
+                                            <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                                            </svg>
+                                            <span>Memproses...</span>
+                                        </span>
+                                    @endguest
                                 </button>
                             </div>
                         </div>

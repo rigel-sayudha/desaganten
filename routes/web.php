@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\SuratPrintController;
 use App\Http\Controllers\Admin\WilayahController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\StatistikController;
 
 /*
 |--------------------------------------------------------------------------
@@ -178,6 +179,47 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     
     // Wilayah Management
     Route::resource('wilayah', WilayahController::class);
+    
+    // Statistik Management
+    Route::prefix('statistik')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\StatistikController::class, 'index'])->name('admin.statistik.index');
+        
+        // Pekerjaan Management
+        Route::get('/pekerjaan', [\App\Http\Controllers\Admin\StatistikController::class, 'pekerjaan'])->name('admin.statistik.pekerjaan');
+        Route::get('/pekerjaan/create', [\App\Http\Controllers\Admin\StatistikController::class, 'createPekerjaan'])->name('admin.statistik.pekerjaan.create');
+        Route::post('/pekerjaan', [\App\Http\Controllers\Admin\StatistikController::class, 'storePekerjaan'])->name('admin.statistik.pekerjaan.store');
+        Route::get('/pekerjaan/{pekerjaan}/edit', [\App\Http\Controllers\Admin\StatistikController::class, 'editPekerjaan'])->name('admin.statistik.pekerjaan.edit');
+        Route::put('/pekerjaan/{pekerjaan}', [\App\Http\Controllers\Admin\StatistikController::class, 'updatePekerjaan'])->name('admin.statistik.pekerjaan.update');
+        Route::delete('/pekerjaan/{pekerjaan}', [\App\Http\Controllers\Admin\StatistikController::class, 'destroyPekerjaan'])->name('admin.statistik.pekerjaan.destroy');
+        
+        // Umur Management
+        Route::get('/umur', [\App\Http\Controllers\Admin\StatistikController::class, 'umur'])->name('admin.statistik.umur');
+        Route::get('/umur/create', [\App\Http\Controllers\Admin\StatistikController::class, 'createUmur'])->name('admin.statistik.umur.create');
+        Route::post('/umur', [\App\Http\Controllers\Admin\StatistikController::class, 'storeUmur'])->name('admin.statistik.umur.store');
+        Route::get('/umur/{umur}/edit', [\App\Http\Controllers\Admin\StatistikController::class, 'editUmur'])->name('admin.statistik.umur.edit');
+        Route::put('/umur/{umur}', [\App\Http\Controllers\Admin\StatistikController::class, 'updateUmur'])->name('admin.statistik.umur.update');
+        Route::delete('/umur/{umur}', [\App\Http\Controllers\Admin\StatistikController::class, 'destroyUmur'])->name('admin.statistik.umur.destroy');
+        
+        // Pendidikan Management
+        Route::get('/pendidikan', [\App\Http\Controllers\Admin\StatistikController::class, 'pendidikan'])->name('admin.statistik.pendidikan');
+        Route::get('/pendidikan/create', [\App\Http\Controllers\Admin\StatistikController::class, 'createPendidikan'])->name('admin.statistik.pendidikan.create');
+        Route::post('/pendidikan', [\App\Http\Controllers\Admin\StatistikController::class, 'storePendidikan'])->name('admin.statistik.pendidikan.store');
+        Route::get('/pendidikan/{pendidikan}/edit', [\App\Http\Controllers\Admin\StatistikController::class, 'editPendidikan'])->name('admin.statistik.pendidikan.edit');
+        Route::put('/pendidikan/{pendidikan}', [\App\Http\Controllers\Admin\StatistikController::class, 'updatePendidikan'])->name('admin.statistik.pendidikan.update');
+        Route::delete('/pendidikan/{pendidikan}', [\App\Http\Controllers\Admin\StatistikController::class, 'destroyPendidikan'])->name('admin.statistik.pendidikan.destroy');
+    });
+    
+    // Laporan Management
+    Route::prefix('laporan')->group(function () {
+        Route::get('/rekap-surat-keluar', [\App\Http\Controllers\Admin\RekapSuratKeluarController::class, 'index'])->name('admin.laporan.rekap-surat-keluar.index');
+        Route::get('/rekap-surat-keluar/create', [\App\Http\Controllers\Admin\RekapSuratKeluarController::class, 'create'])->name('admin.laporan.rekap-surat-keluar.create');
+        Route::post('/rekap-surat-keluar', [\App\Http\Controllers\Admin\RekapSuratKeluarController::class, 'store'])->name('admin.laporan.rekap-surat-keluar.store');
+        Route::get('/rekap-surat-keluar/{rekapSuratKeluar}', [\App\Http\Controllers\Admin\RekapSuratKeluarController::class, 'show'])->name('admin.laporan.rekap-surat-keluar.show');
+        Route::get('/rekap-surat-keluar/{rekapSuratKeluar}/edit', [\App\Http\Controllers\Admin\RekapSuratKeluarController::class, 'edit'])->name('admin.laporan.rekap-surat-keluar.edit');
+        Route::put('/rekap-surat-keluar/{rekapSuratKeluar}', [\App\Http\Controllers\Admin\RekapSuratKeluarController::class, 'update'])->name('admin.laporan.rekap-surat-keluar.update');
+        Route::delete('/rekap-surat-keluar/{rekapSuratKeluar}', [\App\Http\Controllers\Admin\RekapSuratKeluarController::class, 'destroy'])->name('admin.laporan.rekap-surat-keluar.destroy');
+        Route::post('/rekap-surat-keluar/sync', [\App\Http\Controllers\Admin\RekapSuratKeluarController::class, 'syncData'])->name('admin.laporan.rekap-surat-keluar.sync');
+    });
 });
 
 // Surat Submission Routes
@@ -285,4 +327,21 @@ Route::middleware(['auth'])->prefix('user')->group(function () {
     Route::get('/surat/{type}/{id}', [\App\Http\Controllers\User\SuratUserController::class, 'show'])->name('user.surat.show');
     Route::get('/surat/{type}/{id}/print', [\App\Http\Controllers\User\SuratUserController::class, 'printPdf'])->name('user.surat.print');
     Route::post('/surat/{type}/{id}/complete', [\App\Http\Controllers\User\SuratUserController::class, 'completeSurat'])->name('user.surat.complete');
+});
+
+// Statistik Public Routes
+Route::prefix('statistik')->group(function () {
+    Route::get('/', [StatistikController::class, 'statistik'])->name('statistik.main');
+    Route::get('/umur', [StatistikController::class, 'umur'])->name('statistik.umur');
+    Route::get('/pendidikan', [StatistikController::class, 'pendidikan'])->name('statistik.pendidikan');
+    
+    // Redirect dari route lama
+    Route::get('/wilayah', [StatistikController::class, 'wilayah'])->name('statistik.wilayah');
+    Route::get('/usia', [StatistikController::class, 'usia'])->name('statistik.usia');
+    Route::get('/pekerjaan', [StatistikController::class, 'pekerjaan'])->name('statistik.pekerjaan');
+});
+
+// Public Laporan Routes  
+Route::prefix('laporan')->group(function () {
+    Route::get('/rekap-surat-keluar', [\App\Http\Controllers\RekapSuratKeluarController::class, 'index'])->name('laporan.rekap-surat-keluar');
 });

@@ -1,0 +1,74 @@
+===============================================================================
+                        PANDUAN CEPAT INSTALASI
+                    SISTEM SURAT KETERANGAN DESA GANTEN
+===============================================================================
+
+📋 CHECKLIST INSTALASI CEPAT:
+
+1. ✅ DOWNLOAD SOFTWARE:
+   □ XAMPP dari https://www.apachefriends.org/
+   □ Composer dari https://getcomposer.org/
+   □ Node.js dari https://nodejs.org/
+
+2. ✅ INSTALL SOFTWARE:
+   □ Install XAMPP ke C:\xampp
+   □ Install Composer (pilih PHP: C:\xampp\php\php.exe)
+   □ Install Node.js (centang semua opsi)
+
+3. ✅ DOWNLOAD PROJECT:
+   □ Download file ZIP dari Google Drive
+   □ Extract ke C:\xampp\htdocs\desaganten
+
+4. ✅ JALANKAN INSTALLER:
+   □ Klik kanan INSTALL_OTOMATIS.bat
+   □ Pilih "Run as administrator"
+   □ Ikuti petunjuk di layar
+
+5. ✅ BUAT DATABASE:
+   □ Buka http://localhost/phpmyadmin
+   □ Login: root (password kosong)
+   □ Buat database nama: desaganten
+
+6. ✅ JALANKAN APLIKASI:
+   □ Buka Command Prompt di folder project
+   □ Ketik: php artisan serve
+   □ Buka browser: http://localhost:8000
+
+===============================================================================
+
+🔧 JIKA ADA MASALAH:
+
+❌ Port 80 sudah digunakan:
+   Solusi: Ubah Apache port ke 8080 di XAMPP Config
+
+❌ Composer install gagal:
+   Solusi: composer install --ignore-platform-reqs
+
+❌ NPM install gagal:
+   Solusi: npm cache clean --force, lalu npm install --force
+
+❌ Database error:
+   Solusi: Cek MySQL berjalan, database sudah dibuat, file .env benar
+
+❌ Halaman blank:
+   Solusi: php artisan cache:clear
+
+===============================================================================
+
+📞 BANTUAN:
+- Baca: TUTORIAL_INSTALASI_INDONESIA.txt (panduan lengkap)
+- Email: rigel.sayudha@example.com
+- GitHub: https://github.com/rigel-sayudha/desaganten
+
+===============================================================================
+
+🎯 AKUN DEFAULT:
+- Admin: admin@desa.com / password
+- User: Daftar sendiri di /register
+
+🌐 URL PENTING:
+- Homepage: http://localhost:8000
+- Admin: http://localhost:8000/admin
+- Register: http://localhost:8000/register
+
+===============================================================================

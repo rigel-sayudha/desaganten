@@ -17,6 +17,7 @@ use App\Models\SuratKehilangan;
 use App\Services\VerificationStageService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class SuratUserController extends Controller
 {
@@ -213,21 +214,71 @@ class SuratUserController extends Controller
         $surat = $this->getSuratByType($type, $id);
         $user = Auth::user();
         
+        Log::info("PrintPdf - Type: $type, ID: $id, User ID: {$user->id}, User NIK: {$user->nik}");
+        
         if (!$surat) {
+            Log::warning("PrintPdf - Surat not found: type=$type, id=$id");
             return redirect()->back()->with('error', 'Surat tidak ditemukan');
         }
         
-        // Check if user is the owner
+        Log::info("PrintPdf - Surat found", [
+            'type' => $type,
+            'id' => $id,
+            'surat_user_id' => $surat->user_id ?? 'null',
+            'surat_nik' => $surat->nik ?? 'null',
+            'surat_nama' => $surat->nama ?? 'null',
+            'surat_nama_lengkap' => $surat->nama_lengkap ?? 'null',
+            'user_data' => [
+                'id' => $user->id,
+                'nik' => $user->nik,
+                'name' => $user->name
+            ]
+        ]);
+        
+        // Comprehensive ownership verification
         $isOwner = false;
-        if (isset($surat->nik)) {
-            // NIK-based models (older)
-            $isOwner = $surat->nik === $user->nik;
-        } elseif (isset($surat->user_id)) {
-            // user_id-based models (newer)
-            $isOwner = $surat->user_id == $user->id;
+        $ownershipMethod = 'none';
+        
+        // Method 1: Check user_id (primary for newer models)
+        if (isset($surat->user_id) && $surat->user_id == $user->id) {
+            $isOwner = true;
+            $ownershipMethod = 'user_id';
+        }
+        // Method 2: Check NIK (fallback for older models)
+        elseif (isset($surat->nik) && $surat->nik === $user->nik) {
+            $isOwner = true;
+            $ownershipMethod = 'nik';
+        }
+        // Method 3: Check nama field match with user name
+        elseif (isset($surat->nama) && trim(strtolower($surat->nama)) === trim(strtolower($user->name))) {
+            $isOwner = true;
+            $ownershipMethod = 'nama';
+        }
+        // Method 4: Check nama_lengkap field match with user name
+        elseif (isset($surat->nama_lengkap) && trim(strtolower($surat->nama_lengkap)) === trim(strtolower($user->name))) {
+            $isOwner = true;
+            $ownershipMethod = 'nama_lengkap';
         }
         
+        Log::info("PrintPdf - Ownership check result", [
+            'isOwner' => $isOwner,
+            'method' => $ownershipMethod,
+            'checks' => [
+                'user_id_match' => isset($surat->user_id) ? ($surat->user_id == $user->id) : 'field_not_set',
+                'nik_match' => isset($surat->nik) ? ($surat->nik === $user->nik) : 'field_not_set',
+                'nama_match' => isset($surat->nama) ? (trim(strtolower($surat->nama)) === trim(strtolower($user->name))) : 'field_not_set',
+                'nama_lengkap_match' => isset($surat->nama_lengkap) ? (trim(strtolower($surat->nama_lengkap)) === trim(strtolower($user->name))) : 'field_not_set'
+            ]
+        ]);
+        
         if (!$isOwner) {
+            Log::warning("PrintPdf - Access denied: User does not own this surat", [
+                'user_id' => $user->id,
+                'user_nik' => $user->nik,
+                'surat_type' => $type,
+                'surat_id' => $id,
+                'available_fields' => array_keys($surat->toArray())
+            ]);
             return redirect()->back()->with('error', 'Anda tidak memiliki akses ke surat ini');
         }
         
@@ -291,21 +342,53 @@ class SuratUserController extends Controller
         $surat = $this->getSuratByType($type, $id);
         $user = Auth::user();
         
+        \Log::info('User accessing surat detail', [
+            'user_id' => $user->id,
+            'user_nik' => $user->nik,
+            'surat_type' => $type,
+            'surat_id' => $id,
+            'surat_found' => $surat ? 'yes' : 'no'
+        ]);
+        
         if (!$surat) {
+            \Log::warning('Surat not found', ['type' => $type, 'id' => $id]);
             return redirect()->back()->with('error', 'Surat tidak ditemukan');
         }
         
-        // Check if user is the owner
+        // Check if user is the owner - improved logic
         $isOwner = false;
-        if (isset($surat->nik)) {
-            // NIK-based models (older)
-            $isOwner = $surat->nik === $user->nik;
-        } elseif (isset($surat->user_id)) {
-            // user_id-based models (newer)
-            $isOwner = $surat->user_id == $user->id;
+        
+        // Check by user_id first (newer models)
+        if (isset($surat->user_id) && $surat->user_id == $user->id) {
+            $isOwner = true;
+            \Log::info('Ownership verified by user_id', ['surat_user_id' => $surat->user_id, 'current_user_id' => $user->id]);
+        }
+        // Check by NIK (older models) - only if user has NIK and surat has NIK
+        elseif (isset($surat->nik) && $user->nik && $surat->nik == $user->nik) {
+            $isOwner = true;
+            \Log::info('Ownership verified by NIK', ['surat_nik' => $surat->nik, 'current_user_nik' => $user->nik]);
+        }
+        // For some models, check nama field as fallback
+        elseif (isset($surat->nama) && $surat->nama == $user->name) {
+            $isOwner = true;
+            \Log::info('Ownership verified by name', ['surat_nama' => $surat->nama, 'current_user_name' => $user->name]);
+        }
+        // For models with nama_lengkap field
+        elseif (isset($surat->nama_lengkap) && $surat->nama_lengkap == $user->name) {
+            $isOwner = true;
+            \Log::info('Ownership verified by nama_lengkap', ['surat_nama_lengkap' => $surat->nama_lengkap, 'current_user_name' => $user->name]);
         }
         
         if (!$isOwner) {
+            \Log::warning('User does not own this surat', [
+                'user_id' => $user->id,
+                'user_nik' => $user->nik,
+                'user_name' => $user->name,
+                'surat_user_id' => $surat->user_id ?? 'null',
+                'surat_nik' => $surat->nik ?? 'null',
+                'surat_nama' => $surat->nama ?? 'null',
+                'surat_nama_lengkap' => $surat->nama_lengkap ?? 'null'
+            ]);
             return redirect()->back()->with('error', 'Anda tidak memiliki akses ke surat ini');
         }
         

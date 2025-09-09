@@ -126,17 +126,54 @@
                     class="ml-6 sm:ml-8 mt-1 sm:mt-2 space-y-1"
                     style="display: none;"
                 >
-                    <a href="/admin/wilayah" class="block px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm text-gray-600 hover:bg-blue-50 hover:text-[#0088cc] transition-colors {{ request()->is('admin/wilayah*') ? 'bg-blue-50 text-[#0088cc] font-medium' : '' }}">
-                        Wilayah
+
+                    <!-- Divider -->
+                    <div class="border-t border-gray-200 my-2"></div>
+                    
+                    <!-- Admin CRUD Menu -->
+                    <div class="px-2 py-1">
+                        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Kelola Data</p>
+                    </div>
+                    
+                    <a href="{{ route('admin.statistik.index') }}" class="block px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm text-gray-600 hover:bg-blue-50 hover:text-[#0088cc] transition-colors {{ request()->is('admin/statistik') ? 'bg-blue-50 text-[#0088cc] font-medium' : '' }}">
+                        <i class="fas fa-tachometer-alt w-3 h-3 mr-2"></i>
+                        Dashboard Statistik
                     </a>
-                    <a href="/statistik/usia" class="block px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm text-gray-600 hover:bg-blue-50 hover:text-[#0088cc] transition-colors">
-                        Usia
+                    
+                    <a href="{{ route('admin.statistik.umur') }}" class="block px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm text-gray-600 hover:bg-blue-50 hover:text-[#0088cc] transition-colors {{ request()->is('admin/statistik/umur*') ? 'bg-blue-50 text-[#0088cc] font-medium' : '' }}">
+                        <i class="fas fa-birthday-cake w-3 h-3 mr-2"></i>
+                        Kelola Data Umur
                     </a>
-                    <a href="/statistik/pendidikan" class="block px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm text-gray-600 hover:bg-blue-50 hover:text-[#0088cc] transition-colors">
-                        Pendidikan
+                    
+                    <a href="{{ route('admin.statistik.pendidikan') }}" class="block px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm text-gray-600 hover:bg-blue-50 hover:text-[#0088cc] transition-colors {{ request()->is('admin/statistik/pendidikan*') ? 'bg-blue-50 text-[#0088cc] font-medium' : '' }}">
+                        <i class="fas fa-graduation-cap w-3 h-3 mr-2"></i>
+                        Kelola Data Pendidikan
                     </a>
-                    <a href="/statistik/pekerjaan" class="block px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm text-gray-600 hover:bg-blue-50 hover:text-[#0088cc] transition-colors">
-                        Pekerjaan
+                    
+                    <a href="{{ route('admin.statistik.pekerjaan') }}" class="block px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm text-gray-600 hover:bg-blue-50 hover:text-[#0088cc] transition-colors {{ request()->is('admin/statistik/pekerjaan*') ? 'bg-blue-50 text-[#0088cc] font-medium' : '' }}">
+                        <i class="fas fa-briefcase w-3 h-3 mr-2"></i>
+                        Kelola Data Pekerjaan
+                    </a>
+                    
+                    <!-- Divider -->
+                    <div class="border-t border-gray-200 my-2"></div>
+                    
+                    <!-- Public View Menu -->
+                    <div class="px-2 py-1">
+                        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Lihat Publik</p>
+                    </div>
+                    
+                    <a href="/statistik/umur" class="block px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm text-gray-600 hover:bg-blue-50 hover:text-[#0088cc] transition-colors" target="_blank">
+                        <i class="fas fa-external-link-alt w-3 h-3 mr-2"></i>
+                        Lihat Data Umur
+                    </a>
+                    <a href="/statistik/pendidikan" class="block px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm text-gray-600 hover:bg-blue-50 hover:text-[#0088cc] transition-colors" target="_blank">
+                        <i class="fas fa-external-link-alt w-3 h-3 mr-2"></i>
+                        Lihat Data Pendidikan
+                    </a>
+                    <a href="/statistik" class="block px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm text-gray-600 hover:bg-blue-50 hover:text-[#0088cc] transition-colors" target="_blank">
+                        <i class="fas fa-external-link-alt w-3 h-3 mr-2"></i>
+                        Lihat Data Pekerjaan
                     </a>
                 </div>
             </div>
@@ -174,9 +211,9 @@
                     <a href="{{ route('admin.settings.index') }}" class="block px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm text-gray-600 hover:bg-blue-50 hover:text-[#0088cc] transition-colors {{ request()->is('admin/settings*') ? 'bg-blue-50 text-[#0088cc] font-medium' : '' }}">
                         Pengaturan Surat
                     </a>
-                    <a href="{{ route('admin.test-notification') }}" class="block px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm text-yellow-600 hover:bg-yellow-50 hover:text-yellow-800 transition-colors {{ request()->is('admin/test-notification*') ? 'bg-yellow-50 text-yellow-800 font-medium' : '' }}">
+                    {{-- <a href="{{ route('admin.test-notification') }}" class="block px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm text-yellow-600 hover:bg-yellow-50 hover:text-yellow-800 transition-colors {{ request()->is('admin/test-notification*') ? 'bg-yellow-50 text-yellow-800 font-medium' : '' }}">
                         <i class="fas fa-bell mr-2"></i>Test Notifikasi
-                    </a>
+                    </a> --}}
                 </div>
             </div>
 
@@ -184,11 +221,11 @@
             <div class="relative">
                 <button 
                     @click="toggleDropdown('laporan')"
-                    class="flex items-center w-full rounded-lg text-gray-700 hover:bg-blue-50 hover:text-[#0088cc] transition-all duration-200 group focus:outline-none"
+                    class="flex items-center w-full rounded-lg text-gray-700 hover:bg-blue-50 hover:text-[#0088cc] transition-all duration-200 group focus:outline-none {{ request()->is('admin/laporan*') ? 'bg-blue-50 text-[#0088cc] font-semibold' : '' }}"
                     :class="{'px-2 py-2 justify-center': isMinimized && !isMobile, 'px-3 py-2.5 sm:px-4 sm:py-3': !isMinimized || isMobile}"
                     :title="(isMinimized && !isMobile) ? 'Laporan' : ''"
                 >
-                    <i class="fas fa-file-alt w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 text-gray-400 group-hover:text-[#0088cc]"></i>
+                    <i class="fas fa-file-alt w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 {{ request()->is('admin/laporan*') ? 'text-[#0088cc]' : 'text-gray-400 group-hover:text-[#0088cc]' }}"></i>
                     <span class="ml-2 sm:ml-3 flex-1 text-left transition-all duration-300 whitespace-nowrap text-sm sm:text-base" :class="{'opacity-0 w-0 hidden': isMinimized && !isMobile, 'opacity-100 block': !isMinimized || isMobile}">Laporan</span>
                     <i class="fas fa-chevron-down text-xs transition-transform duration-200" 
                        :class="{'rotate-180': activeDropdown === 'laporan', 'opacity-0 hidden': isMinimized && !isMobile, 'opacity-100 block': !isMinimized || isMobile}"></i>
@@ -204,12 +241,15 @@
                     class="ml-6 sm:ml-8 mt-1 sm:mt-2 space-y-1"
                     style="display: none;"
                 >
-                    <a href="/laporan/bulanan" class="block px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm text-gray-600 hover:bg-blue-50 hover:text-[#0088cc] transition-colors">
-                        Laporan Bulanan
+                    <a href="{{ route('admin.laporan.rekap-surat-keluar.index') }}" class="block px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm text-gray-600 hover:bg-blue-50 hover:text-[#0088cc] transition-colors {{ request()->is('admin/laporan/rekap-surat-keluar*') ? 'bg-blue-50 text-[#0088cc] font-medium' : '' }}">
+                        <i class="fas fa-file-export w-3 h-3 mr-2"></i>Data Rekap Surat Keluar
+                    </a>
+                    {{-- <a href="/laporan/bulanan" class="block px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm text-gray-600 hover:bg-blue-50 hover:text-[#0088cc] transition-colors">
+                        <i class="fas fa-calendar-alt w-3 h-3 mr-2"></i>Laporan Bulanan
                     </a>
                     <a href="/laporan/rekap" class="block px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm text-gray-600 hover:bg-blue-50 hover:text-[#0088cc] transition-colors">
-                        Rekap Bulanan
-                    </a>
+                        <i class="fas fa-chart-line w-3 h-3 mr-2"></i>Rekap Bulanan
+                    </a> --}}
                 </div>
             </div>
 

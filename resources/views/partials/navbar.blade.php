@@ -51,29 +51,10 @@
                     Profil Desa
                 </a>
 
-                <!-- Statistik Penduduk Dropdown -->
-                <div class="relative" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
-                    <button class="flex items-center px-4 py-2 rounded-lg text-black hover:bg-blue-50 transition-colors font-medium">
-                        Statistik Penduduk
-                        <i class="fas fa-chevron-down ml-2 text-xs transition-transform duration-200" :class="{'rotate-180': open}"></i>
-                    </button>
-                    <div 
-                        x-show="open"
-                        x-transition:enter="transition ease-out duration-200"
-                        x-transition:enter-start="opacity-0 transform scale-95"
-                        x-transition:enter-end="opacity-100 transform scale-100"
-                        x-transition:leave="transition ease-in duration-150"
-                        x-transition:leave-start="opacity-100 transform scale-100"
-                        x-transition:leave-end="opacity-0 transform scale-95"
-                        class="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-100 py-2 z-50"
-                        style="display: none;"
-                    >
-                        <a href="/statistik/wilayah" class="block px-4 py-2 text-black hover:bg-blue-50 hover:text-black transition-colors">Wilayah</a>
-                        <a href="/statistik/usia" class="block px-4 py-2 text-black hover:bg-blue-50 hover:text-black transition-colors">Usia</a>
-                        <a href="/statistik/pendidikan" class="block px-4 py-2 text-black hover:bg-blue-50 hover:text-black transition-colors">Pendidikan</a>
-                        <a href="/statistik/pekerjaan" class="block px-4 py-2 text-black hover:bg-blue-50 hover:text-black transition-colors">Pekerjaan</a>
-                    </div>
-                </div>
+                <a href="{{ route('statistik.main') }}" 
+                    class="px-4 py-2 rounded-lg text-black hover:bg-blue-50 transition-colors font-medium">
+                     Statistik Penduduk
+                </a>
 
                 <!-- Pelayanan Surat Dropdown -->
                 <div class="relative" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
@@ -98,8 +79,6 @@
                         </a>
                         <div class="border-t border-gray-100 my-1"></div>
                         @endauth
-                        <a href="/surat/status" class="block px-4 py-2 text-black hover:bg-blue-50 hover:text-black transition-colors">Status Layanan</a>
-                        <a href="/surat/jadwal" class="block px-4 py-2 text-black hover:bg-blue-50 hover:text-black transition-colors">Jadwal Pengambilan</a>
                         <a href="/surat/form" class="block px-4 py-2 text-black hover:bg-blue-50 hover:text-black transition-colors">Pelayanan Surat</a>
                     </div>
                 </div>
@@ -121,8 +100,9 @@
                         class="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-100 py-2 z-50"
                         style="display: none;"
                     >
-                        <a href="/laporan/bulanan" class="block px-4 py-2 text-black hover:bg-blue-50 hover:text-black transition-colors">Laporan Bulanan</a>
-                        <a href="/laporan/rekap" class="block px-4 py-2 text-black hover:bg-blue-50 hover:text-black transition-colors">Rekap Bulanan</a>
+                        {{-- <a href="/laporan/bulanan" class="block px-4 py-2 text-black hover:bg-blue-50 hover:text-black transition-colors">Laporan Bulanan</a>
+                        <a href="/laporan/rekap" class="block px-4 py-2 text-black hover:bg-blue-50 hover:text-black transition-colors">Rekap Bulanan</a> --}}
+                        <a href="{{ route('laporan.rekap-surat-keluar') }}" class="block px-4 py-2 text-black hover:bg-blue-50 hover:text-black transition-colors">Data Rekap Surat Keluar</a>
                     </div>
                 </div>
 
@@ -375,10 +355,10 @@
                         <i class="fas fa-chevron-down text-xs transition-transform duration-200" :class="{'rotate-180': open}"></i>
                     </button>
                     <div x-show="open" class="pl-6 mt-1 space-y-1" style="display: none;">
-                        <a href="/statistik/wilayah" class="block px-3 py-2 rounded-lg text-black hover:bg-blue-50 hover:text-black transition-colors">Wilayah</a>
-                        <a href="/statistik/usia" class="block px-3 py-2 rounded-lg text-black hover:bg-blue-50 hover:text-black transition-colors">Usia</a>
-                        <a href="/statistik/pendidikan" class="block px-3 py-2 rounded-lg text-black hover:bg-blue-50 hover:text-black transition-colors">Pendidikan</a>
-                        <a href="/statistik/pekerjaan" class="block px-3 py-2 rounded-lg text-black hover:bg-blue-50 hover:text-black transition-colors">Pekerjaan</a>
+                        <a href="{{ route('statistik.main') }}" class="block px-3 py-2 rounded-lg text-black hover:bg-blue-50 hover:text-black transition-colors">Wilayah</a>
+                        <a href="{{ route('statistik.main') }}" class="block px-3 py-2 rounded-lg text-black hover:bg-blue-50 hover:text-black transition-colors">Usia</a>
+                        <a href="{{ route('statistik.main') }}" class="block px-3 py-2 rounded-lg text-black hover:bg-blue-50 hover:text-black transition-colors">Pendidikan</a>
+                        <a href="{{ route('statistik.main') }}" class="block px-3 py-2 rounded-lg text-black hover:bg-blue-50 hover:text-black transition-colors">Pekerjaan</a>
                     </div>
                 </div>
 

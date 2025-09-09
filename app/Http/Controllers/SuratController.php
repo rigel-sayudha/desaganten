@@ -111,6 +111,12 @@ class SuratController extends Controller
 
     public function kehilanganSubmit(Request $request)
     {
+        // Add debug logging
+        \Log::info('Kehilangan form submission started', [
+            'user_id' => auth()->id(),
+            'request_data' => $request->all()
+        ]);
+
         $validated = $request->validate([
             'nama' => 'required|string|max:255',
             'nik' => 'required|string|size:16',
@@ -119,13 +125,20 @@ class SuratController extends Controller
             'alamat' => 'required|string',
             'jenis_barang' => 'required|string|max:255',
             'waktu_tempat' => 'required|string',
+            // Make file uploads optional
+            'ktp_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+            'bukti_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+            'foto_file' => 'nullable|file|mimes:jpg,jpeg,png|max:2048',
         ]);
 
         try {
             // Check if user is authenticated
             if (!auth()->check()) {
+                \Log::warning('Unauthenticated access to kehilangan submit');
                 return redirect()->route('login')->with('error', 'Anda harus login terlebih dahulu untuk mengajukan surat.');
             }
+
+            \Log::info('User authenticated, checking existing requests', ['user_id' => auth()->id()]);
 
             // Cek apakah sudah ada permohonan yang masih pending
             $existingRequest = \App\Models\SuratKehilangan::where('user_id', auth()->id())
@@ -133,11 +146,45 @@ class SuratController extends Controller
                 ->first();
 
             if ($existingRequest) {
+                \Log::warning('User has existing pending request', ['user_id' => auth()->id(), 'existing_id' => $existingRequest->id]);
                 return redirect()->back()->with('error', 'Anda masih memiliki permohonan surat kehilangan yang sedang diproses. Silakan tunggu hingga selesai sebelum mengajukan permohonan baru.');
+            }
+
+            \Log::info('Processing file uploads if any');
+            
+            // Handle file uploads
+            $filePaths = [];
+            if ($request->hasFile('ktp_file')) {
+                try {
+                    $filePaths['ktp_file'] = $request->file('ktp_file')->store('kehilangan/ktp', 'public');
+                    \Log::info('KTP file uploaded', ['path' => $filePaths['ktp_file']]);
+                } catch (\Exception $e) {
+                    \Log::error('KTP file upload failed: ' . $e->getMessage());
+                }
+            }
+            
+            if ($request->hasFile('bukti_file')) {
+                try {
+                    $filePaths['bukti_file'] = $request->file('bukti_file')->store('kehilangan/bukti', 'public');
+                    \Log::info('Bukti file uploaded', ['path' => $filePaths['bukti_file']]);
+                } catch (\Exception $e) {
+                    \Log::error('Bukti file upload failed: ' . $e->getMessage());
+                }
+            }
+            
+            if ($request->hasFile('foto_file')) {
+                try {
+                    $filePaths['foto_file'] = $request->file('foto_file')->store('kehilangan/foto', 'public');
+                    \Log::info('Foto file uploaded', ['path' => $filePaths['foto_file']]);
+                } catch (\Exception $e) {
+                    \Log::error('Foto file upload failed: ' . $e->getMessage());
+                }
             }
 
             // Parse the waktu_tempat to extract meaningful data
             $waktuTempat = $validated['waktu_tempat'];
+            
+            \Log::info('Initializing verification stages');
             
             // Initialize verification stages using VerificationStageService
             $stages = null;
@@ -158,6 +205,13 @@ class SuratController extends Controller
                     5 => ['name' => 'Penerbitan Surat', 'status' => 'waiting', 'notes' => '', 'updated_at' => null, 'required_documents' => ['Surat kehilangan'], 'description' => 'Pembuatan dan penandatanganan surat keterangan kehilangan', 'duration' => '1 hari']
                 ];
             }
+            
+            \Log::info('Creating kehilangan record with data', [
+                'nama_lengkap' => $validated['nama'],
+                'nik' => $validated['nik'],
+                'user_id' => auth()->id(),
+                'file_paths' => $filePaths
+            ]);
             
             // Create the kehilangan record using mass assignment
             $kehilangan = \App\Models\SuratKehilangan::create([
@@ -183,10 +237,15 @@ class SuratController extends Controller
                 'tahapan_verifikasi' => $stages
             ]);
 
+            \Log::info('Kehilangan record created successfully', ['id' => $kehilangan->id]);
+
             return redirect()->back()->with('success', 'Permohonan surat keterangan kehilangan berhasil dikirim. Tim verifikasi akan segera memproses permohonan Anda.');
             
         } catch (\Exception $e) {
-            \Log::error('Error saving kehilangan form: ' . $e->getMessage());
+            \Log::error('Error saving kehilangan form: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+                'user_id' => auth()->id() ?? 'guest'
+            ]);
             return redirect()->back()->with('error', 'Terjadi kesalahan saat menyimpan data. Silakan coba lagi. Error: ' . $e->getMessage());
         }
     }
