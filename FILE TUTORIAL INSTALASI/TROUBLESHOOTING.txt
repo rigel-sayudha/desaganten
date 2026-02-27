@@ -1,0 +1,313 @@
+===============================================================================
+                            TROUBLESHOOTING GUIDE
+                    SISTEM SURAT KETERANGAN DESA GANTEN
+===============================================================================
+
+📋 DAFTAR MASALAH UMUM DAN SOLUSINYA:
+
+===============================================================================
+1. MASALAH XAMPP
+===============================================================================
+
+❌ APACHE TIDAK BISA START - PORT 80 SUDAH DIGUNAKAN
+Solusi:
+1. Buka XAMPP Control Panel
+2. Klik tombol "Config" pada Apache
+3. Pilih "httpd.conf"
+4. Cari baris "Listen 80"
+5. Ubah menjadi "Listen 8080"
+6. Simpan file (Ctrl+S)
+7. Restart Apache
+8. Akses aplikasi dengan: http://localhost:8080
+
+❌ MYSQL TIDAK BISA START - PORT 3306 SUDAH DIGUNAKAN
+Solusi A (Restart):
+1. Restart komputer
+2. Jalankan XAMPP sebelum aplikasi lain
+
+Solusi B (Ubah Port):
+1. Klik "Config" pada MySQL di XAMPP
+2. Pilih "my.ini"
+3. Cari "port=3306"
+4. Ubah menjadi "port=3307"
+5. Simpan dan restart MySQL
+6. Edit file .env di project, ubah DB_PORT=3307
+
+❌ XAMPP SERVICE ERROR
+Solusi:
+1. Tutup XAMPP Control Panel
+2. Klik kanan "XAMPP Control Panel" 
+3. Pilih "Run as administrator"
+4. Start Apache dan MySQL
+
+===============================================================================
+2. MASALAH COMPOSER
+===============================================================================
+
+❌ COMPOSER INSTALL GAGAL - DEPENDENCY ERROR
+Solusi:
+1. Buka Command Prompt sebagai Administrator
+2. Masuk ke folder project: cd C:\xampp\htdocs\desaganten
+3. Ketik: composer clear-cache
+4. Ketik: composer install --ignore-platform-reqs
+5. Jika masih error: composer install --no-scripts
+
+❌ COMPOSER NOT FOUND
+Solusi:
+1. Download ulang Composer dari https://getcomposer.org/
+2. Install ulang sebagai Administrator
+3. Restart Command Prompt
+4. Test dengan: composer --version
+
+❌ PHP EXECUTABLE NOT FOUND
+Solusi:
+1. Uninstall Composer
+2. Install ulang Composer
+3. Saat instalasi, pilih PHP executable: C:\xampp\php\php.exe
+4. Selesaikan instalasi
+
+===============================================================================
+3. MASALAH NODE.JS & NPM
+===============================================================================
+
+❌ NPM INSTALL GAGAL - PERMISSION ERROR
+Solusi:
+1. Buka Command Prompt sebagai Administrator
+2. Ketik: npm cache clean --force
+3. Hapus folder node_modules (jika ada)
+4. Ketik: npm install --force
+
+❌ NODE/NPM NOT FOUND
+Solusi:
+1. Download ulang Node.js dari https://nodejs.org/
+2. Install versi LTS terbaru
+3. Pastikan centang "Add to PATH"
+4. Restart Command Prompt
+5. Test dengan: node --version dan npm --version
+
+❌ NPM RUN BUILD GAGAL
+Solusi:
+1. Ketik: npm cache clean --force
+2. Ketik: rm -rf node_modules (atau hapus manual)
+3. Ketik: npm install
+4. Ketik: npm run build
+5. Jika masih error: npm run production
+
+===============================================================================
+4. MASALAH DATABASE
+===============================================================================
+
+❌ DATABASE CONNECTION ERROR
+Cek hal-hal berikut:
+1. MySQL di XAMPP sudah running (hijau)
+2. Database 'desaganten' sudah dibuat di phpMyAdmin
+3. File .env sudah benar:
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=desaganten
+   DB_USERNAME=root
+   DB_PASSWORD=
+
+❌ MIGRATION FAILED
+Solusi:
+1. Pastikan database kosong
+2. Ketik: php artisan migrate:fresh
+3. Jika error: php artisan migrate:fresh --force
+4. Isi data: php artisan db:seed
+
+❌ CANNOT ACCESS PHPMYADMIN
+Solusi:
+1. Pastikan Apache running
+2. Buka: http://localhost/phpmyadmin
+3. Jika port Apache diubah: http://localhost:8080/phpmyadmin
+4. Login: username=root, password=(kosong)
+
+===============================================================================
+5. MASALAH LARAVEL
+===============================================================================
+
+❌ PHP ARTISAN SERVE GAGAL - PORT SUDAH DIGUNAKAN
+Solusi:
+1. Tutup aplikasi yang menggunakan port 8000
+2. Atau gunakan port lain: php artisan serve --port=8001
+3. Akses dengan: http://localhost:8001
+
+❌ APPLICATION KEY ERROR
+Solusi:
+1. Ketik: php artisan key:generate
+2. Jika error: php artisan key:generate --force
+
+❌ HALAMAN BLANK/WHITE SCREEN
+Solusi:
+1. Ketik: php artisan config:clear
+2. Ketik: php artisan cache:clear
+3. Ketik: php artisan view:clear
+4. Ketik: php artisan route:clear
+5. Refresh browser
+
+❌ 500 INTERNAL SERVER ERROR
+Solusi:
+1. Cek file log: storage/logs/laravel.log
+2. Baca error message di log
+3. Biasanya masalah permission atau config
+4. Ketik: php artisan optimize:clear
+
+===============================================================================
+6. MASALAH PERMISSION
+===============================================================================
+
+❌ PERMISSION DENIED ERROR
+Solusi Windows:
+1. Klik kanan folder project
+2. Pilih "Properties"
+3. Tab "Security"
+4. Klik "Edit"
+5. Pilih "Users"
+6. Centang "Full control"
+7. Klik "OK"
+
+❌ STORAGE FOLDER ERROR
+Solusi:
+1. Masuk ke folder project
+2. Klik kanan folder "storage"
+3. Properties > Security > Edit
+4. Berikan "Full control" untuk "Users"
+5. Centang "Replace all child permissions"
+
+===============================================================================
+7. MASALAH PDF DOWNLOAD
+===============================================================================
+
+❌ PDF TIDAK BISA DOWNLOAD
+Solusi:
+1. Ketik: composer require barryvdh/laravel-dompdf
+2. Ketik: php artisan vendor:publish --provider="Barryvdh\DomPDF\ServiceProvider"
+3. Restart server: Ctrl+C, lalu php artisan serve
+
+❌ PDF KOSONG/ERROR
+Solusi:
+1. Cek template PDF di: resources/views/admin/reports/
+2. Pastikan data tersedia
+3. Cek log error di: storage/logs/laravel.log
+
+===============================================================================
+8. MASALAH NETWORK/AKSES
+===============================================================================
+
+❌ TIDAK BISA AKSES DARI KOMPUTER LAIN
+Solusi:
+1. Stop server dengan Ctrl+C
+2. Ketik: php artisan serve --host=0.0.0.0 --port=8000
+3. Akses dari komputer lain: http://[IP_KOMPUTER]:8000
+4. Pastikan firewall tidak memblokir port 8000
+
+❌ LOADING SANGAT LAMBAT
+Solusi:
+1. Ketik: php artisan optimize
+2. Ketik: php artisan config:cache
+3. Ketik: php artisan route:cache
+4. Ketik: php artisan view:cache
+
+===============================================================================
+9. MASALAH UPLOAD FILE
+===============================================================================
+
+❌ UPLOAD FOTO KTP GAGAL
+Solusi:
+1. Cek folder storage/app/public/ ada atau tidak
+2. Jika tidak ada, ketik: php artisan storage:link
+3. Cek permission folder storage
+4. Restart server
+
+❌ FILE TOO LARGE ERROR
+Solusi:
+1. Edit file: C:\xampp\php\php.ini
+2. Cari dan ubah:
+   upload_max_filesize = 10M
+   post_max_size = 10M
+   max_execution_time = 300
+3. Restart Apache di XAMPP
+
+===============================================================================
+10. CARA CEK LOG ERROR
+===============================================================================
+
+LOKASI FILE LOG:
+- Laravel: storage/logs/laravel.log
+- Apache: C:\xampp\apache\logs\error.log
+- MySQL: C:\xampp\mysql\data\mysql_error.log
+
+CARA BACA LOG:
+1. Buka file dengan Notepad++
+2. Scroll ke bawah untuk error terbaru
+3. Cari error message dan line number
+4. Google error message untuk solusi
+
+===============================================================================
+11. COMMAND BERGUNA
+===============================================================================
+
+CEK STATUS:
+- composer --version
+- node --version
+- npm --version
+- php --version
+- php artisan --version
+
+RESET PROJECT:
+- php artisan config:clear
+- php artisan cache:clear
+- php artisan view:clear
+- php artisan route:clear
+- composer dump-autoload
+
+RESET DATABASE:
+- php artisan migrate:fresh
+- php artisan db:seed
+
+BUILD ASSETS:
+- npm run build
+- npm run production
+
+===============================================================================
+12. KONTAK BANTUAN
+===============================================================================
+
+Jika masalah masih belum teratasi:
+
+1. DOKUMENTASI LARAVEL:
+   https://laravel.com/docs
+
+2. FORUM LARAVEL INDONESIA:
+   https://www.facebook.com/groups/laravel/
+
+3. STACK OVERFLOW:
+   Cari dengan keyword: "Laravel [error message]"
+
+4. DEVELOPER:
+   Email: rigel.sayudha@example.com
+   GitHub: https://github.com/rigel-sayudha/desaganten
+
+5. CARA MELAPORKAN BUG:
+   - Screenshot error message
+   - Copy isi file log
+   - Jelaskan langkah yang dilakukan
+   - Sebutkan versi Windows dan software
+
+===============================================================================
+
+TIPS TAMBAHAN:
+
+✅ SELALU JALANKAN COMMAND PROMPT SEBAGAI ADMINISTRATOR
+✅ BACKUP PROJECT SEBELUM MELAKUKAN PERUBAHAN BESAR
+✅ UPDATE SOFTWARE SECARA BERKALA
+✅ GUNAKAN ANTIVIRUS YANG TIDAK MEMBLOKIR XAMPP
+✅ TUTUP APLIKASI LAIN YANG MENGGUNAKAN PORT 80/3306/8000
+
+===============================================================================
+
+Dibuat oleh: Rigel Sayudha
+Tanggal: 2 September 2025
+Versi: 2.0
+
+===============================================================================
