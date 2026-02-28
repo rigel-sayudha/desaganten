@@ -28,9 +28,7 @@
             <!-- Logo Section -->
             <div class="flex items-center space-x-3 flex-shrink-0">
                 <a href="/" class="flex items-center space-x-3 group">
-                    <div class="w-12 h-12 lg:w-14 lg:h-14 bg-white rounded-full flex items-center justify-center p-1 shadow-md group-hover:shadow-lg transition-shadow">
-                        <img src="/img/logo.png" alt="Logo Desa Ganten" class="w-full h-full rounded-full object-contain">
-                    </div>
+                    <img src="/img/logo.png" alt="Logo Desa Ganten" class="h-10 lg:h-12 w-auto object-contain">
                     <div class="flex flex-col">
                         <span class="font-bold text-lg lg:text-xl text-[#0088cc] leading-tight">DESA GANTEN</span>
                         <span class="text-xs lg:text-sm text-gray-600 hidden sm:block">KERJO - KARANGANYAR</span>
