@@ -2,6 +2,8 @@
 
 Sistem pelayanan digital untuk pengelolaan surat keterangan di Desa Ganten, Kecamatan Kerjo, Kabupaten Karanganyar. Dibangun menggunakan Laravel dengan fitur admin panel, dashboard pengguna, cetak PDF, statistik kependudukan, dan rekap surat keluar.
 
+![Dashboard Sistem Pelayanan Desa Ganten](public/img/capture_web.png)
+
 ## Fitur
 
 - **10 Jenis Surat** — Domisili, Tidak Mampu, Belum Menikah, Kematian, Usaha, SKCK, KTP, Kelahiran, KK, Kehilangan
